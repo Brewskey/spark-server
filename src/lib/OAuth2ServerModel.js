@@ -14,51 +14,52 @@
 *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 *    You can download the source here: https://github.com/spark/spark-server
+*
+* @flow
+*
 */
 
-var PasswordHasher = require('./PasswordHasher');
-var roles = require('./RolesController.js');
-var when = require('when');
+const roles = require('./RolesController.js');
 
+type Callback = (error: ?Error, result: mixed) => void;
+type GrantType = 'password';
 
-var OAuth2ServerModel = function (options) {
-	this.options = options;
-};
-OAuth2ServerModel.prototype = {
+class OAuth2ServerModel {
+  static getAccessToken(bearerToken: string, callback: Callback) {
+    const token = roles.getTokenInfoByToken(bearerToken);
+    callback(null, token);
+  }
 
-	getAccessToken: function (bearerToken, callback) {
-		var token = roles.getTokenInfoByToken(bearerToken);
-		callback(null, token);
-	},
+  static getClient(clientId: string, clientSecret: string, callback: Callback) {
+    return callback(null, { client_id: clientId });
+  }
 
-	getClient: function (clientId, clientSecret, callback) {
-		return callback(null, { client_id: clientId });
-	},
+  static grantTypeAllowed(clientId: string, grantType: GrantType, callback: Callback) {
+    return callback(null, grantType === 'password');
+  }
 
-	grantTypeAllowed: function (clientId, grantType, callback) {
-		return callback(null, 'password' === grantType);
-	},
+  static async saveAccessToken(
+    accessToken: string,
+    clientId: string,
+    userId: string,
+    expires: number,
+    callback: Callback,
+  ) {
+    try {
+      await roles.addAccessToken(accessToken, clientId, userId, expires);
+    } finally {
+      callback();
+    }
+  }
 
-	saveAccessToken: function (accessToken, clientId, userId, expires, callback) {
-		when(roles.addAccessToken(accessToken, clientId, userId, expires))
-			.ensure(callback);
-	},
+  static async getUser(username: string, password: string, callback: Callback) {
+    try {
+      const user = await roles.validateLogin(username, password);
+      callback(null, { id: user._id });
+    } catch (error) {
+      callback(error, null);
+    }
+  }
+}
 
-	getUser: function (username, password, callback) {
-		if (username && username.toLowerCase) {
-			username = username.toLowerCase();
-		}
-
-		when(roles.validateLogin(username, password))
-			.then(
-			function (user) {
-				callback(null, { id: user._id });
-			},
-			function (err) {
-				callback(err, null);
-			});
-	}
-};
-
-module.exports = OAuth2ServerModel;
-
+export default OAuth2ServerModel;

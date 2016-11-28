@@ -78,7 +78,7 @@ const oauth = OAuthServer({
     post: ['/v1/users'],
   },
   grants: ['password'],
-  model: new OAuth2ServerModel({}),
+  model: OAuth2ServerModel,
 });
 
 const setCORSHeaders: Middleware = (
