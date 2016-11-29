@@ -16,7 +16,7 @@
 */
 
 
-var roles = require('./RolesController.js');
+const rolesManager = require('./RolesManager');
 var when = require('when');
 
 
@@ -28,7 +28,7 @@ UserCreator.prototype = {
 	create: function (username, password, callback) {
 		username = username.toLowerCase();
 
-		roles.createUser(username, password)
+		rolesManager.createUser(username, password)
 			.then(callback, callback);
 	},
 

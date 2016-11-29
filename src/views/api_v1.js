@@ -19,7 +19,7 @@
 var settings = require('../settings.js');
 
 var CoreController = require('../lib/CoreController.js');
-var roles = require('../lib/RolesController.js');
+const rolesManager = require('../lib/RolesManager');
 
 var sequence = require('when/sequence');
 var parallel = require('when/parallel');

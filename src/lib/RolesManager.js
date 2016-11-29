@@ -22,7 +22,6 @@ var when = require('when');
 var sequence = require('when/sequence');
 var pipeline = require('when/pipeline');
 import PasswordHasher from './PasswordHasher';
-var roles = require('./RolesController.js');
 import settings from '../settings';
 var logger = require('./logger.js');
 
@@ -227,4 +226,4 @@ RolesController.prototype = {
 		return tmp.promise;
 	}
 };
-module.exports = global.roles = new RolesController();
+module.exports = global.rolesManager = new RolesController();

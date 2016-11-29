@@ -19,14 +19,14 @@
 *
 */
 
-const roles = require('./RolesController.js');
+const rolesManager = require('./RolesManager');
 
 type Callback = (error: ?Error, result: mixed) => void;
 type GrantType = 'password';
 
 class OAuth2ServerModel {
   static getAccessToken(bearerToken: string, callback: Callback) {
-    const token = roles.getTokenInfoByToken(bearerToken);
+    const token = rolesManager.getTokenInfoByToken(bearerToken);
     callback(null, token);
   }
 
@@ -46,7 +46,7 @@ class OAuth2ServerModel {
     callback: Callback,
   ) {
     try {
-      await roles.addAccessToken(accessToken, clientId, userId, expires);
+      await rolesManager.addAccessToken(accessToken, clientId, userId, expires);
     } finally {
       callback();
     }
@@ -54,7 +54,7 @@ class OAuth2ServerModel {
 
   static async getUser(username: string, password: string, callback: Callback) {
     try {
-      const user = await roles.validateLogin(username, password);
+      const user = await rolesManager.validateLogin(username, password);
       callback(null, { id: user._id });
     } catch (error) {
       callback(error, null);
