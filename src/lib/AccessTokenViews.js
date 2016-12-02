@@ -22,7 +22,7 @@ var when = require('when');
 var sequence = require('when/sequence');
 var pipeline = require('when/pipeline');
 var PasswordHasher = require('./PasswordHasher.js');
-var roles = require('./RolesController.js');
+const rolesManager = require('./RolesManager');
 
 var AccessTokenViews = function (options) {
 	this.options = options;
@@ -45,7 +45,7 @@ AccessTokenViews.prototype = {
 		//if successful, should return something like:
 		//  [ { token: d.token, expires: d.expires, client: d.client_id } ]
 
-		when(roles.validateLogin(credentials.username, credentials.password))
+		when(rolesManager.validateLogin(credentials.username, credentials.password))
 			.then(
 			function (userObj) {
 				res.json(userObj.access_tokens);
@@ -64,11 +64,11 @@ AccessTokenViews.prototype = {
 			});
 		}
 
-		when(roles.validateLogin(credentials.username, credentials.password))
+		when(rolesManager.validateLogin(credentials.username, credentials.password))
 			.then(
 			function (userObj) {
 				try {
-					roles.destroyAccessToken(req.params.token);
+					rolesManager.destroyAccessToken(req.params.token);
 					res.json({ ok: true });
 				}
 				catch (ex) {
