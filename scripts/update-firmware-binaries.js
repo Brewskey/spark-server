@@ -15,9 +15,8 @@ type BinaryVerificationData = {
 const GITHUB_USER = 'spark';
 const GITHUB_FIRMWARE_REPOSITORY = 'firmware';
 const GITHUB_CLI_REPOSITORY = 'particle-cli';
-const SPECIFICATIONS_FILE = settings.BINARIES_DIRECTORY + '/specifications.js';
-const SETTINGS_FILE = settings.BINARIES_DIRECTORY + '/settings.js';
-const SETTINGS_FILE = `${settings.BINARIES_DIRECTORY}/settings.json`;
+const SPECIFICATIONS_FILE = `${settings.BINARIES_DIRECTORY}/specifications.js`;
+const SETTINGS_FILE = `${settings.BINARIES_DIRECTORY}/settings.js`;
 
 // This default is here so that the regex will work when updating these files.
 /* eslint-disable */
@@ -103,7 +102,7 @@ const updateSettings = (): Array<string> => {
     fs.writeFileSync(
       SETTINGS_FILE,
       `module.exports = ${JSON.stringify(DEFAULT_SETTINGS, null, 2)};`,
-      { flag: 'wx' }
+      { flag: 'wx' },
     );
   }
 
@@ -170,7 +169,7 @@ const clearBinariesPromise = cleanBinariesDirectory()
   });
 
 // Download known app binaries
-const downloadKnownAppPromise = clearBinariesPromise.then(
+const downloadKnownAppsPromise = clearBinariesPromise.then(
   (): Promise<Array<string>> => downloadAppBinaries(),
 );
 
@@ -225,18 +224,21 @@ downloadFirmwarePromise
     verifyBinariesMatch(binaryVerificationData),
   );
 
-const specificationsPromise = githubAPI.repos.getContent({
+const downloadSpecificationsPromise = githubAPI.repos.getContent({
   owner: GITHUB_USER,
   path: 'lib/deviceSpecs/specifications.js',
-  repo: GITHUB_CLI_REPOSITORY
-}).then(response => {
+  repo: GITHUB_CLI_REPOSITORY,
+}).then((response: Object) => {
   fs.writeFileSync(
     SPECIFICATIONS_FILE,
     new Buffer(response.content, 'base64').toString(),
-    { flag: 'wx' }
+    { flag: 'wx' },
   );
-})
+});
 
-Promise.all([appPromise, firmwarePromise, specificationsPromise])
-  .then(() => console.log('\r\nCompleted Sync'))
+Promise.all([
+  downloadFirmwarePromise,
+  downloadKnownAppsPromise,
+  downloadSpecificationsPromise,
+]).then((): void => console.log('\r\nCompleted Sync'))
   .catch(console.log);
