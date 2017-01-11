@@ -28,7 +28,7 @@
   "scripts": {
     "build": "babel ./src --out-dir ./build",
     "build:clean": "rimraf ./build",
-    "update": "node ./scripts/update-firmware-binaries",
+    "update-firmware": "babel-node ./scripts/update-firmware-binaries",
     "lint": "eslint -- .",
     "postinstall": "npm run update-firmware",
     "prebuild": "npm run build:clean",
