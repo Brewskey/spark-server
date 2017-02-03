@@ -55,6 +55,7 @@
     "basic-auth-parser": "0.0.2",
     "binary-version-reader": "^0.5.0",
     "body-parser": "^1.15.2",
+    "connect-timeout": "^1.8.0",
     "constitute": "^1.6.2",
     "express": "^4.14.0",
     "express-oauth-server": "^2.0.0-b1",

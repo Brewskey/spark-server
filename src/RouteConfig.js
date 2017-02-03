@@ -13,6 +13,7 @@ import type { Settings } from './types';
 import OAuthServer from 'express-oauth-server';
 import nullthrows from 'nullthrows';
 import multer from 'multer';
+import timeout from 'connect-timeout';
 import OAuthModel from './OAuthModel';
 import HttpError from './lib/HttpError';
 
@@ -96,8 +97,9 @@ export default (
       (app: any)[httpVerb](
         route,
         maybe(oauth.authenticate(), !anonymous),
-        maybe(serverSentEventsMiddleware(), serverSentEvents),
         injectUserMiddleware(),
+        maybe(timeout(settings.API_TIMEOUT * 1000), !serverSentEvents),
+        maybe(serverSentEventsMiddleware(), serverSentEvents),
         maybe(filesMiddleware(allowedUploads), allowedUploads),
         async (request: $Request, response: $Response): Promise<void> => {
           const argumentNames = (route.match(/:[\w]*/g) || []).map(
@@ -134,16 +136,7 @@ export default (
             );
 
             if (functionResult.then) {
-              const result = await Promise.race([
-                functionResult,
-                new Promise(
-                  (resolve: () => void, reject: () => void): number =>
-                    setTimeout(
-                      () => reject(new Error('timeout')),
-                      settings.API_TIMEOUT * 1000,
-                    ),
-                ),
-              ]);
+              const result = await functionResult;
               response
                 .status(nullthrows(result).status)
                 .json(nullthrows(result).data);
