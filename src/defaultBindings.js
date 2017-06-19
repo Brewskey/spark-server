@@ -18,6 +18,7 @@ import WebhookLogger from './lib/WebhookLogger';
 import DeviceManager from './managers/DeviceManager';
 import WebhookManager from './managers/WebhookManager';
 import EventManager from './managers/EventManager';
+import EventProvider from './lib/EventProvider';
 import PermissionManager from './managers/PermissionManager';
 import DeviceFirmwareFileRepository from './repository/DeviceFirmwareFileRepository';
 import NeDb from './repository/NeDb';
@@ -83,6 +84,12 @@ export default (container: Container, newSettings: Settings) => {
     'WebhookLogger',
     WebhookLogger,
     [],
+  );
+
+  container.bindClass(
+    'EVENT_PROVIDER',
+    EventProvider,
+    ['EventPublisher'],
   );
 
   // controllers

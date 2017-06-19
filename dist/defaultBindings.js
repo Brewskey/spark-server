@@ -66,6 +66,10 @@ var _EventManager = require('./managers/EventManager');
 
 var _EventManager2 = _interopRequireDefault(_EventManager);
 
+var _EventProvider = require('./lib/EventProvider');
+
+var _EventProvider2 = _interopRequireDefault(_EventProvider);
+
 var _PermissionManager = require('./managers/PermissionManager');
 
 var _PermissionManager2 = _interopRequireDefault(_PermissionManager);
@@ -141,6 +145,8 @@ exports.default = function (container, newSettings) {
 
   // lib
   container.bindClass('WebhookLogger', _WebhookLogger2.default, []);
+
+  container.bindClass('EVENT_PROVIDER', _EventProvider2.default, ['EventPublisher']);
 
   // controllers
   container.bindClass('DeviceClaimsController', _DeviceClaimsController2.default, ['DeviceManager', 'ClaimCodeManager']);
