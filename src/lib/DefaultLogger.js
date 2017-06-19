@@ -41,24 +41,40 @@ function getDate(): string {
   return new Date().toISOString();
 }
 
-export class DefaultLogger implements ILogger {
-  static log(...params: Array<any>) {
+export class Logger implements ILogger {
+  name: string = 'default'
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  log(...params: Array<any>) {
     if (settings.SHOW_VERBOSE_DEVICE_LOGS) {
-      DefaultLogger._log(`[${getDate()}]`, _transform(...params));
+      Logger._log(`[${getDate()}] ${this.name}`, _transform(...params));
     }
   }
 
-  static info(...params: Array<any>) {
-    DefaultLogger._log(`[${getDate()}]`, chalk.cyan(_transform(...params)));
+  info(...params: Array<any>) {
+    Logger._log(
+      `[${getDate()}] ${this.name}`,
+      chalk.cyan(_transform(...params)),
+    );
   }
 
-  static warn(...params: Array<any>) {
-    DefaultLogger._log(`[${getDate()}]`, chalk.yellow(_transform(...params)));
+  warn(...params: Array<any>) {
+    Logger._log(
+      `[${getDate()}] ${this.name}`,
+      chalk.yellow(_transform(...params)),
+    );
   }
 
-  static error(...params: Array<any>) {
-    DefaultLogger._log(`[${getDate()}]`, chalk.red(_transform(...params)));
+  error(...params: Array<any>) {
+    Logger._log(
+      `[${getDate()}] ${this.name}`,
+      chalk.red(_transform(...params)),
+    );
   }
+
   static _log(...params: Array<any>) {
     console.log(...params);
   }
