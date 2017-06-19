@@ -10,7 +10,7 @@ import type {
 import nullthrows from 'nullthrows';
 import { Request, Response } from 'oauth2-server';
 import HttpError from '../lib/HttpError';
-import logger from '../lib/logger';
+import Logger from '../lib/logger'; const logger = Logger.createModuleLogger(module);
 import settings from '../settings';
 
 class PermissionManager {

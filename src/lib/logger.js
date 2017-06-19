@@ -21,9 +21,11 @@
 
 import { DefaultLogger } from './DefaultLogger';
 import { ILogger } from '../types';
+import path from 'path';
 
 export default class Logger {
-  static _logger: ILogger = DefaultLogger;
+  static _logger: ILogger = new DefaultLogger('startup');
+  static _LoggerClass = DefaultLogger;
 
   static error(...params: Array<any>) {
     Logger._logger.error(...params);
@@ -33,8 +35,23 @@ export default class Logger {
     Logger._logger.info(...params);
   }
 
-  static initialize(logger: ILogger) {
-    Logger._logger = logger;
+  static initialize(LoggerClass: any, name: string) {
+    Logger._LoggerClass = LoggerClass;
+    Logger._logger = new LoggerClass(name);
+    Logger.info(`Logger ${name} was created`);
+  }
+
+  static createLogger(name: string): ILogger {
+    const logger = Logger._LoggerClass(name);
+    Logger.info(`ChildLogger ${name} was created`);
+    return logger;
+  }
+
+  static createModuleLogger(aModule: any): ILogger {
+    const loggerName = path.basename(aModule.filename);
+    const logger = new Logger._LoggerClass(loggerName);
+    Logger.info(`ChildModuleLogger ${loggerName} was created`);
+    return logger;
   }
 
   static log(...params: Array<any>) {

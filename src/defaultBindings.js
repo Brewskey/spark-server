@@ -40,7 +40,8 @@ export default (container: Container, newSettings: Settings) => {
 
   // Bind Logger Elements, Function and Class
   container.bindValue('LOGGING_CLASS', DefaultLogger);
-  logger.initialize(container.constitute('LOGGING_CLASS'));
+  // Initialize Default Logger
+  logger.initialize(container.constitute('LOGGING_CLASS'), 'default');
 
   // settings
   container.bindValue('DATABASE_PATH', settings.DB_CONFIG.PATH);

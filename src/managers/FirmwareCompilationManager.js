@@ -4,7 +4,7 @@ import type { File } from 'express';
 
 import crypto from 'crypto';
 import fs from 'fs';
-import logger from '../lib/logger';
+import Logger from '../lib/logger'; const logger = Logger.createModuleLogger(module);
 import path from 'path';
 import mkdirp from 'mkdirp';
 import rmfr from 'rmfr';

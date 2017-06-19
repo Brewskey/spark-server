@@ -9,6 +9,7 @@ import https from 'https';
 import os from 'os';
 import defaultBindings from './defaultBindings';
 import logger from './lib/logger';
+import { Logger } from './lib/DefaultLogger';
 import settings from './settings';
 import { Container } from 'constitute';
 
@@ -35,6 +36,8 @@ process.on('uncaughtException', (exception: Error) => {
  */
 const container = new Container();
 defaultBindings(container, settings);
+
+logger.initialize(Logger, 'MAIN');
 
 const deviceServer = container.constitute('DeviceServer');
 deviceServer.start();

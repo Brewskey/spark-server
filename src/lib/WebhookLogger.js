@@ -1,8 +1,7 @@
 // @flow
 
 import type { IWebhookLogger } from '../types';
-
-import logger from './logger';
+import Logger from './logger'; const logger = Logger.createModuleLogger(module);
 
 class WebhookLogger implements IWebhookLogger {
   _lastLog: Array<any>;

@@ -8,7 +8,7 @@ import anonymous from '../decorators/anonymous';
 import route from '../decorators/route';
 import httpVerb from '../decorators/httpVerb';
 import serverSentEvents from '../decorators/serverSentEvents';
-import logger from '../lib/logger';
+import Logger from '../lib/logger'; const logger = Logger.createModuleLogger(module);
 import eventToApi from '../lib/eventToApi';
 
 class EventsController extends Controller {
