@@ -237,16 +237,22 @@ export interface ILoggerCreate {
   static createModuleLogger(aModule: any): ILogger;
 }
 export interface ILogger {
+  debug (): boolean;
   debug (line: string): void;
   debug (additional: ?Object, line: string): void;
+  error (): boolean;
   error (line: string): void;
   error (additional: ?Object, line: string): void;
+  fatal (): boolean;
   fatal (line: string): void;
   fatal (additional: ?Object, line: string): void;
+  info (): boolean;
   info (line: string): void;
   info (additional: ?Object, line: string): void;
+  warn (): boolean;
   warn (line: string): void;
   warn  (additional: ?Object, line: string): void;
+  trace (): boolean;
   trace (line: string): void;
   trace  (additional: ?Object, line: string): void;
 }
