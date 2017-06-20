@@ -26,11 +26,13 @@ import path from 'path';
 export default class Logger implements ILoggerCreate {
   static createLogger(aName: string): ILogger {
     return bunyan.createLogger({
+      level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
       name: aName,
     });
   }
   static createModuleLogger(aModule: any): ILogger {
     return bunyan.createLogger({
+      level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
       name: path.basename(aModule.filename),
     });
   }
