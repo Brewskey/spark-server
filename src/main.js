@@ -39,8 +39,12 @@ deviceServer.start();
 
 const app = createApp(container, settings);
 
-const onServerStartListen = (): void =>
+const onServerStartListen = () => {
   logger.info({ port: NODE_PORT }, 'express server started');
+  deviceServer._eventPublisher.subscribe('*all*', (ev: any) => {
+    logger.info(ev);
+  });
+};
 
 const {
   SSL_PRIVATE_KEY_FILEPATH: privateKeyFilePath,
