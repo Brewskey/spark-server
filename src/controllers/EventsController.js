@@ -39,7 +39,7 @@ class EventsController extends Controller {
       this.response.write(`event: ${event.name}\n`);
       this.response.write(`data: ${JSON.stringify(eventToApi(event))}\n\n`);
     } catch (error) {
-      logger.error(`pipeEvents - write error: ${error}`);
+      logger.error({ err: error }, 'pipeEvents - write error');
       throw error;
     }
   }
