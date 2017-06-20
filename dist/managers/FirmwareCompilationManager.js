@@ -62,6 +62,9 @@ var _settings2 = _interopRequireDefault(_settings);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var logger = _logger2.default.createModuleLogger(module);
+
+
 var IS_COMPILATION_ENABLED = _fs2.default.existsSync(_settings2.default.FIRMWARE_REPOSITORY_DIRECTORY);
 
 var USER_APP_PATH = _path2.default.join(_settings2.default.FIRMWARE_REPOSITORY_DIRECTORY, 'user/applications');
@@ -163,7 +166,7 @@ FirmwareCompilationManager.compileSource = function () {
             errors = [];
 
             makeProcess.stderr.on('data', function (data) {
-              _logger2.default.error('' + data);
+              logger.error('' + data);
               errors.push('' + data);
             });
 

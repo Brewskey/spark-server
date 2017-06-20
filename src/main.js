@@ -8,18 +8,14 @@ import http from 'http';
 import https from 'https';
 import os from 'os';
 import defaultBindings from './defaultBindings';
-import logger from './lib/logger';
-import { Logger } from './lib/DefaultLogger';
+import Logger from './lib/logger'; const logger = Logger.createModuleLogger(module);
 import settings from './settings';
 import { Container } from 'constitute';
 
 const NODE_PORT = process.env.NODE_PORT || settings.EXPRESS_SERVER_CONFIG.PORT;
 
 process.on('uncaughtException', (exception: Error) => {
-  logger.error('uncaughtException', {
-    message: exception.message,
-    stack: exception.stack,
-  }); // logging with MetaData
+  logger.error({ err: exception }, 'uncaughtException');
   process.exit(1); // exit with failure
 });
 
@@ -37,7 +33,6 @@ process.on('uncaughtException', (exception: Error) => {
 const container = new Container();
 defaultBindings(container, settings);
 
-logger.initialize(Logger, 'MAIN');
 
 const deviceServer = container.constitute('DeviceServer');
 deviceServer.start();
@@ -45,7 +40,7 @@ deviceServer.start();
 const app = createApp(container, settings);
 
 const onServerStartListen = (): void =>
-  logger.info(`express server started on port ${NODE_PORT}`);
+  logger.info({ port: NODE_PORT }, 'express server started');
 
 const {
   SSL_PRIVATE_KEY_FILEPATH: privateKeyFilePath,
@@ -80,6 +75,6 @@ const addresses = arrayFlatten(
         .map((address: Object): boolean => address.address),
   ),
 );
-addresses.forEach((address: string): void =>
-  logger.info(`Your device server IP address is: ${address}`),
+addresses.forEach((aAddress: string): void =>
+  logger.info({ address: aAddress }, 'Server IP address found'),
 );

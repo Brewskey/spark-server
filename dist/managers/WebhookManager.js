@@ -62,6 +62,9 @@ var _throttle2 = _interopRequireDefault(_throttle);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var logger = _logger2.default.createModuleLogger(module);
+
+
 var parseEventData = function parseEventData(event) {
   try {
     if (event.data) {
@@ -298,7 +301,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
 
         _this.runWebhookThrottled(webhook, event);
       } catch (error) {
-        _logger2.default.error('webhookError: ' + error);
+        logger.error('webhookError: ' + error);
       }
     };
   };
@@ -372,7 +375,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
               _context6.prev = 25;
               _context6.t0 = _context6['catch'](0);
 
-              _logger2.default.error('webhookError: ' + _context6.t0);
+              logger.error('webhookError: ' + _context6.t0);
 
             case 28:
             case 'end':

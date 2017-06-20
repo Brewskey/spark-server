@@ -1,6 +1,6 @@
 // @flow
 
-import logger from './lib/logger';
+import Logger from './lib/logger'; const logger = Logger.createModuleLogger(module);
 import createApp from './app';
 import defaultBindings from './defaultBindings';
 import settings from './settings';

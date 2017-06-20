@@ -27,8 +27,10 @@ var _MongoDb2 = _interopRequireDefault(_MongoDb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var logger = _logger2.default.createModuleLogger(module);
+
 exports.MongoDb = _MongoDb2.default;
 exports.createApp = _app2.default;
 exports.defaultBindings = _defaultBindings2.default;
-exports.logger = _logger2.default;
+exports.logger = logger;
 exports.settings = _settings2.default;

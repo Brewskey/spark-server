@@ -232,9 +232,21 @@ export interface IBaseDatabase {
   remove(collectionName: string, query: Object): Promise<*>,
 }
 
+export interface ILoggerCreate {
+  static createLogger(aName: string): ILogger;
+  static createModuleLogger(aModule: any): ILogger;
+}
 export interface ILogger {
-  static error(params: Array<any>): void,
-  static info(params: Array<any>): void,
-  static log(params: Array<any>): void,
-  static warn(params: Array<any>): void,
+  debug (line: string): void;
+  debug (additional: ?Object, line: string): void;
+  error (line: string): void;
+  error (additional: ?Object, line: string): void;
+  fatal (line: string): void;
+  fatal (additional: ?Object, line: string): void;
+  info (line: string): void;
+  info (additional: ?Object, line: string): void;
+  warn (line: string): void;
+  warn  (additional: ?Object, line: string): void;
+  trace (line: string): void;
+  trace  (additional: ?Object, line: string): void;
 }

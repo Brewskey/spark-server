@@ -109,6 +109,7 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
   return desc;
 }
 
+var logger = _logger2.default.createModuleLogger(module);
 var EventsController = (_dec = (0, _httpVerb2.default)('post'), _dec2 = (0, _route2.default)('/v1/ping'), _dec3 = (0, _anonymous2.default)(), _dec4 = (0, _httpVerb2.default)('get'), _dec5 = (0, _route2.default)('/v1/events/:eventNamePrefix?*'), _dec6 = (0, _serverSentEvents2.default)(), _dec7 = (0, _httpVerb2.default)('get'), _dec8 = (0, _route2.default)('/v1/devices/events/:eventNamePrefix?*'), _dec9 = (0, _serverSentEvents2.default)(), _dec10 = (0, _httpVerb2.default)('get'), _dec11 = (0, _route2.default)('/v1/devices/:deviceID/events/:eventNamePrefix?*'), _dec12 = (0, _serverSentEvents2.default)(), _dec13 = (0, _httpVerb2.default)('post'), _dec14 = (0, _route2.default)('/v1/devices/events'), (_class = function (_Controller) {
   (0, _inherits3.default)(EventsController, _Controller);
 
@@ -145,7 +146,7 @@ var EventsController = (_dec = (0, _httpVerb2.default)('post'), _dec2 = (0, _rou
         this.response.write('event: ' + event.name + '\n');
         this.response.write('data: ' + (0, _stringify2.default)((0, _eventToApi2.default)(event)) + '\n\n');
       } catch (error) {
-        _logger2.default.error('pipeEvents - write error: ' + error);
+        logger.error('pipeEvents - write error: ' + error);
         throw error;
       }
     }

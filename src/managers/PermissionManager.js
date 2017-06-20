@@ -125,10 +125,7 @@ class PermissionManager {
       settings.DEFAULT_ADMIN_USERNAME,
     );
     if (defaultAdminUser) {
-      logger.info(
-        'Default admin accessToken: ' +
-          `${defaultAdminUser.accessTokens[0].accessToken}`,
-      );
+      logger.info({ token: defaultAdminUser.accessTokens[0].accessToken }, 'Default Admin token');
     } else {
       await this._createDefaultAdminUser();
     }
