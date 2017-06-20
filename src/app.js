@@ -24,7 +24,7 @@ import bunyanMiddleware from 'bunyan-middleware';
 export default (
   container: Container,
   settings: Settings,
-  existingApp ? : express$Application,
+  existingApp: ?express$Application,
 ): $Application => {
   const app = existingApp || express();
 
