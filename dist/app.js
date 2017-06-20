@@ -49,9 +49,11 @@ exports.default = function (container, settings, existingApp) {
 
   if (settings.LOG_REQUESTS) {
     logger.warn('Request logging enabled');
+    if (!logger.debug()) logger.warn('Request will not log, cause Bunyan loglevel is different!');
     var useLogger = logger;
     app.use((0, _bunyanMiddleware2.default)({
       headerName: 'X-Request-Id',
+      level: 'debug',
       logger: useLogger,
       logName: 'req_id',
       obscureHeaders: [],
