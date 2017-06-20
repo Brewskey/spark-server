@@ -145,7 +145,7 @@ var PermissionManager = function PermissionManager(deviceAttributeRepository, us
   }();
 
   this._createDefaultAdminUser = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
-    var token;
+    var aToken;
     return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
@@ -162,10 +162,10 @@ var PermissionManager = function PermissionManager(deviceAttributeRepository, us
             return _this._generateAdminToken();
 
           case 5:
-            token = _context4.sent;
+            aToken = _context4.sent;
 
 
-            logger.info('New default admin user created with token: ' + token);
+            logger.info({ token: aToken }, 'New default admin user created');
             _context4.next = 12;
             break;
 
@@ -173,7 +173,7 @@ var PermissionManager = function PermissionManager(deviceAttributeRepository, us
             _context4.prev = 9;
             _context4.t0 = _context4['catch'](0);
 
-            logger.error('Error during default admin user creating: ' + _context4.t0);
+            logger.error({ err: _context4.t0 }, 'Error during default admin user creating');
 
           case 12:
           case 'end':

@@ -146,7 +146,7 @@ var EventsController = (_dec = (0, _httpVerb2.default)('post'), _dec2 = (0, _rou
         this.response.write('event: ' + event.name + '\n');
         this.response.write('data: ' + (0, _stringify2.default)((0, _eventToApi2.default)(event)) + '\n\n');
       } catch (error) {
-        logger.error('pipeEvents - write error: ' + error);
+        logger.error({ err: error }, 'pipeEvents - write error');
         throw error;
       }
     }

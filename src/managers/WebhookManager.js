@@ -27,6 +27,7 @@ const parseEventData = (event: Event): Object => {
     }
     return {};
   } catch (error) {
+    logger.warn({ err: error, evdata: event.data }, 'parseEventData failed');
     return {};
   }
 };

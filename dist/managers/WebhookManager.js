@@ -301,7 +301,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
 
         _this.runWebhookThrottled(webhook, event);
       } catch (error) {
-        logger.error('webhookError: ' + error);
+        logger.error({ err: error }, 'webhookError');
       }
     };
   };
@@ -375,7 +375,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
               _context6.prev = 25;
               _context6.t0 = _context6['catch'](0);
 
-              logger.error('webhookError: ' + _context6.t0);
+              logger.error({ err: _context6.t0 }, 'webhookError');
 
             case 28:
             case 'end':
