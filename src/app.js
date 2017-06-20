@@ -48,7 +48,7 @@ export default (
     });
     return next();
   };
-  
+
   if (logger.debug()) {
     app.use(bunyanMiddleware({
       headerName: 'X-Request-Id',
@@ -62,14 +62,13 @@ export default (
   }
 
   app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({
-    extended: true,
-  }));
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(setCORSHeaders);
 
   routeConfig(
     app,
-    container, [
+    container,
+    [
       'DeviceClaimsController',
       // to avoid routes collisions EventsController should be placed
       // before DevicesController
