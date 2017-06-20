@@ -35,7 +35,8 @@ var Logger = function () {
     value: function createLogger(aName) {
       return _bunyan2.default.createLogger({
         level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
-        name: aName
+        name: aName,
+        serializers: _bunyan2.default.stdSerializers
       });
     }
   }, {
@@ -43,7 +44,8 @@ var Logger = function () {
     value: function createModuleLogger(aModule) {
       return _bunyan2.default.createLogger({
         level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
-        name: _path2.default.basename(aModule.filename)
+        name: _path2.default.basename(aModule.filename),
+        serializers: _bunyan2.default.stdSerializers
       });
     }
   }]);

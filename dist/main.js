@@ -101,6 +101,7 @@ var _settings$EXPRESS_SER = _settings2.default.EXPRESS_SERVER_CONFIG,
 
 
 if (useSSL) {
+  logger.debug({ cert: certificateFilePath, key: privateKeyFilePath }, 'Use SSL');
   var options = (0, _extends3.default)({
     cert: certificateFilePath && _fs2.default.readFileSync((0, _nullthrows2.default)(certificateFilePath)),
     key: privateKeyFilePath && _fs2.default.readFileSync((0, _nullthrows2.default)(privateKeyFilePath))

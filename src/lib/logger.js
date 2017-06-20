@@ -28,12 +28,14 @@ export default class Logger implements ILoggerCreate {
     return bunyan.createLogger({
       level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
       name: aName,
+      serializers: bunyan.stdSerializers,
     });
   }
   static createModuleLogger(aModule: any): ILogger {
     return bunyan.createLogger({
       level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
       name: path.basename(aModule.filename),
+      serializers: bunyan.stdSerializers,
     });
   }
 }
