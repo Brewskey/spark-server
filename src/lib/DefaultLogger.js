@@ -41,40 +41,34 @@ function getDate(): string {
   return new Date().toISOString();
 }
 
-export class Logger implements ILogger {
-  name: string = 'default'
+export class DefaultLogger implements ILogger {
 
-  constructor(name: string) {
-    this.name = name;
-  }
-
-  log(...params: Array<any>) {
+  static log(...params: Array<any>) {
     if (settings.SHOW_VERBOSE_DEVICE_LOGS) {
-      Logger._log(`[${getDate()}] ${this.name}`, _transform(...params));
+      DefaultLogger._log(`[${getDate()}]`, _transform(...params));
     }
   }
 
-  info(...params: Array<any>) {
-    Logger._log(
-      `[${getDate()}] ${this.name}`,
+  static info(...params: Array<any>) {
+    DefaultLogger._log(
+      `[${getDate()}]`,
       chalk.cyan(_transform(...params)),
     );
   }
 
-  warn(...params: Array<any>) {
-    Logger._log(
-      `[${getDate()}] ${this.name}`,
+  static warn(...params: Array<any>) {
+    DefaultLogger._log(
+      `[${getDate()}]`,
       chalk.yellow(_transform(...params)),
     );
   }
 
-  error(...params: Array<any>) {
-    Logger._log(
-      `[${getDate()}] ${this.name}`,
+  static error(...params: Array<any>) {
+    DefaultLogger._log(
+      `[${getDate()}]`,
       chalk.red(_transform(...params)),
     );
   }
-
   static _log(...params: Array<any>) {
     console.log(...params);
   }
