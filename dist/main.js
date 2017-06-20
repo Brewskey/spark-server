@@ -60,13 +60,12 @@ var _constitute = require('constitute');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var logger = _logger2.default.createModuleLogger(module);
+
 var NODE_PORT = process.env.NODE_PORT || _settings2.default.EXPRESS_SERVER_CONFIG.PORT;
 
 process.on('uncaughtException', function (exception) {
-  _logger2.default.error('uncaughtException', {
-    message: exception.message,
-    stack: exception.stack
-  }); // logging with MetaData
+  logger.error({ err: exception }, 'uncaughtException');
   process.exit(1); // exit with failure
 });
 
@@ -90,7 +89,7 @@ deviceServer.start();
 var app = (0, _app2.default)(container, _settings2.default);
 
 var onServerStartListen = function onServerStartListen() {
-  return _logger2.default.info('express server started on port ' + NODE_PORT);
+  return logger.info({ port: NODE_PORT }, 'express server started');
 };
 
 var _settings$EXPRESS_SER = _settings2.default.EXPRESS_SERVER_CONFIG,
@@ -125,6 +124,6 @@ function (_ref) {
     return address.address;
   });
 }));
-addresses.forEach(function (address) {
-  return _logger2.default.info('Your device server IP address is: ' + address);
+addresses.forEach(function (aAddress) {
+  return logger.info({ address: aAddress }, 'Server IP address found');
 });

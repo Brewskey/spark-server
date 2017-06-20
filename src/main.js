@@ -34,7 +34,6 @@ process.on('uncaughtException', (exception: Error) => {
 const container = new Container();
 defaultBindings(container, settings);
 
-logger.initialize(Logger, 'MAIN');
 
 const deviceServer = container.constitute('DeviceServer');
 deviceServer.start();
