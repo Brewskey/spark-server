@@ -77,9 +77,10 @@ class PermissionManager {
         'administrator',
       );
 
-      const token = await this._generateAdminToken();
+      const aToken = await this._generateAdminToken();
 
-      logger.info(`New default admin user created with token: ${token}`);
+      logger.info({ token: aToken }, 'New default admin user created',
+      );
     } catch (error) {
       logger.error({ err: error }, 'Error during default admin user creating');
     }
