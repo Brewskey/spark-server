@@ -33,17 +33,15 @@ process.on('uncaughtException', (exception: Error) => {
 const container = new Container();
 defaultBindings(container, settings);
 
-
 const deviceServer = container.constitute('DeviceServer');
 deviceServer.start();
 
 const app = createApp(container, settings);
 
-
 const onServerStartListen = () => {
   logger.info({ port: NODE_PORT }, 'express server started, with events');
   deviceServer._eventPublisher.subscribe('*', (ev: any) => {
-    logger.debug({ data: ev.data, event: ev.name, name: ev.deviceID }, 'Incomming Event');
+    logger.debug({ data: ev.data, deviceID: ev.deviceID, event: ev.name }, 'Incomming Event...');
   });
 };
 
