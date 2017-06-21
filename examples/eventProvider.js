@@ -39,5 +39,5 @@ const evProvider = container.constitute('EVENT_PROVIDER');
 
 evProvider.onNewEvent((event: Event) => {
   logger.info('Event onNewEvent',event);
+  logger.info('Event',event);
 });
-
