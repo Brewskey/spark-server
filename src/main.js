@@ -39,9 +39,10 @@ deviceServer.start();
 
 const app = createApp(container, settings);
 
+
 const onServerStartListen = () => {
-  logger.info({ port: NODE_PORT }, 'express server started');
-  deviceServer._eventPublisher.subscribe('*all*', (ev: any) => {
+  logger.info({ port: NODE_PORT }, 'express server started, with events');
+  deviceServer._eventPublisher.subscribe('*', (ev: any) => {
     logger.debug({ data: ev.data, event: ev.name, name: ev.deviceID }, 'Incomming Event');
   });
 };
