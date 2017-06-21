@@ -40,6 +40,7 @@ deviceServer.start();
 
 const app = createApp(container, settings);
 
+
 const onServerStartListen = () => {
   logger.info({ port: NODE_PORT }, 'express server started, with events');
 };
