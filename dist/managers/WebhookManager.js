@@ -40,10 +40,6 @@ var _HttpError = require('../lib/HttpError');
 
 var _HttpError2 = _interopRequireDefault(_HttpError);
 
-var _logger = require('../lib/logger');
-
-var _logger2 = _interopRequireDefault(_logger);
-
 var _nullthrows = require('nullthrows');
 
 var _nullthrows2 = _interopRequireDefault(_nullthrows);
@@ -60,10 +56,13 @@ var _throttle = require('lodash/throttle');
 
 var _throttle2 = _interopRequireDefault(_throttle);
 
+var _logger = require('../lib/logger');
+
+var _logger2 = _interopRequireDefault(_logger);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var logger = _logger2.default.createModuleLogger(module);
-
 
 var parseEventData = function parseEventData(event) {
   try {

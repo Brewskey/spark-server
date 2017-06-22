@@ -8,9 +8,10 @@ import http from 'http';
 import https from 'https';
 import os from 'os';
 import defaultBindings from './defaultBindings';
-import Logger from './lib/logger'; const logger = Logger.createModuleLogger(module);
 import settings from './settings';
 import { Container } from 'constitute';
+import Logger from './lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 const NODE_PORT = process.env.NODE_PORT || settings.EXPRESS_SERVER_CONFIG.PORT;
 

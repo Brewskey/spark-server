@@ -30,13 +30,13 @@ var _HttpError = require('../lib/HttpError');
 
 var _HttpError2 = _interopRequireDefault(_HttpError);
 
-var _logger = require('../lib/logger');
-
-var _logger2 = _interopRequireDefault(_logger);
-
 var _settings = require('../settings');
 
 var _settings2 = _interopRequireDefault(_settings);
+
+var _logger = require('../lib/logger');
+
+var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

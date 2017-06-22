@@ -17,14 +17,14 @@ import type {
 import bodyParser from 'body-parser';
 import express from 'express';
 import Logger from './lib/logger';
-const logger = Logger.createModuleLogger(module);
 import routeConfig from './RouteConfig';
 import bunyanMiddleware from 'bunyan-middleware';
+const logger = Logger.createModuleLogger(module);
 
 export default (
   container: Container,
   settings: Settings,
-  existingApp: ?express$Application,
+  existingApp?: express$Application,
 ): $Application => {
   const app = existingApp || express();
 
@@ -35,7 +35,8 @@ export default (
   ): mixed => {
     if (request.method === 'OPTIONS') {
       response.set({
-        'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, Accept, Authorization',
+        'Access-Control-Allow-Headers':
+          'X-Requested-With, Content-Type, Accept, Authorization',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Max-Age': '300',
@@ -49,8 +50,11 @@ export default (
   };
 
   if (settings.LOG_REQUESTS) {
-    logger.warn('Request logging enabled');
-    if (!logger.debug()) logger.warn('Request will not log, cause Bunyan loglevel is different!');
+    if (logger.debug()) {
+      logger.warn('Request logging enabled');
+    } else {
+      logger.warn('Request will not log, cause Bunyan loglevel is different!');
+    }
     const useLogger = logger;
     app.use(bunyanMiddleware({
       headerName: 'X-Request-Id',

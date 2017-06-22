@@ -70,13 +70,13 @@ var _serverSentEvents = require('../decorators/serverSentEvents');
 
 var _serverSentEvents2 = _interopRequireDefault(_serverSentEvents);
 
-var _logger = require('../lib/logger');
-
-var _logger2 = _interopRequireDefault(_logger);
-
 var _eventToApi = require('../lib/eventToApi');
 
 var _eventToApi2 = _interopRequireDefault(_eventToApi);
+
+var _logger = require('../lib/logger');
+
+var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -110,6 +110,7 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 }
 
 var logger = _logger2.default.createModuleLogger(module);
+
 var EventsController = (_dec = (0, _httpVerb2.default)('post'), _dec2 = (0, _route2.default)('/v1/ping'), _dec3 = (0, _anonymous2.default)(), _dec4 = (0, _httpVerb2.default)('get'), _dec5 = (0, _route2.default)('/v1/events/:eventNamePrefix?*'), _dec6 = (0, _serverSentEvents2.default)(), _dec7 = (0, _httpVerb2.default)('get'), _dec8 = (0, _route2.default)('/v1/devices/events/:eventNamePrefix?*'), _dec9 = (0, _serverSentEvents2.default)(), _dec10 = (0, _httpVerb2.default)('get'), _dec11 = (0, _route2.default)('/v1/devices/:deviceID/events/:eventNamePrefix?*'), _dec12 = (0, _serverSentEvents2.default)(), _dec13 = (0, _httpVerb2.default)('post'), _dec14 = (0, _route2.default)('/v1/devices/events'), (_class = function (_Controller) {
   (0, _inherits3.default)(EventsController, _Controller);
 

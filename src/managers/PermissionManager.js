@@ -10,8 +10,9 @@ import type {
 import nullthrows from 'nullthrows';
 import { Request, Response } from 'oauth2-server';
 import HttpError from '../lib/HttpError';
-import Logger from '../lib/logger'; const logger = Logger.createModuleLogger(module);
 import settings from '../settings';
+import Logger from '../lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 class PermissionManager {
   _userRepository: IUserRepository;

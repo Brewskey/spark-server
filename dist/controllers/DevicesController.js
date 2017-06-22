@@ -70,13 +70,13 @@ var _route = require('../decorators/route');
 
 var _route2 = _interopRequireDefault(_route);
 
-var _logger = require('../lib/logger');
-
-var _logger2 = _interopRequireDefault(_logger);
-
 var _deviceToAPI = require('../lib/deviceToAPI');
 
 var _deviceToAPI2 = _interopRequireDefault(_deviceToAPI);
+
+var _logger = require('../lib/logger');
+
+var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -110,6 +110,7 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 }
 
 var logger = _logger2.default.createModuleLogger(module);
+
 var DevicesController = (_dec = (0, _httpVerb2.default)('post'), _dec2 = (0, _route2.default)('/v1/devices'), _dec3 = (0, _httpVerb2.default)('get'), _dec4 = (0, _route2.default)('/v1/binaries/:binaryID'), _dec5 = (0, _httpVerb2.default)('post'), _dec6 = (0, _route2.default)('/v1/binaries'), _dec7 = (0, _allowUpload2.default)(), _dec8 = (0, _httpVerb2.default)('delete'), _dec9 = (0, _route2.default)('/v1/devices/:deviceID'), _dec10 = (0, _httpVerb2.default)('get'), _dec11 = (0, _route2.default)('/v1/devices'), _dec12 = (0, _httpVerb2.default)('get'), _dec13 = (0, _route2.default)('/v1/devices/:deviceID'), _dec14 = (0, _httpVerb2.default)('get'), _dec15 = (0, _route2.default)('/v1/devices/:deviceID/:varName/'), _dec16 = (0, _httpVerb2.default)('put'), _dec17 = (0, _route2.default)('/v1/devices/:deviceID'), _dec18 = (0, _allowUpload2.default)('file', 1), _dec19 = (0, _httpVerb2.default)('post'), _dec20 = (0, _route2.default)('/v1/devices/:deviceID/:functionName'), (_class = function (_Controller) {
   (0, _inherits3.default)(DevicesController, _Controller);
 

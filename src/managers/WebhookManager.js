@@ -14,11 +14,12 @@ import type {
 
 import hogan from 'hogan.js';
 import HttpError from '../lib/HttpError';
-import Logger from '../lib/logger'; const logger = Logger.createModuleLogger(module);
 import nullthrows from 'nullthrows';
 import request from 'request';
 import settings from '../settings';
 import throttle from 'lodash/throttle';
+import Logger from '../lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 const parseEventData = (event: Event): Object => {
   try {

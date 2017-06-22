@@ -11,8 +11,9 @@ import FirmwareCompilationManager from '../managers/FirmwareCompilationManager';
 import allowUpload from '../decorators/allowUpload';
 import httpVerb from '../decorators/httpVerb';
 import route from '../decorators/route';
-import Logger from '../lib/logger'; const logger = Logger.createModuleLogger(module);
 import deviceToAPI from '../lib/deviceToAPI';
+import Logger from '../lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 type CompileConfig = {
   platform_id?: string,

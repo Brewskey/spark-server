@@ -4,13 +4,14 @@ import type { File } from 'express';
 
 import crypto from 'crypto';
 import fs from 'fs';
-import Logger from '../lib/logger'; const logger = Logger.createModuleLogger(module);
 import path from 'path';
 import mkdirp from 'mkdirp';
 import rmfr from 'rmfr';
 import { spawn } from 'child_process';
 import { knownPlatforms } from 'spark-protocol';
 import settings from '../settings';
+import Logger from '../lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 const IS_COMPILATION_ENABLED = fs.existsSync(
   settings.FIRMWARE_REPOSITORY_DIRECTORY,
