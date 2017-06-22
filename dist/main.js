@@ -48,15 +48,15 @@ var _defaultBindings = require('./defaultBindings');
 
 var _defaultBindings2 = _interopRequireDefault(_defaultBindings);
 
-var _logger = require('./lib/logger');
-
-var _logger2 = _interopRequireDefault(_logger);
-
 var _settings = require('./settings');
 
 var _settings2 = _interopRequireDefault(_settings);
 
 var _constitute = require('constitute');
+
+var _logger = require('./lib/logger');
+
+var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -89,10 +89,7 @@ deviceServer.start();
 var app = (0, _app2.default)(container, _settings2.default);
 
 var onServerStartListen = function onServerStartListen() {
-  logger.info({ port: NODE_PORT }, 'express server started');
-  deviceServer._eventPublisher.subscribe('*all*', function (ev) {
-    logger.info(ev);
-  });
+  logger.info({ port: NODE_PORT }, 'express server started, with events');
 };
 
 var _settings$EXPRESS_SER = _settings2.default.EXPRESS_SERVER_CONFIG,
