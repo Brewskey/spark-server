@@ -35,6 +35,9 @@ defaultBindings(container, settings);
 const deviceServer = container.constitute('DeviceServer');
 deviceServer.start();
 
-deviceServer._eventPublisher.subscribe('*', (ev: any) => {
-  logger.info({ data: ev.data, event: ev.name, name: ev.deviceID, event: ev }, 'Incomming Event');
+const evProvider = container.constitute('EVENT_PROVIDER');
+
+evProvider.onNewEvent((event: Event) => {
+  logger.info('Event onNewEvent',event);
 });
+
