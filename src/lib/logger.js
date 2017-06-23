@@ -22,18 +22,19 @@
 import bunyan from 'bunyan';
 import { ILoggerCreate, ILogger } from '../types';
 import path from 'path';
+import settings from '../settings';
 
 export default class Logger implements ILoggerCreate {
   static createLogger(applicationName: string): ILogger {
     return bunyan.createLogger({
-      level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
+      level: settings.LOG_LEVEL,
       name: applicationName,
       serializers: bunyan.stdSerializers,
     });
   }
   static createModuleLogger(applicationModule: any): ILogger {
     return bunyan.createLogger({
-      level: process.env.LOG_LEVEL !== undefined ? process.env.LOG_LEVEL : 'info',
+      level: settings.LOG_LEVEL,
       name: path.basename(applicationModule.filename),
       serializers: bunyan.stdSerializers,
     });

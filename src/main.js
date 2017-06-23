@@ -34,12 +34,10 @@ process.on('uncaughtException', (exception: Error) => {
 const container = new Container();
 defaultBindings(container, settings);
 
-
 const deviceServer = container.constitute('DeviceServer');
 deviceServer.start();
 
 const app = createApp(container, settings);
-
 
 const onServerStartListen = () => {
   logger.info({ port: NODE_PORT }, 'express server started, with events');
@@ -53,7 +51,10 @@ const {
 } = settings.EXPRESS_SERVER_CONFIG;
 
 if (useSSL) {
-  logger.debug({ cert: certificateFilePath, key: privateKeyFilePath }, 'Use SSL');
+  logger.debug(
+    { cert: certificateFilePath, key: privateKeyFilePath },
+    'Use SSL',
+  );
   const options = {
     cert:
       certificateFilePath && fs.readFileSync(nulltrhows(certificateFilePath)),
