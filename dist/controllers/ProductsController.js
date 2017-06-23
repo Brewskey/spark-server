@@ -86,7 +86,11 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
   return desc;
 }
 
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
 var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _route2.default)('/v1/products/:productIdOrSlug'), _dec3 = (0, _httpVerb2.default)('get'), _dec4 = (0, _route2.default)('/v1/products/:productIdOrSlug/firmware'), _dec5 = (0, _httpVerb2.default)('post'), _dec6 = (0, _route2.default)('/v1/products/:productIdOrSlug/firmware'), _dec7 = (0, _httpVerb2.default)('get'), _dec8 = (0, _route2.default)('/v1/products/:productIdOrSlug/devices'), _dec9 = (0, _httpVerb2.default)('put'), _dec10 = (0, _route2.default)('/v1/products/:productIdOrSlug/devices/:deviceID'), _dec11 = (0, _httpVerb2.default)('get'), _dec12 = (0, _route2.default)('/v1/products/:productIdOrSlug/config'), _dec13 = (0, _httpVerb2.default)('get'), _dec14 = (0, _route2.default)('/v1/products/:productIdOrSlug/events/:eventPrefix?*'), (_class = function (_Controller) {
+=======
+var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _route2.default)('/v1/products'), _dec3 = (0, _httpVerb2.default)('post'), _dec4 = (0, _route2.default)('/v1/products'), _dec5 = (0, _httpVerb2.default)('get'), _dec6 = (0, _route2.default)('/v1/products/:productIdOrSlug'), _dec7 = (0, _httpVerb2.default)('post'), _dec8 = (0, _route2.default)('/v1/products/:productIdOrSlug/device_claims'), _dec9 = (0, _httpVerb2.default)('get'), _dec10 = (0, _route2.default)('/v1/products/:productIdOrSlug/firmware'), _dec11 = (0, _httpVerb2.default)('post'), _dec12 = (0, _route2.default)('/v1/products/:productIdOrSlug/firmware'), _dec13 = (0, _httpVerb2.default)('get'), _dec14 = (0, _route2.default)('/v1/products/:productIdOrSlug/devices'), _dec15 = (0, _httpVerb2.default)('put'), _dec16 = (0, _route2.default)('/v1/products/:productIdOrSlug/devices/:deviceID'), _dec17 = (0, _httpVerb2.default)('delete'), _dec18 = (0, _route2.default)('/v1/products/:productIdOrSlug/devices/:deviceID'), _dec19 = (0, _httpVerb2.default)('get'), _dec20 = (0, _route2.default)('/v1/products/:productIdOrSlug/config'), _dec21 = (0, _httpVerb2.default)('get'), _dec22 = (0, _route2.default)('/v1/products/:productIdOrSlug/events/:eventPrefix?*'), _dec23 = (0, _httpVerb2.default)('delete'), _dec24 = (0, _route2.default)('/v1/products/:productIdOrSlug/team/:username'), (_class = function (_Controller) {
+>>>>>>> added Requested Changes
   (0, _inherits3.default)(ProductsController, _Controller);
 
   function ProductsController(deviceManager) {
@@ -100,6 +104,7 @@ var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _ro
 
   (0, _createClass3.default)(ProductsController, [{
     key: 'getProducts',
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
     // eslint-disable-next-line class-methods-use-this
     value: function getProducts() {
       throw new _HttpError2.default('not supported in the current server version');
@@ -112,6 +117,10 @@ var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _ro
     }
   }, {
     key: 'getProduct',
+=======
+
+    // eslint-disable-next-line class-methods-use-this
+>>>>>>> added Requested Changes
     value: function () {
       var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(productIdOrSlug) {
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -135,6 +144,7 @@ var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _ro
       return getProduct;
     }()
   }, {
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
     key: 'generateClaimCode',
     // eslint-disable-next-line class-methods-use-this
     value: function generateClaimCode(productIdOrSlug) {
@@ -142,6 +152,11 @@ var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _ro
     }
   }, {
     key: 'getFirmware',
+=======
+    key: 'createProduct',
+
+    // eslint-disable-next-line class-methods-use-this
+>>>>>>> added Requested Changes
     value: function () {
       var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(productIdOrSlug) {
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -192,7 +207,13 @@ var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _ro
       return getFirmware;
     }()
   }, {
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
     key: 'getDevices',
+=======
+    key: 'generateClaimCode',
+
+    // eslint-disable-next-line class-methods-use-this
+>>>>>>> added Requested Changes
     value: function () {
       var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(productIdOrSlug) {
         return _regenerator2.default.wrap(function _callee4$(_context4) {
@@ -291,14 +312,142 @@ var ProductsController = (_dec = (0, _httpVerb2.default)('get'), _dec2 = (0, _ro
         return _ref7.apply(this, arguments);
       }
 
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
+=======
+      return getDevices;
+    }()
+  }, {
+    key: 'setFirmwareVersion',
+    value: function () {
+      var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8(productIdOrSlug, deviceID, body) {
+        return _regenerator2.default.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                throw new _HttpError2.default('Not implemented');
+
+              case 1:
+              case 'end':
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function setFirmwareVersion(_x6, _x7, _x8) {
+        return _ref8.apply(this, arguments);
+      }
+
+      return setFirmwareVersion;
+    }()
+  }, {
+    key: 'removeDeviceFromProduct',
+
+    // eslint-disable-next-line class-methods-use-this
+    value: function () {
+      var _ref9 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9(productIdOrSlug, deviceID) {
+        return _regenerator2.default.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                throw new _HttpError2.default('not supported in the current server version');
+
+              case 1:
+              case 'end':
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function removeDeviceFromProduct(_x9, _x10) {
+        return _ref9.apply(this, arguments);
+      }
+
+      return removeDeviceFromProduct;
+    }()
+  }, {
+    key: 'getConfig',
+    value: function () {
+      var _ref10 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee10(productIdOrSlug) {
+        return _regenerator2.default.wrap(function _callee10$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                throw new _HttpError2.default('Not implemented');
+
+              case 1:
+              case 'end':
+                return _context10.stop();
+            }
+          }
+        }, _callee10, this);
+      }));
+
+      function getConfig(_x11) {
+        return _ref10.apply(this, arguments);
+      }
+
+      return getConfig;
+    }()
+  }, {
+    key: 'getEvents',
+    value: function () {
+      var _ref11 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11(productIdOrSlug, eventName) {
+        return _regenerator2.default.wrap(function _callee11$(_context11) {
+          while (1) {
+            switch (_context11.prev = _context11.next) {
+              case 0:
+                throw new _HttpError2.default('Not implemented');
+
+              case 1:
+              case 'end':
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function getEvents(_x12, _x13) {
+        return _ref11.apply(this, arguments);
+      }
+
+>>>>>>> added Requested Changes
       return getEvents;
     }()
   }, {
     key: 'removeTeamMember',
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
     // eslint-disable-next-line class-methods-use-this
     value: function removeTeamMember(productIdOrSlug, username) {
       throw new _HttpError2.default('not supported in the current server version');
     }
+=======
+
+    // eslint-disable-next-line class-methods-use-this
+    value: function () {
+      var _ref12 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee12(productIdOrSlug, username) {
+        return _regenerator2.default.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
+                throw new _HttpError2.default('not supported in the current server version');
+
+              case 1:
+              case 'end':
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this);
+      }));
+
+      function removeTeamMember(_x14, _x15) {
+        return _ref12.apply(this, arguments);
+      }
+
+      return removeTeamMember;
+    }()
+>>>>>>> added Requested Changes
   }]);
   return ProductsController;
 }(_Controller3.default), (_applyDecoratedDescriptor(_class.prototype, 'getProduct', [_dec, _dec2], (0, _getOwnPropertyDescriptor2.default)(_class.prototype, 'getProduct'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'getFirmware', [_dec3, _dec4], (0, _getOwnPropertyDescriptor2.default)(_class.prototype, 'getFirmware'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'getFirmware', [_dec5, _dec6], (0, _getOwnPropertyDescriptor2.default)(_class.prototype, 'getFirmware'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'getDevices', [_dec7, _dec8], (0, _getOwnPropertyDescriptor2.default)(_class.prototype, 'getDevices'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'setFirmwareVersion', [_dec9, _dec10], (0, _getOwnPropertyDescriptor2.default)(_class.prototype, 'setFirmwareVersion'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'getConfig', [_dec11, _dec12], (0, _getOwnPropertyDescriptor2.default)(_class.prototype, 'getConfig'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'getEvents', [_dec13, _dec14], (0, _getOwnPropertyDescriptor2.default)(_class.prototype, 'getEvents'), _class.prototype)), _class));

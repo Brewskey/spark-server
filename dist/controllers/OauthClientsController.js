@@ -42,7 +42,40 @@ var _route2 = _interopRequireDefault(_route);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
 var OauthClientsController = function (_Controller) {
+=======
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+  var desc = {};
+  Object['ke' + 'ys'](descriptor).forEach(function (key) {
+    desc[key] = descriptor[key];
+  });
+  desc.enumerable = !!desc.enumerable;
+  desc.configurable = !!desc.configurable;
+
+  if ('value' in desc || desc.initializer) {
+    desc.writable = true;
+  }
+
+  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+    return decorator(target, property, desc) || desc;
+  }, desc);
+
+  if (context && desc.initializer !== void 0) {
+    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+    desc.initializer = undefined;
+  }
+
+  if (desc.initializer === void 0) {
+    Object['define' + 'Property'](target, property, desc);
+    desc = null;
+  }
+
+  return desc;
+}
+
+var OauthClientsController = (_dec = (0, _httpVerb2.default)('post'), _dec2 = (0, _route2.default)('/v1/products/:productIDorSlug/clients/'), _dec3 = (0, _httpVerb2.default)('put'), _dec4 = (0, _route2.default)('/v1/products/:productIDorSlug/clients/:clientID'), _dec5 = (0, _httpVerb2.default)('delete'), _dec6 = (0, _route2.default)('/v1/products/:productIDorSlug/clients/:clientID'), (_class = function (_Controller) {
+>>>>>>> added Requested Changes
   (0, _inherits3.default)(OauthClientsController, _Controller);
 
   function OauthClientsController() {
@@ -52,6 +85,7 @@ var OauthClientsController = function (_Controller) {
 
   (0, _createClass3.default)(OauthClientsController, [{
     key: 'createClient',
+<<<<<<< 3175cdd3571f91ce76ceadb1edf36fb89e2d5d21
     // eslint-disable-next-line class-methods-use-this
     value: function createClient() {
       throw new _HttpError2.default('not supported in the current server version');
@@ -68,6 +102,84 @@ var OauthClientsController = function (_Controller) {
     value: function deleteClient() {
       throw new _HttpError2.default('not supported in the current server version');
     }
+=======
+
+    // eslint-disable-next-line class-methods-use-this
+    value: function () {
+      var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
+        return _regenerator2.default.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                throw new _HttpError2.default('not supported in the current server version');
+
+              case 1:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function createClient() {
+        return _ref.apply(this, arguments);
+      }
+
+      return createClient;
+    }()
+  }, {
+    key: 'editClient',
+
+    // eslint-disable-next-line class-methods-use-this
+    value: function () {
+      var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+        return _regenerator2.default.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                throw new _HttpError2.default('not supported in the current server version');
+
+              case 1:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function editClient() {
+        return _ref2.apply(this, arguments);
+      }
+
+      return editClient;
+    }()
+  }, {
+    key: 'deleteClient',
+
+    // eslint-disable-next-line class-methods-use-this
+    value: function () {
+      var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
+        return _regenerator2.default.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                throw new _HttpError2.default('not supported in the current server version');
+
+              case 1:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function deleteClient() {
+        return _ref3.apply(this, arguments);
+      }
+
+      return deleteClient;
+    }()
+>>>>>>> added Requested Changes
   }]);
   return OauthClientsController;
 }(_Controller3.default);

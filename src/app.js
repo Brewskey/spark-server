@@ -12,8 +12,10 @@ import type { Settings } from './types';
 
 import bodyParser from 'body-parser';
 import express from 'express';
-import morgan from 'morgan';
+import Logger from './lib/logger';
 import routeConfig from './RouteConfig';
+import bunyanMiddleware from 'bunyan-middleware';
+const logger = Logger.createModuleLogger(module);
 
 export default (
   container: Container,
@@ -41,14 +43,16 @@ export default (
     return next();
   };
 
-  if (settings.LOG_REQUESTS) {
-    app.use(
-      morgan(
-        '[:date[iso]] :remote-addr - :remote-user ":method :url ' +
-          'HTTP/:http-version" :status :res[content-length] ":referrer" ' +
-          '":user-agent"',
-      ),
-    );
+  if (logger.debug()) {
+    app.use(bunyanMiddleware({
+      headerName: 'X-Request-Id',
+      level: 'debug',
+      logger,
+      logName: 'req_id',
+      obscureHeaders: [],
+      propertyName: 'reqId',
+    }));
+    logger.warn('Request logging enabled');
   }
 
   app.use(bodyParser.json());
