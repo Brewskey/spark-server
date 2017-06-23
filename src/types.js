@@ -154,7 +154,7 @@ export type Settings = {
   },
   FIRMWARE_DIRECTORY: string,
   FIRMWARE_REPOSITORY_DIRECTORY: string,
-  LOG_REQUESTS: boolean,
+  LOG_LEVEL: string,
   LOGIN_ROUTE: string,
   SERVER_KEY_FILENAME: string,
   SERVER_KEYS_DIRECTORY: string,

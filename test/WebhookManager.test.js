@@ -8,7 +8,8 @@ import { EventPublisher } from 'spark-protocol';
 import WebhookFileRepository from '../src/repository/WebhookFileRepository';
 import WebhookManager from '../src/managers/WebhookManager';
 import TestData from './setup/TestData';
-import Logger from '../src/lib/logger'; const logger = Logger.createModuleLogger(module);
+import Logger from '../lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 const WEBHOOK_BASE = {
   event: 'test-event',
