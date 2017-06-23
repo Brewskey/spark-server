@@ -10,8 +10,9 @@ import type {
 import nullthrows from 'nullthrows';
 import { Request, Response } from 'oauth2-server';
 import HttpError from '../lib/HttpError';
-import logger from '../lib/logger';
 import settings from '../settings';
+import Logger from '../lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 class PermissionManager {
   _userRepository: IUserRepository;
@@ -79,9 +80,10 @@ class PermissionManager {
 
       const token = await this._generateAdminToken();
 
-      logger.info(`New default admin user created with token: ${token}`);
+      logger.info({ token }, 'New default admin user created',
+      );
     } catch (error) {
-      logger.error(`Error during default admin user creating: ${error}`);
+      logger.error({ err: error }, 'Error during default admin user creating');
     }
   };
 
@@ -125,10 +127,7 @@ class PermissionManager {
       settings.DEFAULT_ADMIN_USERNAME,
     );
     if (defaultAdminUser) {
-      logger.info(
-        'Default admin accessToken: ' +
-          `${defaultAdminUser.accessTokens[0].accessToken}`,
-      );
+      logger.info({ token: defaultAdminUser.accessTokens[0].accessToken }, 'Default Admin token');
     } else {
       await this._createDefaultAdminUser();
     }
