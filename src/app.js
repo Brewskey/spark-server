@@ -48,22 +48,17 @@ export default (
     });
     return next();
   };
-
-  if (settings.LOG_REQUESTS) {
-    if (logger.debug()) {
-      logger.warn('Request logging enabled');
-    } else {
-      logger.warn('Request will not log, cause Bunyan loglevel is different!');
-    }
-    const useLogger = logger;
+  
+  if (logger.debug()) {
     app.use(bunyanMiddleware({
       headerName: 'X-Request-Id',
       level: 'debug',
-      logger: useLogger,
+      logger,
       logName: 'req_id',
       obscureHeaders: [],
       propertyName: 'reqId',
     }));
+    logger.warn('Request logging enabled');
   }
 
   app.use(bodyParser.json());

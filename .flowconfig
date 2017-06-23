@@ -3,6 +3,7 @@
 [include]
 
 [libs]
+./flow-typed/bunyan/bunyan_v1.x.x.js
 
 [options]
 esproposal.decorators=ignore
