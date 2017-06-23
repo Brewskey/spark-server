@@ -18,16 +18,15 @@ import https from 'https';
 import os from 'os';
 import path from 'path';
 import settings from './settings';
-import { MongoDb, createApp, defaultBindings, logger } from 'spark-server';
+import { MongoDb, createApp, defaultBindings } from 'spark-server';
+import Logger from '../lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 const NODE_PORT = process.env.NODE_PORT || settings.EXPRESS_SERVER_CONFIG.PORT;
 const useHttp = NODE_PORT !== 443;
 
 process.on('uncaughtException', (exception: Error) => {
-  logger.error('uncaughtException', {
-    message: exception.message,
-    stack: exception.stack,
-  }); // logging with MetaData
+  logger.error({ err: exception }, 'uncaughtException'); // logging with MetaData
   process.exit(1); // exit with failure
 });
 

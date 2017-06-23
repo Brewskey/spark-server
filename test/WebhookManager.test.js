@@ -9,6 +9,7 @@ import WebhookFileRepository from '../src/repository/WebhookFileRepository';
 import WebhookManager from '../src/managers/WebhookManager';
 import TestData from './setup/TestData';
 import Logger from '../src/lib/logger';
+const logger = Logger.createModuleLogger(module);
 
 const WEBHOOK_BASE = {
   event: 'test-event',
@@ -358,7 +359,7 @@ test('should throw an error if wrong requestType is provided', async t => {
   };
   const defaultRequestData = getDefaultRequestData(event);
 
-  Logger.error = sinon.spy((message: string) => {
+  logger.error = sinon.spy((message: string) => {
     t.is(message, 'webhookError: Error: wrong requestType');
   });
 
