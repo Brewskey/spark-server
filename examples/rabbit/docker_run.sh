@@ -1,0 +1,1 @@
+docker run --rm --name rabbitconnect -e "rabc_username=$1" -e "rabc_password=$2" --link rabbit:rabbit --link sparkserver:sparkserver keatec/rabbitconnect:latest

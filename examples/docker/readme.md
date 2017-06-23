@@ -79,7 +79,7 @@ Your working directory is now **/runtime/spark-server**
 To start the Server 
 
 ```shell
-docker run -p 8100:8080 -p 5683:5683 --volume /runtime/spark-server/data:/usr/src/localCloud/spark-server/data --rm --name spark-server --hostname spark-server spark-server:latest
+docker run -p 8100:8080 -p 5683:5683 --volume /runtime/spark-server/data:/usr/src/localCloud/spark-server/data --rm --name sparkserver --hostname sparkserver spark-server:latest
 ``` 
 
 Just a short explanation what's happening
@@ -89,9 +89,9 @@ Just a short explanation what's happening
 * **--volume /runtime/spark-server/data:/usr/src/localCloud/spark-server/data**   
 your data directory created early is mapped to the data directory insinde the instance
 * **--rm** Instance is removed after finished
-* **--name spark-server** you can access or reference this instance using **spark-server**   
+* **--name sparkserver** you can access or reference this instance using **sparkserver**   
 this also ensures only one instance with this name can run at the same time!
-* **--hostname spark-server** any other running **Docker Instance** can access the Server using the hostname **spark-server**
+* **--hostname sparkserver** any other running **Docker Instance** can access the Server using the hostname **spark-server**
 * **spark-server:latest** use the image tagged with **latest** for this instance
 
 ## Thats all!
