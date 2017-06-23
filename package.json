@@ -79,7 +79,6 @@
     ]
   },
   "dependencies": {
-    "@types/bunyan": "^1.8.0",
     "array-flatten": "^2.1.1",
     "babel-cli": "^6.22.2",
     "babel-runtime": "^6.22.0",
