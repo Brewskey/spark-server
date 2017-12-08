@@ -75,14 +75,14 @@ var NeDb = function (_BaseMongoDb) {
     var _this = (0, _possibleConstructorReturn3.default)(this, (NeDb.__proto__ || (0, _getPrototypeOf2.default)(NeDb)).call(this));
 
     _this.count = function () {
-      var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(collectionName, query) {
+      var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(collectionName, query) {
         return _regenerator2.default.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
                 return _this.__runForCollection(collectionName, function () {
-                  var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(collection) {
+                  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(collection) {
                     return _regenerator2.default.wrap(function _callee$(_context) {
                       while (1) {
                         switch (_context.prev = _context.next) {
@@ -133,14 +133,14 @@ var NeDb = function (_BaseMongoDb) {
     }();
 
     _this.insertOne = function () {
-      var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(collectionName, entity) {
+      var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(collectionName, entity) {
         return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
                 return _this.__runForCollection(collectionName, function () {
-                  var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(collection) {
+                  var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(collection) {
                     var insertResult;
                     return _regenerator2.default.wrap(function _callee3$(_context3) {
                       while (1) {
@@ -183,14 +183,14 @@ var NeDb = function (_BaseMongoDb) {
     }();
 
     _this.find = function () {
-      var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(collectionName, query) {
+      var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(collectionName, query) {
         return _regenerator2.default.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
                 _context6.next = 2;
                 return _this.__runForCollection(collectionName, function () {
-                  var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(collection) {
+                  var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(collection) {
                     var page, _query$pageSize, pageSize, otherQuery, boundFunction, resultItems;
 
                     return _regenerator2.default.wrap(function _callee5$(_context5) {
@@ -240,14 +240,14 @@ var NeDb = function (_BaseMongoDb) {
     }();
 
     _this.findAndModify = function () {
-      var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8(collectionName, query, updateQuery) {
+      var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8(collectionName, query, updateQuery) {
         return _regenerator2.default.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
               case 0:
                 _context8.next = 2;
                 return _this.__runForCollection(collectionName, function () {
-                  var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7(collection) {
+                  var _ref8 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(collection) {
                     var _ref9, _ref10, count, resultItem;
 
                     return _regenerator2.default.wrap(function _callee7$(_context7) {
@@ -298,14 +298,14 @@ var NeDb = function (_BaseMongoDb) {
     }();
 
     _this.findOne = function () {
-      var _ref11 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee10(collectionName, query) {
+      var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10(collectionName, query) {
         return _regenerator2.default.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
                 _context10.next = 2;
                 return _this.__runForCollection(collectionName, function () {
-                  var _ref12 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9(collection) {
+                  var _ref12 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(collection) {
                     var resultItem;
                     return _regenerator2.default.wrap(function _callee9$(_context9) {
                       while (1) {
@@ -348,14 +348,14 @@ var NeDb = function (_BaseMongoDb) {
     }();
 
     _this.remove = function () {
-      var _ref13 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee12(collectionName, query) {
+      var _ref13 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee12(collectionName, query) {
         return _regenerator2.default.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
                 _context12.next = 2;
                 return _this.__runForCollection(collectionName, function () {
-                  var _ref14 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11(collection) {
+                  var _ref14 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(collection) {
                     return _regenerator2.default.wrap(function _callee11$(_context11) {
                       while (1) {
                         switch (_context11.prev = _context11.next) {
@@ -396,7 +396,7 @@ var NeDb = function (_BaseMongoDb) {
     }();
 
     _this.__runForCollection = function () {
-      var _ref15 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee13(collectionName, callback) {
+      var _ref15 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee13(collectionName, callback) {
         return _regenerator2.default.wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {

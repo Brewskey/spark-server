@@ -55,7 +55,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     _this._collectionName = _collectionNames2.default.PRODUCT_DEVICES;
 
     _this.create = function () {
-      var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(model) {
+      var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(model) {
         return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -80,7 +80,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.deleteByID = function () {
-      var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(id) {
+      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(id) {
         return _regenerator2.default.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -105,7 +105,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.getAll = function () {
-      var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
+      var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
         var userID = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
         var query;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -134,7 +134,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.getAllByProductID = function () {
-      var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(productID, page, pageSize) {
+      var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(productID, page, pageSize) {
         return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -163,7 +163,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.getByID = function () {
-      var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(id) {
+      var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(id) {
         return _regenerator2.default.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
@@ -188,7 +188,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.getFromDeviceID = function () {
-      var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(deviceID) {
+      var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(deviceID) {
         return _regenerator2.default.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
@@ -215,7 +215,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.getManyFromDeviceIDs = function () {
-      var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7(deviceIDs) {
+      var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(deviceIDs) {
         return _regenerator2.default.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
@@ -241,7 +241,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
       };
     }();
 
-    _this.updateByID = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8() {
+    _this.updateByID = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8() {
       return _regenerator2.default.wrap(function _callee8$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
@@ -257,7 +257,7 @@ var ProductDeviceDatabaseRepository = function (_BaseRepository) {
     }));
 
     _this.updateByID = function () {
-      var _ref9 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9(productDeviceID, productDevice) {
+      var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(productDeviceID, productDevice) {
         return _regenerator2.default.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {

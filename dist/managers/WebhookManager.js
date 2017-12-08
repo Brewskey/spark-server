@@ -112,7 +112,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
   this._errorsCountByWebhookID = new _map2.default();
 
   this.create = function () {
-    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(model) {
+    var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(model) {
       var webhook;
       return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
@@ -141,7 +141,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
   }();
 
   this.deleteByID = function () {
-    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(webhookID) {
+    var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(webhookID) {
       var webhook;
       return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
@@ -180,7 +180,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
     };
   }();
 
-  this.getAll = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
+  this.getAll = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
@@ -200,7 +200,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
   }));
 
   this.getByID = function () {
-    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(webhookID) {
+    var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(webhookID) {
       var webhook;
       return _regenerator2.default.wrap(function _callee4$(_context4) {
         while (1) {
@@ -235,7 +235,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
     };
   }();
 
-  this._init = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
+  this._init = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
     var allWebhooks;
     return _regenerator2.default.wrap(function _callee5$(_context5) {
       while (1) {
@@ -306,7 +306,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
   };
 
   this.runWebhook = function () {
-    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(webhook, event) {
+    var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(webhook, event) {
       var webhookVariablesObject, requestAuth, requestJson, requestFormData, requestHeaders, requestUrl, requestQuery, responseTopic, requestType, isGetRequest, requestOptions, _responseBody, isResponseBodyAnObject, responseTemplate, responseEventData, chunks;
 
       return _regenerator2.default.wrap(function _callee6$(_context6) {
@@ -497,7 +497,7 @@ var WebhookManager = function WebhookManager(eventPublisher, permissionManager, 
   this._webhookLogger = webhookLogger;
   this._webhookRepository = webhookRepository;
 
-  (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
+  (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7() {
     return _regenerator2.default.wrap(function _callee7$(_context7) {
       while (1) {
         switch (_context7.prev = _context7.next) {

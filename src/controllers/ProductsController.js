@@ -536,17 +536,14 @@ class ProductsController extends Controller {
 
     const deviceAttributes = await this._deviceAttributeRepository.getManyFromIDs(
       ids,
-      this.user.id,
     );
+
     const incorrectPlatformDeviceIDs = deviceAttributes
       .filter(
-        deviceAttribute =>
-          deviceAttribute.particleProductId !== product.platform_id,
+        deviceAttribute => deviceAttribute.platformId !== product.platform_id,
       )
       .map(deviceAttribute => deviceAttribute.deviceID);
-    const deviceAttributeIDs = deviceAttributes.map(
-      deviceAttribute => deviceAttribute.deviceID,
-    );
+
     const existingProductDeviceIDs = (await this._productDeviceRepository.getManyFromDeviceIDs(
       ids,
     )).map(productDevice => productDevice.deviceID);
@@ -556,11 +553,15 @@ class ProductsController extends Controller {
       ...existingProductDeviceIDs,
     ];
 
+    const deviceAttributeIDs = deviceAttributes.map(
+      deviceAttribute => deviceAttribute.deviceID,
+    );
+
     const nonmemberDeviceIds = ids.filter(
       id => !deviceAttributeIDs.includes(id),
     );
 
-    if (invalidDeviceIds.length) {
+    if (invalidDeviceIds.length || nonmemberDeviceIds.length) {
       return {
         data: {
           updated: 0,
@@ -572,10 +573,9 @@ class ProductsController extends Controller {
     }
 
     const idsToCreate = ids.filter(
-      id =>
-        !invalidDeviceIds.includes(id) &&
-        !existingProductDeviceIDs.includes(id),
+      id => !existingProductDeviceIDs.includes(id),
     );
+
     await Promise.all(
       idsToCreate.map(id =>
         this._productDeviceRepository.create({

@@ -63,7 +63,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     _this._collectionName = _collectionNames2.default.USERS;
 
     _this.create = function () {
-      var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(user) {
+      var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(user) {
         return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -88,7 +88,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.createWithCredentials = function () {
-      var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(userCredentials) {
+      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(userCredentials) {
         var userRole = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
         var username, password, salt, passwordHash, modelToSave;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -134,7 +134,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.deleteAccessToken = function () {
-      var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(userID, accessToken) {
+      var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(userID, accessToken) {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
@@ -159,7 +159,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.deleteByID = function () {
-      var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(id) {
+      var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(id) {
         return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
@@ -183,7 +183,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
       };
     }();
 
-    _this.getAll = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
+    _this.getAll = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
       return _regenerator2.default.wrap(function _callee5$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
@@ -199,7 +199,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }));
 
     _this.getByAccessToken = function () {
-      var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(accessToken) {
+      var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(accessToken) {
         var user;
         return _regenerator2.default.wrap(function _callee6$(_context6) {
           while (1) {
@@ -243,7 +243,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.getByID = function () {
-      var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7(id) {
+      var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee7(id) {
         return _regenerator2.default.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
@@ -264,7 +264,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.getByUsername = function () {
-      var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8(username) {
+      var _ref8 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee8(username) {
         return _regenerator2.default.wrap(function _callee8$(_context8) {
           while (1) {
             switch (_context8.prev = _context8.next) {
@@ -293,7 +293,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     };
 
     _this.isUserNameInUse = function () {
-      var _ref9 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9(username) {
+      var _ref9 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee9(username) {
         return _regenerator2.default.wrap(function _callee9$(_context9) {
           while (1) {
             switch (_context9.prev = _context9.next) {
@@ -318,7 +318,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.saveAccessToken = function () {
-      var _ref10 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee10(userID, tokenObject) {
+      var _ref10 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee10(userID, tokenObject) {
         return _regenerator2.default.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
@@ -347,7 +347,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     };
 
     _this.updateByID = function () {
-      var _ref11 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11(id, props) {
+      var _ref11 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee11(id, props) {
         return _regenerator2.default.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
@@ -372,7 +372,7 @@ var UserDatabaseRepository = function (_BaseRepository) {
     }();
 
     _this.validateLogin = function () {
-      var _ref12 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee12(username, password) {
+      var _ref12 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee12(username, password) {
         var user, hash;
         return _regenerator2.default.wrap(function _callee12$(_context12) {
           while (1) {
