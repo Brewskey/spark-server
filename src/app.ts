@@ -1,4 +1,10 @@
-import type { Application as $Application, Application } from 'express';
+import type {
+  Application as $Application,
+  Application,
+  NextFunction,
+  Request,
+  Response,
+} from 'express';
 import type { Container } from 'constitute';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -39,19 +45,57 @@ function createApp<TApplication extends Application>(
   //   return next();
   // };
 
-  if (logger.debug()) {
-    app.use(
-      bunyanMiddleware({
-        headerName: 'X-Request-Id',
-        level: 'debug',
-        logger,
-        logName: 'req_id',
-        obscureHeaders: [],
-        propertyName: 'reqId',
-      }),
-    );
-    logger.warn('Request logging enabled');
-  }
+  app.use(
+    bunyanMiddleware({
+      headerName: 'X-Request-Id',
+      level: 'debug',
+      logger,
+      logName: 'req_id',
+      obscureHeaders: [],
+      propertyName: 'reqId',
+    }),
+  );
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const buffers: Buffer[] = [];
+    const proxyHandler = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      apply<TFunc extends (...p: any[]) => any>(
+        target: TFunc,
+        thisArg: unknown,
+        argumentsList: unknown[],
+      ) {
+        const contentType = res.getHeader('content-type');
+        if (
+          typeof contentType === 'string' &&
+          contentType.includes('json') &&
+          argumentsList[0]
+        ) {
+          buffers.push(argumentsList[0] as unknown as Buffer);
+        }
+        return target.call(thisArg, ...argumentsList);
+      },
+    };
+    res.write = new Proxy(res.write, proxyHandler);
+    res.end = new Proxy(res.end, proxyHandler);
+    res.on('finish', () => {
+      let bodyResponse = Buffer.concat(buffers).toString('utf8');
+      try {
+        bodyResponse = JSON.parse(bodyResponse);
+      } catch (_) {
+        /* intentionally ignore */
+      }
+      req.log.info({
+        msg: 'Request',
+        url: req.url,
+        method: req.method,
+        bodyRequest: req.body,
+        statusCode: res.statusCode,
+        bodyResponse,
+        headers: req.headers,
+      });
+    });
+    next();
+  });
 
   app.use(bodyParser.json());
   app.use(
