@@ -1,13 +1,15 @@
 import { LogLevel } from 'bunyan';
 import path from 'path';
+import { Settings } from '../../types';
+import settings from 'spark-protocol/dist/settings';
 
-const SETTINGS = {
+const SETTINGS: Settings & { CUSTOM_FIRMWARE_DIRECTORY: string } = {
+  ...settings,
   BUILD_DIRECTORY: path.join(__dirname, '../__test_data__/build'),
   CUSTOM_FIRMWARE_DIRECTORY: path.join(__dirname, '../__test_data__'),
   DEFAULT_ADMIN_PASSWORD: 'adminPassword',
   DEFAULT_ADMIN_USERNAME: '__admin__',
   DEVICE_DIRECTORY: path.join(__dirname, '../__test_data__/deviceKeys'),
-  ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: true,
   FIRMWARE_DIRECTORY: path.join(__dirname, '../__test_data__/knownApps'),
   FIRMWARE_REPOSITORY_DIRECTORY: path.join(
     __dirname,
@@ -22,7 +24,6 @@ const SETTINGS = {
   ACCESS_TOKEN_LIFETIME: 7776000, // 90 days,
   API_TIMEOUT: 30000,
   CRYPTO_ALGORITHM: 'aes-128-cbc',
-  LOG_REQUESTS: false,
   LOGIN_ROUTE: '/oauth/token',
 
   EXPRESS_SERVER_CONFIG: {
@@ -34,6 +35,7 @@ const SETTINGS = {
   TCP_DEVICE_SERVER_CONFIG: {
     HOST: 'localhost',
     PORT: 5683,
+    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: true,
   },
   DB_CONFIG: {
     PATH: path.join(__dirname, '../__test_data__/db'),

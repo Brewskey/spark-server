@@ -48,12 +48,14 @@ export default <TSettings extends Settings>(
     BINARIES_DIRECTORY,
     CONNECTED_DEVICES_LOGGING_INTERVAL,
     DEVICE_DIRECTORY,
-    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES,
     SERVER_KEY_FILENAME,
     SERVER_KEY_PASSWORD,
     SERVER_KEYS_DIRECTORY,
     TCP_DEVICE_SERVER_CONFIG,
   } = newSettings;
+
+  const { ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES } =
+    newSettings.TCP_DEVICE_SERVER_CONFIG;
 
   // spark protocol container bindings
   defaultBindings(container, {
@@ -63,7 +65,7 @@ export default <TSettings extends Settings>(
     DEVICE_DIRECTORY,
     ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES,
     SERVER_KEY_FILENAME,
-    SERVER_KEY_PASSWORD,
+    SERVER_KEY_PASSWORD: SERVER_KEY_PASSWORD ?? undefined,
     SERVER_KEYS_DIRECTORY,
     TCP_DEVICE_SERVER_CONFIG,
   });
