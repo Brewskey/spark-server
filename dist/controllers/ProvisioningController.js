@@ -1,119 +1,102 @@
 "use strict";
-
-var _Reflect$construct = require("@babel/runtime-corejs3/core-js-stable/reflect/construct");
-
-var _Object$defineProperty = require("@babel/runtime-corejs3/core-js-stable/object/define-property");
-
-var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
-
-_Object$defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = void 0;
-
-var _getOwnPropertyDescriptor = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptor"));
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime-corejs3/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/asyncToGenerator"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/createClass"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/assertThisInitialized"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/inherits"));
-
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/possibleConstructorReturn"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/getPrototypeOf"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/defineProperty"));
-
-var _applyDecoratedDescriptor2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/applyDecoratedDescriptor"));
-
-var _Controller2 = _interopRequireDefault(require("./Controller"));
-
-var _httpVerb = _interopRequireDefault(require("../decorators/httpVerb"));
-
-var _route = _interopRequireDefault(require("../decorators/route"));
-
-var _deviceToAPI = _interopRequireDefault(require("../lib/deviceToAPI"));
-
-var _HttpError = _interopRequireDefault(require("../lib/HttpError"));
-
-var _dec, _dec2, _class;
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = _Reflect$construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !_Reflect$construct) return false; if (_Reflect$construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(_Reflect$construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-var ProvisioningController = (_dec = (0, _httpVerb["default"])('post'), _dec2 = (0, _route["default"])('/v1/provisioning/:deviceID'), (_class = /*#__PURE__*/function (_Controller) {
-  (0, _inherits2["default"])(ProvisioningController, _Controller);
-
-  var _super = _createSuper(ProvisioningController);
-
-  function ProvisioningController(deviceManager) {
-    var _this;
-
-    (0, _classCallCheck2["default"])(this, ProvisioningController);
-    _this = _super.call(this);
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "_deviceManager", void 0);
-    _this._deviceManager = deviceManager;
-    return _this;
-  }
-
-  (0, _createClass2["default"])(ProvisioningController, [{
-    key: "provision",
-    value: function () {
-      var _provision = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(deviceID, postBody) {
-        var device;
-        return _regenerator["default"].wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                if (postBody.publicKey) {
-                  _context.next = 2;
-                  break;
-                }
-
-                throw new _HttpError["default"]('No key provided');
-
-              case 2:
-                _context.next = 4;
-                return this._deviceManager.provision(deviceID, this.user.id, postBody.publicKey, postBody.algorithm);
-
-              case 4:
-                device = _context.sent;
-
-                if (device) {
-                  _context.next = 7;
-                  break;
-                }
-
-                throw new _HttpError["default"]('Provisioning error');
-
-              case 7:
-                return _context.abrupt("return", this.ok((0, _deviceToAPI["default"])(device)));
-
-              case 8:
-              case "end":
-                return _context.stop();
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
             }
-          }
-        }, _callee, this);
-      }));
-
-      function provision(_x, _x2) {
-        return _provision.apply(this, arguments);
-      }
-
-      return provision;
-    }()
-  }]);
-  return ProvisioningController;
-}(_Controller2["default"]), ((0, _applyDecoratedDescriptor2["default"])(_class.prototype, "provision", [_dec, _dec2], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "provision"), _class.prototype)), _class));
-var _default = ProvisioningController;
-exports["default"] = _default;
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Controller_1 = __importDefault(require("./Controller"));
+var httpVerb_1 = __importDefault(require("../decorators/httpVerb"));
+var route_1 = __importDefault(require("../decorators/route"));
+var deviceToAPI_1 = __importDefault(require("../lib/deviceToAPI"));
+var HttpError_1 = __importDefault(require("../lib/HttpError"));
+var ProvisioningController = /** @class */ (function (_super) {
+    __extends(ProvisioningController, _super);
+    function ProvisioningController(deviceManager) {
+        var _this = _super.call(this) || this;
+        _this._deviceManager = deviceManager;
+        return _this;
+    }
+    ProvisioningController.prototype.provision = function (deviceID, postBody) {
+        return __awaiter(this, void 0, void 0, function () {
+            var device;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!postBody.publicKey) {
+                            throw new HttpError_1.default('No key provided');
+                        }
+                        return [4 /*yield*/, this._deviceManager.provision(deviceID, this.user.id, postBody.publicKey, postBody.algorithm)];
+                    case 1:
+                        device = _a.sent();
+                        if (!device) {
+                            throw new HttpError_1.default('Provisioning error');
+                        }
+                        return [2 /*return*/, this.ok((0, deviceToAPI_1.default)(device))];
+                }
+            });
+        });
+    };
+    __decorate([
+        (0, httpVerb_1.default)('post'),
+        (0, route_1.default)('/v1/provisioning/:deviceID')
+    ], ProvisioningController.prototype, "provision", null);
+    return ProvisioningController;
+}(Controller_1.default));
+exports.default = ProvisioningController;
+//# sourceMappingURL=ProvisioningController.js.map

@@ -1,242 +1,178 @@
 "use strict";
-
-var _Reflect$construct = require("@babel/runtime-corejs3/core-js-stable/reflect/construct");
-
-var _Object$keys = require("@babel/runtime-corejs3/core-js-stable/object/keys");
-
-var _Object$getOwnPropertySymbols = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-symbols");
-
-var _filterInstanceProperty = require("@babel/runtime-corejs3/core-js-stable/instance/filter");
-
-var _Object$getOwnPropertyDescriptor2 = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptor");
-
-var _forEachInstanceProperty = require("@babel/runtime-corejs3/core-js-stable/instance/for-each");
-
-var _Object$getOwnPropertyDescriptors = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptors");
-
-var _Object$defineProperties = require("@babel/runtime-corejs3/core-js-stable/object/define-properties");
-
-var _Object$defineProperty = require("@babel/runtime-corejs3/core-js-stable/object/define-property");
-
-var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
-
-_Object$defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = void 0;
-
-var _getOwnPropertyDescriptor = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptor"));
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime-corejs3/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/asyncToGenerator"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/createClass"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/assertThisInitialized"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/inherits"));
-
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/possibleConstructorReturn"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/getPrototypeOf"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/defineProperty"));
-
-var _applyDecoratedDescriptor2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/applyDecoratedDescriptor"));
-
-var _Controller2 = _interopRequireDefault(require("./Controller"));
-
-var _HttpError = _interopRequireDefault(require("../lib/HttpError"));
-
-var _httpVerb = _interopRequireDefault(require("../decorators/httpVerb"));
-
-var _route = _interopRequireDefault(require("../decorators/route"));
-
-var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _class;
-
-function ownKeys(object, enumerableOnly) { var keys = _Object$keys(object); if (_Object$getOwnPropertySymbols) { var symbols = _Object$getOwnPropertySymbols(object); if (enumerableOnly) { symbols = _filterInstanceProperty(symbols).call(symbols, function (sym) { return _Object$getOwnPropertyDescriptor2(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { var _context5; _forEachInstanceProperty(_context5 = ownKeys(Object(source), true)).call(_context5, function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (_Object$getOwnPropertyDescriptors) { _Object$defineProperties(target, _Object$getOwnPropertyDescriptors(source)); } else { var _context6; _forEachInstanceProperty(_context6 = ownKeys(Object(source))).call(_context6, function (key) { _Object$defineProperty(target, key, _Object$getOwnPropertyDescriptor2(source, key)); }); } } return target; }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = _Reflect$construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !_Reflect$construct) return false; if (_Reflect$construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(_Reflect$construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-var validateWebhookMutator = function validateWebhookMutator(webhookMutator) {
-  if (!webhookMutator.event) {
-    return new _HttpError["default"]('no event name provided');
-  }
-
-  if (!webhookMutator.url) {
-    return new _HttpError["default"]('no url provided');
-  }
-
-  if (!webhookMutator.requestType) {
-    return new _HttpError["default"]('no requestType provided');
-  }
-
-  return null;
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
-
-var WebhooksController = (_dec = (0, _httpVerb["default"])('get'), _dec2 = (0, _route["default"])('/v1/webhooks'), _dec3 = (0, _httpVerb["default"])('get'), _dec4 = (0, _route["default"])('/v1/webhooks/:webhookID'), _dec5 = (0, _httpVerb["default"])('post'), _dec6 = (0, _route["default"])('/v1/webhooks'), _dec7 = (0, _httpVerb["default"])('delete'), _dec8 = (0, _route["default"])('/v1/webhooks/:webhookID'), (_class = /*#__PURE__*/function (_Controller) {
-  (0, _inherits2["default"])(WebhooksController, _Controller);
-
-  var _super = _createSuper(WebhooksController);
-
-  function WebhooksController(webhookManager) {
-    var _this;
-
-    (0, _classCallCheck2["default"])(this, WebhooksController);
-    _this = _super.call(this);
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "_webhookManager", void 0);
-    _this._webhookManager = webhookManager;
-    return _this;
-  }
-
-  (0, _createClass2["default"])(WebhooksController, [{
-    key: "getAll",
-    value: function () {
-      var _getAll = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
-        return _regenerator["default"].wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.t0 = this;
-                _context.next = 3;
-                return this._webhookManager.getAll();
-
-              case 3:
-                _context.t1 = _context.sent;
-                return _context.abrupt("return", _context.t0.ok.call(_context.t0, _context.t1));
-
-              case 5:
-              case "end":
-                return _context.stop();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
             }
-          }
-        }, _callee, this);
-      }));
-
-      function getAll() {
-        return _getAll.apply(this, arguments);
-      }
-
-      return getAll;
-    }()
-  }, {
-    key: "getByID",
-    value: function () {
-      var _getByID = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(webhookID) {
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.t0 = this;
-                _context2.next = 3;
-                return this._webhookManager.getByID(webhookID);
-
-              case 3:
-                _context2.t1 = _context2.sent;
-                return _context2.abrupt("return", _context2.t0.ok.call(_context2.t0, _context2.t1));
-
-              case 5:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function getByID(_x) {
-        return _getByID.apply(this, arguments);
-      }
-
-      return getByID;
-    }()
-  }, {
-    key: "create",
-    value: function () {
-      var _create = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(model) {
-        var validateError, newWebhook;
-        return _regenerator["default"].wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                validateError = validateWebhookMutator(model);
-
-                if (!validateError) {
-                  _context3.next = 3;
-                  break;
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var Controller_1 = __importDefault(require("./Controller"));
+var HttpError_1 = __importDefault(require("../lib/HttpError"));
+var httpVerb_1 = __importDefault(require("../decorators/httpVerb"));
+var route_1 = __importDefault(require("../decorators/route"));
+var validateWebhookMutator = function (webhookMutator) {
+    if (!webhookMutator.event) {
+        return new HttpError_1.default('no event name provided');
+    }
+    if (!webhookMutator.url) {
+        return new HttpError_1.default('no url provided');
+    }
+    if (!webhookMutator.requestType) {
+        return new HttpError_1.default('no requestType provided');
+    }
+    return null;
+};
+var WebhooksController = /** @class */ (function (_super) {
+    __extends(WebhooksController, _super);
+    function WebhooksController(webhookManager) {
+        var _this = _super.call(this) || this;
+        _this._webhookManager = webhookManager;
+        return _this;
+    }
+    WebhooksController.prototype.getAll = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this.ok;
+                        return [4 /*yield*/, this._webhookManager.getAll()];
+                    case 1: return [2 /*return*/, _a.apply(this, [_b.sent()])];
                 }
-
-                throw validateError;
-
-              case 3:
-                _context3.next = 5;
-                return this._webhookManager.create(_objectSpread(_objectSpread({}, model), {}, {
-                  ownerID: this.user.id
-                }));
-
-              case 5:
-                newWebhook = _context3.sent;
-                return _context3.abrupt("return", this.ok({
-                  created_at: newWebhook.created_at,
-                  event: newWebhook.event,
-                  id: newWebhook.id,
-                  ok: true,
-                  url: newWebhook.url
-                }));
-
-              case 7:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function create(_x2) {
-        return _create.apply(this, arguments);
-      }
-
-      return create;
-    }()
-  }, {
-    key: "deleteByID",
-    value: function () {
-      var _deleteByID = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(webhookID) {
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return this._webhookManager.deleteByID(webhookID);
-
-              case 2:
-                return _context4.abrupt("return", this.ok({
-                  ok: true
-                }));
-
-              case 3:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function deleteByID(_x3) {
-        return _deleteByID.apply(this, arguments);
-      }
-
-      return deleteByID;
-    }()
-  }]);
-  return WebhooksController;
-}(_Controller2["default"]), ((0, _applyDecoratedDescriptor2["default"])(_class.prototype, "getAll", [_dec, _dec2], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "getAll"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "getByID", [_dec3, _dec4], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "getByID"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "create", [_dec5, _dec6], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "create"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "deleteByID", [_dec7, _dec8], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "deleteByID"), _class.prototype)), _class));
-var _default = WebhooksController;
-exports["default"] = _default;
+            });
+        });
+    };
+    WebhooksController.prototype.getByID = function (webhookID) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this.ok;
+                        return [4 /*yield*/, this._webhookManager.getByID(webhookID)];
+                    case 1: return [2 /*return*/, _a.apply(this, [_b.sent()])];
+                }
+            });
+        });
+    };
+    WebhooksController.prototype.create = function (model) {
+        return __awaiter(this, void 0, void 0, function () {
+            var validateError, newWebhook;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        validateError = validateWebhookMutator(model);
+                        if (validateError) {
+                            throw validateError;
+                        }
+                        return [4 /*yield*/, this._webhookManager.create(__assign(__assign({}, model), { ownerID: this.user.id }))];
+                    case 1:
+                        newWebhook = _a.sent();
+                        return [2 /*return*/, this.ok({
+                                created_at: newWebhook.created_at,
+                                event: newWebhook.event,
+                                id: newWebhook.id,
+                                ok: true,
+                                url: newWebhook.url,
+                            })];
+                }
+            });
+        });
+    };
+    WebhooksController.prototype.deleteByID = function (webhookID) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._webhookManager.deleteByID(webhookID)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, this.ok({ ok: true })];
+                }
+            });
+        });
+    };
+    __decorate([
+        (0, httpVerb_1.default)('get'),
+        (0, route_1.default)('/v1/webhooks')
+    ], WebhooksController.prototype, "getAll", null);
+    __decorate([
+        (0, httpVerb_1.default)('get'),
+        (0, route_1.default)('/v1/webhooks/:webhookID')
+    ], WebhooksController.prototype, "getByID", null);
+    __decorate([
+        (0, httpVerb_1.default)('post'),
+        (0, route_1.default)('/v1/webhooks')
+    ], WebhooksController.prototype, "create", null);
+    __decorate([
+        (0, httpVerb_1.default)('delete'),
+        (0, route_1.default)('/v1/webhooks/:webhookID')
+    ], WebhooksController.prototype, "deleteByID", null);
+    return WebhooksController;
+}(Controller_1.default));
+exports.default = WebhooksController;
+//# sourceMappingURL=WebhooksController.js.map

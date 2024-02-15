@@ -1,5 +1,12 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "javascript.validate.enable": false,
-    "flow.useNPMPackagedFlow": true
+  "javascript.validate.enable": false,
+  "flow.useNPMPackagedFlow": true,
+  "eslint.format.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "jest.runMode": "on-demand",
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "cSpell.words": ["nullthrows"]
 }

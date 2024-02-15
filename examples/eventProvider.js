@@ -1,10 +1,10 @@
 /*
-* Many of you want to scale the server with docker images or some other way.
-* You should be able to use the following code to get full events stream
-* and pipe it with some service like rabbitMQ or zeroMQ.
-* You shouldn't worry about events mirroring between different processes,
-* EVENT_PROVIDER is smart enough to filter broadcasted events.
-*/
+ * Many of you want to scale the server with docker images or some other way.
+ * You should be able to use the following code to get full events stream
+ * and pipe it with some service like rabbitMQ or zeroMQ.
+ * You shouldn't worry about events mirroring between different processes,
+ * EVENT_PROVIDER is smart enough to filter broadcasted events.
+ */
 
 /*
   to build this sample run
@@ -23,7 +23,6 @@
 
 /* eslint-disable */
 
-import type { Event } from '../types';
 import { Container } from 'constitute';
 import defaultBindings from '../defaultBindings';
 import settings from '../settings.js';
@@ -36,6 +35,6 @@ const deviceServer = container.constitute('DeviceServer');
 deviceServer.start();
 
 const eventProvider = container.constitute('EVENT_PROVIDER');
-eventProvider.onNewEvent((event: Event) => {
+eventProvider.onNewEvent((event) => {
   logger.info('Event onNewEvent', event);
 });

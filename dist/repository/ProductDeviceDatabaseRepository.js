@@ -1,346 +1,157 @@
 "use strict";
-
-var _Reflect$construct = require("@babel/runtime-corejs3/core-js-stable/reflect/construct");
-
-var _Object$keys = require("@babel/runtime-corejs3/core-js-stable/object/keys");
-
-var _Object$getOwnPropertySymbols = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-symbols");
-
-var _filterInstanceProperty = require("@babel/runtime-corejs3/core-js-stable/instance/filter");
-
-var _Object$getOwnPropertyDescriptor = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptor");
-
-var _forEachInstanceProperty = require("@babel/runtime-corejs3/core-js-stable/instance/for-each");
-
-var _Object$getOwnPropertyDescriptors = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptors");
-
-var _Object$defineProperties = require("@babel/runtime-corejs3/core-js-stable/object/define-properties");
-
-var _Object$defineProperty = require("@babel/runtime-corejs3/core-js-stable/object/define-property");
-
-var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
-
-_Object$defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = void 0;
-
-var _find = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/find"));
-
-var _map = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/map"));
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime-corejs3/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/asyncToGenerator"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/classCallCheck"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/assertThisInitialized"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/inherits"));
-
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/possibleConstructorReturn"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/getPrototypeOf"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/defineProperty"));
-
-var _collectionNames = _interopRequireDefault(require("./collectionNames"));
-
-var _BaseRepository2 = _interopRequireDefault(require("./BaseRepository"));
-
-function ownKeys(object, enumerableOnly) { var keys = _Object$keys(object); if (_Object$getOwnPropertySymbols) { var symbols = _Object$getOwnPropertySymbols(object); if (enumerableOnly) { symbols = _filterInstanceProperty(symbols).call(symbols, function (sym) { return _Object$getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { var _context15; _forEachInstanceProperty(_context15 = ownKeys(Object(source), true)).call(_context15, function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (_Object$getOwnPropertyDescriptors) { _Object$defineProperties(target, _Object$getOwnPropertyDescriptors(source)); } else { var _context16; _forEachInstanceProperty(_context16 = ownKeys(Object(source))).call(_context16, function (key) { _Object$defineProperty(target, key, _Object$getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = _Reflect$construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !_Reflect$construct) return false; if (_Reflect$construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(_Reflect$construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-var ProductDeviceDatabaseRepository = /*#__PURE__*/function (_BaseRepository) {
-  (0, _inherits2["default"])(ProductDeviceDatabaseRepository, _BaseRepository);
-
-  var _super = _createSuper(ProductDeviceDatabaseRepository);
-
-  function ProductDeviceDatabaseRepository(database) {
-    var _this;
-
-    (0, _classCallCheck2["default"])(this, ProductDeviceDatabaseRepository);
-    _this = _super.call(this, database, _collectionNames["default"].PRODUCT_DEVICES);
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "_database", void 0);
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "_collectionName", _collectionNames["default"].PRODUCT_DEVICES);
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "countByProductID", function (productID) {
-      var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      return _this._database.count(_this._collectionName, _objectSpread(_objectSpread({}, query), {}, {
-        productID: productID
-      }));
-    });
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "create", /*#__PURE__*/function () {
-      var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(model) {
-        return _regenerator["default"].wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                return _context.abrupt("return", _this._database.insertOne(_this._collectionName, _objectSpread({}, model)));
-
-              case 1:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }));
-
-      return function (_x) {
-        return _ref.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "deleteByID", /*#__PURE__*/function () {
-      var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(id) {
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                return _context2.abrupt("return", _this._database.remove(_this._collectionName, {
-                  _id: id
-                }));
-
-              case 1:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2);
-      }));
-
-      return function (_x2) {
-        return _ref2.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "getAll", /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3() {
-      var _context3;
-
-      var userID,
-          query,
-          _args3 = arguments;
-      return _regenerator["default"].wrap(function _callee3$(_context4) {
-        while (1) {
-          switch (_context4.prev = _context4.next) {
-            case 0:
-              userID = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : null;
-              // TODO - this should probably just query the organization
-              query = userID ? {
-                ownerID: userID
-              } : {};
-              return _context4.abrupt("return", (0, _find["default"])(_context3 = _this._database).call(_context3, _this._collectionName, query));
-
-            case 3:
-            case "end":
-              return _context4.stop();
-          }
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
         }
-      }, _callee3);
-    })));
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "getAllByProductID", /*#__PURE__*/function () {
-      var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(productID, skip, take) {
-        var _context5;
-
-        return _regenerator["default"].wrap(function _callee4$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                return _context6.abrupt("return", (0, _find["default"])(_context5 = _this._database).call(_context5, _this._collectionName, {
-                  productID: productID,
-                  skip: skip,
-                  take: take
-                }));
-
-              case 1:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee4);
-      }));
-
-      return function (_x3, _x4, _x5) {
-        return _ref4.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "getManyByProductID", /*#__PURE__*/function () {
-      var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(productID, query) {
-        var _context7;
-
-        return _regenerator["default"].wrap(function _callee5$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                return _context8.abrupt("return", (0, _find["default"])(_context7 = _this._database).call(_context7, _this._collectionName, _objectSpread(_objectSpread({}, query), {}, {
-                  productID: productID
-                })));
-
-              case 1:
-              case "end":
-                return _context8.stop();
-            }
-          }
-        }, _callee5);
-      }));
-
-      return function (_x6, _x7) {
-        return _ref5.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "getByID", /*#__PURE__*/function () {
-      var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(id) {
-        return _regenerator["default"].wrap(function _callee6$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
-                return _context9.abrupt("return", _this._database.findOne(_this._collectionName, {
-                  _id: id
-                }));
-
-              case 1:
-              case "end":
-                return _context9.stop();
-            }
-          }
-        }, _callee6);
-      }));
-
-      return function (_x8) {
-        return _ref6.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "getFromDeviceID", /*#__PURE__*/function () {
-      var _ref7 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(deviceID) {
-        return _regenerator["default"].wrap(function _callee7$(_context10) {
-          while (1) {
-            switch (_context10.prev = _context10.next) {
-              case 0:
-                return _context10.abrupt("return", _this._database.findOne(_this._collectionName, {
-                  deviceID: deviceID.toLowerCase()
-                }));
-
-              case 1:
-              case "end":
-                return _context10.stop();
-            }
-          }
-        }, _callee7);
-      }));
-
-      return function (_x9) {
-        return _ref7.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "getManyFromDeviceIDs", /*#__PURE__*/function () {
-      var _ref8 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(deviceIDs) {
-        var _context11;
-
-        return _regenerator["default"].wrap(function _callee8$(_context12) {
-          while (1) {
-            switch (_context12.prev = _context12.next) {
-              case 0:
-                return _context12.abrupt("return", // todo  $in operator doesn't work for neDb(no matter with regexp or plain strings)
-                (0, _find["default"])(_context11 = _this._database).call(_context11, _this._collectionName, {
-                  deviceID: {
-                    $in: (0, _map["default"])(deviceIDs).call(deviceIDs, function (id) {
-                      return id.toLowerCase();
-                    })
-                  }
-                }));
-
-              case 1:
-              case "end":
-                return _context12.stop();
-            }
-          }
-        }, _callee8);
-      }));
-
-      return function (_x10) {
-        return _ref8.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "updateByID", /*#__PURE__*/function () {
-      var _ref9 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(productDeviceID, productDevice) {
-        return _regenerator["default"].wrap(function _callee9$(_context13) {
-          while (1) {
-            switch (_context13.prev = _context13.next) {
-              case 0:
-                return _context13.abrupt("return", _this._database.findAndModify(_this._collectionName, {
-                  _id: productDeviceID
-                }, {
-                  $set: _objectSpread(_objectSpread({}, productDevice), productDevice.deviceID ? {
-                    deviceID: productDevice.deviceID.toLowerCase()
-                  } : {})
-                }));
-
-              case 1:
-              case "end":
-                return _context13.stop();
-            }
-          }
-        }, _callee9);
-      }));
-
-      return function (_x11, _x12) {
-        return _ref9.apply(this, arguments);
-      };
-    }());
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "deleteByProductID", /*#__PURE__*/function () {
-      var _ref10 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(productID) {
-        return _regenerator["default"].wrap(function _callee10$(_context14) {
-          while (1) {
-            switch (_context14.prev = _context14.next) {
-              case 0:
-                return _context14.abrupt("return", _this._database.remove(_this._collectionName, {
-                  product_id: productID
-                }));
-
-              case 1:
-              case "end":
-                return _context14.stop();
-            }
-          }
-        }, _callee10);
-      }));
-
-      return function (_x13) {
-        return _ref10.apply(this, arguments);
-      };
-    }());
-    _this._database = database;
-
-    _this.tryCreateIndex({
-      productID: 1
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-
-    _this.tryCreateIndex({
-      productID: 1,
-      productFirmwareVersion: 1
-    });
-
-    _this.tryCreateIndex({
-      ownerID: 1
-    });
-
-    _this.tryCreateIndex({
-      deviceID: 1
-    });
-
-    _this.tryCreateIndex({
-      product_id: 1
-    });
-
-    return _this;
-  }
-
-  return ProductDeviceDatabaseRepository;
-}(_BaseRepository2["default"]);
-
-var _default = ProductDeviceDatabaseRepository;
-exports["default"] = _default;
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var collectionNames_1 = __importDefault(require("./collectionNames"));
+var BaseRepository_1 = __importDefault(require("./BaseRepository"));
+var ProductDeviceDatabaseRepository = /** @class */ (function (_super) {
+    __extends(ProductDeviceDatabaseRepository, _super);
+    function ProductDeviceDatabaseRepository(database) {
+        var _this = _super.call(this, database, collectionNames_1.default.PRODUCT_DEVICES) || this;
+        _this._collectionName = collectionNames_1.default.PRODUCT_DEVICES;
+        _this.countByProductID = function (productID, query) {
+            return _this._database.count(_this._collectionName, __assign(__assign({}, query), { productID: productID }));
+        };
+        _this.create = function (model) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this._database.insertOne(this._collectionName, __assign({}, model))];
+            });
+        }); };
+        _this.deleteByID = function (id) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+            return [2 /*return*/, this._database.remove(this._collectionName, { _id: id })];
+        }); }); };
+        _this.getAll = function (userID) {
+            if (userID === void 0) { userID = null; }
+            return __awaiter(_this, void 0, void 0, function () {
+                var query;
+                return __generator(this, function (_a) {
+                    query = userID ? { ownerID: userID } : {};
+                    return [2 /*return*/, this._database.find(this._collectionName, query)];
+                });
+            });
+        };
+        _this.getAllByProductID = function (productID, skip, take) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this._database.find(this._collectionName, {
+                        productID: productID,
+                        skip: skip,
+                        take: take,
+                    })];
+            });
+        }); };
+        _this.getManyByProductID = function (productID, query) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this._database.find(this._collectionName, __assign(__assign({}, query), { productID: productID }))];
+            });
+        }); };
+        _this.getByID = function (id) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+            return [2 /*return*/, this._database.findOne(this._collectionName, { _id: id })];
+        }); }); };
+        _this.getFromDeviceID = function (deviceID) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this._database.findOne(this._collectionName, {
+                        deviceID: deviceID.toLowerCase(),
+                    })];
+            });
+        }); };
+        _this.getManyFromDeviceIDs = function (deviceIDs) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, // todo  $in operator doesn't work for neDb(no matter with regexp or plain strings)
+                    this._database.find(this._collectionName, {
+                        deviceID: {
+                            $in: deviceIDs.map(function (id) { return id.toLowerCase(); }),
+                        },
+                    })];
+            });
+        }); };
+        _this.updateByID = function (productDeviceID, productDevice) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this._database.findAndModify(this._collectionName, { _id: productDeviceID }, {
+                        $set: __assign(__assign({}, productDevice), (productDevice.deviceID
+                            ? { deviceID: productDevice.deviceID.toLowerCase() }
+                            : {})),
+                    })];
+            });
+        }); };
+        _this.deleteByProductID = function (productID) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this._database.remove(this._collectionName, {
+                        product_id: productID,
+                    })];
+            });
+        }); };
+        _this._database = database;
+        _this.tryCreateIndex({ productID: 1 });
+        _this.tryCreateIndex({ productID: 1, productFirmwareVersion: 1 });
+        _this.tryCreateIndex({ ownerID: 1 });
+        _this.tryCreateIndex({ deviceID: 1 });
+        _this.tryCreateIndex({ product_id: 1 });
+        return _this;
+    }
+    return ProductDeviceDatabaseRepository;
+}(BaseRepository_1.default));
+exports.default = ProductDeviceDatabaseRepository;
+//# sourceMappingURL=ProductDeviceDatabaseRepository.js.map

@@ -1,37 +1,18 @@
 {
+  "root": true,
+  "parserOptions": {
+    "project": "./tsconfig.json",
+  },
+  "plugins": ["@typescript-eslint", "import", "prettier"],
   "extends": [
-    "airbnb-base",
+    "airbnb-typescript/base",
     "prettier",
-    "plugin:flowtype/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
   ],
-  "parser": "@babel/eslint-parser",
-  "plugins": [
-    "flowtype"
-  ],
+  "parser": "@typescript-eslint/parser",
   "rules": {
     "eol-last": 2,
-    "flowtype/define-flow-type": 1,
-    "flowtype/require-parameter-type": 1,
-    "flowtype/require-valid-file-annotation": [
-      2,
-      "always"
-    ],
-    "flowtype/require-return-type": [
-      1,
-      "always",
-      {
-        "annotateUndefined": "never"
-      }
-    ],
-    "flowtype/space-after-type-colon": [
-      1,
-      "always"
-    ],
-    "flowtype/space-before-type-colon": [
-      1,
-      "never"
-    ],
-    "flowtype/use-flow-type": 1,
     "import/first": 0,
     "import/newline-after-import": 0,
     "import/no-duplicates": 0,
@@ -46,16 +27,43 @@
     "no-mixed-operators": 0,
     "no-underscore-dangle": 0,
     "no-use-before-define": 0,
-    "object-curly-spacing": 2,
     "class-methods-use-this": "off",
     "no-promise-executor-return": "off",
     "quotes": [
       2,
       "single",
       {
-        "avoidEscape": true
-      }
+        "avoidEscape": true,
+      },
     ],
-    "semi": 2
-  }
+    "semi": 2,
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn", // or "error"
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+      },
+    ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": ["parameter", "variable"],
+        "leadingUnderscore": "forbid",
+        "filter": {
+          // keep this one open for destructuring
+          "regex": "_*",
+          "match": false,
+        },
+        "format": null,
+      },
+      {
+        "selector": "parameter",
+        "leadingUnderscore": "require",
+        "format": null,
+        "modifiers": ["unused"],
+      },
+    ],
+  },
 }

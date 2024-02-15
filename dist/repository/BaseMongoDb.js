@@ -1,88 +1,65 @@
 "use strict";
-
-var _Object$keys2 = require("@babel/runtime-corejs3/core-js-stable/object/keys");
-
-var _Object$getOwnPropertySymbols = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-symbols");
-
-var _filterInstanceProperty = require("@babel/runtime-corejs3/core-js-stable/instance/filter");
-
-var _Object$getOwnPropertyDescriptor = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptor");
-
-var _forEachInstanceProperty2 = require("@babel/runtime-corejs3/core-js-stable/instance/for-each");
-
-var _Object$getOwnPropertyDescriptors = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptors");
-
-var _Object$defineProperties = require("@babel/runtime-corejs3/core-js-stable/object/define-properties");
-
-var _Object$defineProperty = require("@babel/runtime-corejs3/core-js-stable/object/define-property");
-
-var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
-
-_Object$defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = void 0;
-
-var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/objectWithoutProperties"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/classCallCheck"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/defineProperty"));
-
-var _forEach = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/for-each"));
-
-var _keys = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/object/keys"));
-
-var _mongodb = require("mongodb");
-
-var _excluded = ["id"],
-    _excluded2 = ["_id"];
-
-function ownKeys(object, enumerableOnly) { var keys = _Object$keys2(object); if (_Object$getOwnPropertySymbols) { var symbols = _Object$getOwnPropertySymbols(object); if (enumerableOnly) { symbols = _filterInstanceProperty(symbols).call(symbols, function (sym) { return _Object$getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { var _context2; _forEachInstanceProperty2(_context2 = ownKeys(Object(source), true)).call(_context2, function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (_Object$getOwnPropertyDescriptors) { _Object$defineProperties(target, _Object$getOwnPropertyDescriptors(source)); } else { var _context3; _forEachInstanceProperty2(_context3 = ownKeys(Object(source))).call(_context3, function (key) { _Object$defineProperty(target, key, _Object$getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-var deepToObjectIdCast = function deepToObjectIdCast(node) {
-  var _context;
-
-  (0, _forEach["default"])(_context = (0, _keys["default"])(node)).call(_context, function (key) {
-    if (node[key] === Object(node[key])) {
-      deepToObjectIdCast(node[key]);
-    }
-
-    if (key === '_id') {
-      // eslint-disable-next-line
-      node[key] = new _mongodb.ObjectId(node[key]);
-    }
-  });
-  return node;
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
-
-var BaseMongoDb = function BaseMongoDb() {
-  var _this = this;
-
-  (0, _classCallCheck2["default"])(this, BaseMongoDb);
-  (0, _defineProperty2["default"])(this, "__filterID", function (_ref) {
-    var id = _ref.id,
-        otherProps = (0, _objectWithoutProperties2["default"])(_ref, _excluded);
-    return _objectSpread({}, otherProps);
-  });
-  (0, _defineProperty2["default"])(this, "__translateQuery", function (query) {
-    return _this.__filterID(deepToObjectIdCast(query));
-  });
-  (0, _defineProperty2["default"])(this, "__translateResultItem", function (item) {
-    if (!item) {
-      return null;
-    }
-
-    var _id = item._id,
-        otherProps = (0, _objectWithoutProperties2["default"])(item, _excluded2);
-    return _objectSpread(_objectSpread({}, otherProps), {}, {
-      id: _id.toString()
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var mongodb_1 = require("mongodb");
+var deepToObjectIdCast = function (node) {
+    Object.keys(node).forEach(function (key) {
+        var val = node[key];
+        if (val === Object(node[key])) {
+            deepToObjectIdCast(val);
+        }
+        if (key === '_id') {
+            // eslint-disable-next-line
+            node[key] = new mongodb_1.ObjectId(val);
+        }
     });
-  });
+    return node;
 };
-
-var _default = BaseMongoDb;
-exports["default"] = _default;
+var BaseMongoDb = /** @class */ (function () {
+    function BaseMongoDb() {
+        var _this = this;
+        // eslint-disable-next-line no-unused-vars
+        this.__filterID = function (_a) {
+            var _ = _a.id, otherProps = __rest(_a, ["id"]);
+            return (__assign({}, otherProps));
+        };
+        this.__translateQuery = function (query) {
+            return _this.__filterID(deepToObjectIdCast(query !== null && query !== void 0 ? query : {}));
+        };
+        this.__translateResultItem = function (item) {
+            if (!item) {
+                return null;
+            }
+            var castEntity = item;
+            if (castEntity._id) {
+                castEntity.id = castEntity._id.toString();
+                delete castEntity._id;
+            }
+            return item;
+        };
+    }
+    return BaseMongoDb;
+}());
+exports.default = BaseMongoDb;
+//# sourceMappingURL=BaseMongoDb.js.map

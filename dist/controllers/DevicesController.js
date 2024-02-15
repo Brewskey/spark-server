@@ -1,597 +1,357 @@
 "use strict";
-
-var _Reflect$construct = require("@babel/runtime-corejs3/core-js-stable/reflect/construct");
-
-var _Object$keys = require("@babel/runtime-corejs3/core-js-stable/object/keys");
-
-var _Object$getOwnPropertySymbols = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-symbols");
-
-var _filterInstanceProperty = require("@babel/runtime-corejs3/core-js-stable/instance/filter");
-
-var _Object$getOwnPropertyDescriptor2 = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptor");
-
-var _forEachInstanceProperty = require("@babel/runtime-corejs3/core-js-stable/instance/for-each");
-
-var _Object$getOwnPropertyDescriptors = require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptors");
-
-var _Object$defineProperties = require("@babel/runtime-corejs3/core-js-stable/object/define-properties");
-
-var _Object$defineProperty = require("@babel/runtime-corejs3/core-js-stable/object/define-property");
-
-var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
-
-_Object$defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = void 0;
-
-var _map = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/map"));
-
-var _includes = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/includes"));
-
-var _parseInt2 = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/parse-int"));
-
-var _endsWith = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/ends-with"));
-
-var _indexOf = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/index-of"));
-
-var _getOwnPropertyDescriptor = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/object/get-own-property-descriptor"));
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime-corejs3/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/asyncToGenerator"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/createClass"));
-
-var _assertThisInitialized2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/assertThisInitialized"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/inherits"));
-
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/possibleConstructorReturn"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/getPrototypeOf"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/defineProperty"));
-
-var _applyDecoratedDescriptor2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/applyDecoratedDescriptor"));
-
-var _nullthrows = _interopRequireDefault(require("nullthrows"));
-
-var _Controller2 = _interopRequireDefault(require("./Controller"));
-
-var _HttpError = _interopRequireDefault(require("../lib/HttpError"));
-
-var _FirmwareCompilationManager = _interopRequireDefault(require("../managers/FirmwareCompilationManager"));
-
-var _allowUpload = _interopRequireDefault(require("../decorators/allowUpload"));
-
-var _httpVerb = _interopRequireDefault(require("../decorators/httpVerb"));
-
-var _route = _interopRequireDefault(require("../decorators/route"));
-
-var _deviceToAPI = _interopRequireDefault(require("../lib/deviceToAPI"));
-
-var _logger = _interopRequireDefault(require("../lib/logger"));
-
-var _dec, _dec2, _dec3, _dec4, _dec5, _dec6, _dec7, _dec8, _dec9, _dec10, _dec11, _dec12, _dec13, _dec14, _dec15, _dec16, _dec17, _dec18, _dec19, _dec20, _dec21, _dec22, _class;
-
-function ownKeys(object, enumerableOnly) { var keys = _Object$keys(object); if (_Object$getOwnPropertySymbols) { var symbols = _Object$getOwnPropertySymbols(object); if (enumerableOnly) { symbols = _filterInstanceProperty(symbols).call(symbols, function (sym) { return _Object$getOwnPropertyDescriptor2(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { var _context12; _forEachInstanceProperty(_context12 = ownKeys(Object(source), true)).call(_context12, function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (_Object$getOwnPropertyDescriptors) { _Object$defineProperties(target, _Object$getOwnPropertyDescriptors(source)); } else { var _context13; _forEachInstanceProperty(_context13 = ownKeys(Object(source))).call(_context13, function (key) { _Object$defineProperty(target, key, _Object$getOwnPropertyDescriptor2(source, key)); }); } } return target; }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = _Reflect$construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !_Reflect$construct) return false; if (_Reflect$construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(_Reflect$construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-var logger = _logger["default"].createModuleLogger(module);
-
-var DevicesController = (_dec = (0, _httpVerb["default"])('post'), _dec2 = (0, _route["default"])('/v1/devices'), _dec3 = (0, _httpVerb["default"])('get'), _dec4 = (0, _route["default"])('/v1/binaries/:binaryID'), _dec5 = (0, _httpVerb["default"])('post'), _dec6 = (0, _route["default"])('/v1/binaries'), _dec7 = (0, _allowUpload["default"])(), _dec8 = (0, _httpVerb["default"])('delete'), _dec9 = (0, _route["default"])('/v1/devices/:deviceIDorName'), _dec10 = (0, _httpVerb["default"])('get'), _dec11 = (0, _route["default"])('/v1/devices'), _dec12 = (0, _httpVerb["default"])('get'), _dec13 = (0, _route["default"])('/v1/devices/:deviceIDorName'), _dec14 = (0, _httpVerb["default"])('get'), _dec15 = (0, _route["default"])('/v1/devices/:deviceIDorName/:varName/'), _dec16 = (0, _httpVerb["default"])('put'), _dec17 = (0, _route["default"])('/v1/devices/:deviceIDorName'), _dec18 = (0, _allowUpload["default"])('file', 1), _dec19 = (0, _httpVerb["default"])('post'), _dec20 = (0, _route["default"])('/v1/devices/:deviceIDorName/:functionName'), _dec21 = (0, _httpVerb["default"])('put'), _dec22 = (0, _route["default"])('/v1/devices/:deviceIDorName/ping'), (_class = /*#__PURE__*/function (_Controller) {
-  (0, _inherits2["default"])(DevicesController, _Controller);
-
-  var _super = _createSuper(DevicesController);
-
-  function DevicesController(deviceManager) {
-    var _this;
-
-    (0, _classCallCheck2["default"])(this, DevicesController);
-    _this = _super.call(this);
-    (0, _defineProperty2["default"])((0, _assertThisInitialized2["default"])(_this), "_deviceManager", void 0);
-    _this._deviceManager = deviceManager;
-    return _this;
-  }
-
-  (0, _createClass2["default"])(DevicesController, [{
-    key: "claimDevice",
-    value: function () {
-      var _claimDevice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(postBody) {
-        var deviceID;
-        return _regenerator["default"].wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                deviceID = postBody.id;
-                _context.prev = 1;
-                _context.next = 4;
-                return this._deviceManager.getDeviceID(deviceID);
-
-              case 4:
-                deviceID = _context.sent;
-                _context.next = 9;
-                break;
-
-              case 7:
-                _context.prev = 7;
-                _context.t0 = _context["catch"](1);
-
-              case 9:
-                _context.next = 11;
-                return this._deviceManager.claimDevice(deviceID, this.user.id);
-
-              case 11:
-                return _context.abrupt("return", this.ok({
-                  ok: true
-                }));
-
-              case 12:
-              case "end":
-                return _context.stop();
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
             }
-          }
-        }, _callee, this, [[1, 7]]);
-      }));
-
-      function claimDevice(_x) {
-        return _claimDevice.apply(this, arguments);
-      }
-
-      return claimDevice;
-    }()
-  }, {
-    key: "getAppFirmware",
-    value: function () {
-      var _getAppFirmware = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(binaryID) {
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                return _context2.abrupt("return", this.ok(_FirmwareCompilationManager["default"].getBinaryForID(binaryID)));
-
-              case 1:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function getAppFirmware(_x2) {
-        return _getAppFirmware.apply(this, arguments);
-      }
-
-      return getAppFirmware;
-    }()
-  }, {
-    key: "compileSources",
-    value: function () {
-      var _compileSources = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(postBody) {
-        var response;
-        return _regenerator["default"].wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return _FirmwareCompilationManager["default"].compileSource((0, _nullthrows["default"])(postBody.platform_id || postBody.product_id), this.request.files);
-
-              case 2:
-                response = _context3.sent;
-
-                if (response) {
-                  _context3.next = 5;
-                  break;
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var nullthrows_1 = __importDefault(require("nullthrows"));
+var Controller_1 = __importDefault(require("./Controller"));
+var HttpError_1 = __importDefault(require("../lib/HttpError"));
+var FirmwareCompilationManager_1 = __importDefault(require("../managers/FirmwareCompilationManager"));
+var allowUpload_1 = __importDefault(require("../decorators/allowUpload"));
+var httpVerb_1 = __importDefault(require("../decorators/httpVerb"));
+var route_1 = __importDefault(require("../decorators/route"));
+var deviceToAPI_1 = __importDefault(require("../lib/deviceToAPI"));
+var logger_1 = __importDefault(require("../lib/logger"));
+var logger = logger_1.default.createModuleLogger(module);
+var DevicesController = /** @class */ (function (_super) {
+    __extends(DevicesController, _super);
+    function DevicesController(deviceManager) {
+        var _this = _super.call(this) || this;
+        _this._deviceManager = deviceManager;
+        return _this;
+    }
+    DevicesController.prototype.claimDevice = function (postBody) {
+        return __awaiter(this, void 0, void 0, function () {
+            var deviceID, _1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        deviceID = postBody.id;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, this._deviceManager.getDeviceID(deviceID)];
+                    case 2:
+                        deviceID = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 3:
+                        _1 = _a.sent();
+                        return [3 /*break*/, 4];
+                    case 4: return [4 /*yield*/, this._deviceManager.claimDevice(deviceID, this.user.id)];
+                    case 5:
+                        _a.sent();
+                        return [2 /*return*/, this.ok({ ok: true })];
                 }
-
-                throw new _HttpError["default"]('Error during compilation');
-
-              case 5:
-                return _context3.abrupt("return", this.ok(_objectSpread(_objectSpread({}, response), {}, {
-                  binary_url: "/v1/binaries/".concat(response.binary_id),
-                  ok: true
-                })));
-
-              case 6:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function compileSources(_x3) {
-        return _compileSources.apply(this, arguments);
-      }
-
-      return compileSources;
-    }()
-  }, {
-    key: "unclaimDevice",
-    value: function () {
-      var _unclaimDevice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(deviceIDorName) {
-        var deviceID;
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return this._deviceManager.getDeviceID(deviceIDorName);
-
-              case 2:
-                deviceID = _context4.sent;
-                _context4.next = 5;
-                return this._deviceManager.unclaimDevice(deviceID);
-
-              case 5:
-                return _context4.abrupt("return", this.ok({
-                  ok: true
-                }));
-
-              case 6:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function unclaimDevice(_x4) {
-        return _unclaimDevice.apply(this, arguments);
-      }
-
-      return unclaimDevice;
-    }()
-  }, {
-    key: "getDevices",
-    value: function () {
-      var _getDevices = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5() {
-        var devices;
-        return _regenerator["default"].wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                _context5.prev = 0;
-                _context5.next = 3;
-                return this._deviceManager.getAll();
-
-              case 3:
-                devices = _context5.sent;
-                return _context5.abrupt("return", this.ok((0, _map["default"])(devices).call(devices, function (device) {
-                  return (0, _deviceToAPI["default"])(device);
-                })));
-
-              case 7:
-                _context5.prev = 7;
-                _context5.t0 = _context5["catch"](0);
-                // I wish we could return no devices found but meh :/
-                // at least we should issue a warning
-                logger.warn({
-                  err: _context5.t0
-                }, 'get devices throws error, possibly no devices found?');
-                return _context5.abrupt("return", this.ok([]));
-
-              case 11:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this, [[0, 7]]);
-      }));
-
-      function getDevices() {
-        return _getDevices.apply(this, arguments);
-      }
-
-      return getDevices;
-    }()
-  }, {
-    key: "getDevice",
-    value: function () {
-      var _getDevice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(deviceIDorName) {
-        var deviceID, device;
-        return _regenerator["default"].wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                _context6.next = 2;
-                return this._deviceManager.getDeviceID(deviceIDorName);
-
-              case 2:
-                deviceID = _context6.sent;
-                _context6.next = 5;
-                return this._deviceManager.getByID(deviceID);
-
-              case 5:
-                device = _context6.sent;
-                return _context6.abrupt("return", this.ok((0, _deviceToAPI["default"])(device)));
-
-              case 7:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      function getDevice(_x5) {
-        return _getDevice.apply(this, arguments);
-      }
-
-      return getDevice;
-    }()
-  }, {
-    key: "getVariableValue",
-    value: function () {
-      var _getVariableValue = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(deviceIDorName, varName) {
-        var deviceID, varValue, errorMessage;
-        return _regenerator["default"].wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                _context7.prev = 0;
-                _context7.next = 3;
-                return this._deviceManager.getDeviceID(deviceIDorName);
-
-              case 3:
-                deviceID = _context7.sent;
-                _context7.next = 6;
-                return this._deviceManager.getVariableValue(deviceID, varName);
-
-              case 6:
-                varValue = _context7.sent;
-                return _context7.abrupt("return", this.ok({
-                  result: varValue
-                }));
-
-              case 10:
-                _context7.prev = 10;
-                _context7.t0 = _context7["catch"](0);
-                errorMessage = _context7.t0.message;
-
-                if (!errorMessage.match('Variable not found')) {
-                  _context7.next = 15;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.getAppFirmware = function (binaryID) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.ok(FirmwareCompilationManager_1.default.getBinaryForID(binaryID))];
+            });
+        });
+    };
+    DevicesController.prototype.compileSources = function (postBody) {
+        return __awaiter(this, void 0, void 0, function () {
+            var files, response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        files = this.request.files;
+                        if (!files) {
+                            return [2 /*return*/, this.bad('No files were uploaded')];
+                        }
+                        return [4 /*yield*/, FirmwareCompilationManager_1.default.compileSource((0, nullthrows_1.default)(postBody.platform_id || postBody.product_id), Array.isArray(files) ? files : Object.values(files).flat())];
+                    case 1:
+                        response = _a.sent();
+                        if (!response) {
+                            throw new HttpError_1.default('Error during compilation');
+                        }
+                        return [2 /*return*/, this.ok(__assign(__assign({}, response), { binary_url: "/v1/binaries/".concat(response.binary_id), ok: true }))];
                 }
-
-                throw new _HttpError["default"]('Variable not found', 404);
-
-              case 15:
-                throw _context7.t0;
-
-              case 16:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this, [[0, 10]]);
-      }));
-
-      function getVariableValue(_x6, _x7) {
-        return _getVariableValue.apply(this, arguments);
-      }
-
-      return getVariableValue;
-    }()
-  }, {
-    key: "updateDevice",
-    value: function () {
-      var _updateDevice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(deviceIDorName, postBody) {
-        var deviceID, updatedAttributes, _context8, flashResult, file, _ref, originalname, _flashResult;
-
-        return _regenerator["default"].wrap(function _callee8$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
-                _context9.next = 2;
-                return this._deviceManager.getDeviceID(deviceIDorName);
-
-              case 2:
-                deviceID = _context9.sent;
-
-                if (!postBody.name) {
-                  _context9.next = 8;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.unclaimDevice = function (deviceIDorName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var deviceID;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._deviceManager.getDeviceID(deviceIDorName)];
+                    case 1:
+                        deviceID = _a.sent();
+                        return [4 /*yield*/, this._deviceManager.unclaimDevice(deviceID)];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/, this.ok({ ok: true })];
                 }
-
-                _context9.next = 6;
-                return this._deviceManager.renameDevice(deviceID, postBody.name);
-
-              case 6:
-                updatedAttributes = _context9.sent;
-                return _context9.abrupt("return", this.ok({
-                  name: updatedAttributes.name,
-                  ok: true
-                }));
-
-              case 8:
-                if (!postBody.signal) {
-                  _context9.next = 14;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.getDevices = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var devices, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this._deviceManager.getAll()];
+                    case 1:
+                        devices = _a.sent();
+                        return [2 /*return*/, this.ok(devices.map(function (device) { return (0, deviceToAPI_1.default)(device); }))];
+                    case 2:
+                        error_1 = _a.sent();
+                        // I wish we could return no devices found but meh :/
+                        // at least we should issue a warning
+                        logger.warn({ err: error_1 }, 'get devices throws error, possibly no devices found?');
+                        return [2 /*return*/, this.ok([])];
+                    case 3: return [2 /*return*/];
                 }
-
-                if ((0, _includes["default"])(_context8 = ['1', '0']).call(_context8, postBody.signal)) {
-                  _context9.next = 11;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.getDevice = function (deviceIDorName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var deviceID, device;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._deviceManager.getDeviceID(deviceIDorName)];
+                    case 1:
+                        deviceID = _a.sent();
+                        return [4 /*yield*/, this._deviceManager.getByID(deviceID)];
+                    case 2:
+                        device = _a.sent();
+                        return [2 /*return*/, this.ok((0, deviceToAPI_1.default)(device))];
                 }
-
-                throw new _HttpError["default"]('Wrong signal value');
-
-              case 11:
-                _context9.next = 13;
-                return this._deviceManager.raiseYourHand(deviceID, !!(0, _parseInt2["default"])(postBody.signal, 10));
-
-              case 13:
-                return _context9.abrupt("return", this.ok({
-                  id: deviceID,
-                  ok: true
-                }));
-
-              case 14:
-                if (!postBody.app_id) {
-                  _context9.next = 19;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.getVariableValue = function (deviceIDorName, varName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var deviceID, varValue, error_2, errorMessage;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, this._deviceManager.getDeviceID(deviceIDorName)];
+                    case 1:
+                        deviceID = _a.sent();
+                        return [4 /*yield*/, this._deviceManager.getVariableValue(deviceID, varName)];
+                    case 2:
+                        varValue = _a.sent();
+                        return [2 /*return*/, this.ok({ result: varValue })];
+                    case 3:
+                        error_2 = _a.sent();
+                        errorMessage = error_2 instanceof Error ? error_2.message : JSON.stringify(error_2);
+                        if (errorMessage.match('Variable not found')) {
+                            throw new HttpError_1.default('Variable not found', 404);
+                        }
+                        throw error_2;
+                    case 4: return [2 /*return*/];
                 }
-
-                _context9.next = 17;
-                return this._deviceManager.flashKnownApp(deviceID, postBody.app_id);
-
-              case 17:
-                flashResult = _context9.sent;
-                return _context9.abrupt("return", this.ok({
-                  id: deviceID,
-                  status: flashResult.status
-                }));
-
-              case 19:
-                // 4 flash device with custom application
-                file = postBody.file;
-
-                if (file) {
-                  _context9.next = 22;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.updateDevice = function (deviceIDorName, postBody) {
+        return __awaiter(this, void 0, void 0, function () {
+            var deviceID, updatedAttributes, flashResult, file, originalname, flashResult;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._deviceManager.getDeviceID(deviceIDorName)];
+                    case 1:
+                        deviceID = _a.sent();
+                        if (!postBody.name) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this._deviceManager.renameDevice(deviceID, postBody.name)];
+                    case 2:
+                        updatedAttributes = _a.sent();
+                        return [2 /*return*/, this.ok({ name: updatedAttributes.name, ok: true })];
+                    case 3:
+                        if (!postBody.signal) return [3 /*break*/, 5];
+                        if (!['1', '0'].includes(postBody.signal)) {
+                            throw new HttpError_1.default('Wrong signal value');
+                        }
+                        return [4 /*yield*/, this._deviceManager.raiseYourHand(deviceID, !!parseInt(postBody.signal, 10))];
+                    case 4:
+                        _a.sent();
+                        return [2 /*return*/, this.ok({ id: deviceID, ok: true })];
+                    case 5:
+                        if (!postBody.app_id) return [3 /*break*/, 7];
+                        return [4 /*yield*/, this._deviceManager.flashKnownApp(deviceID, postBody.app_id)];
+                    case 6:
+                        flashResult = _a.sent();
+                        return [2 /*return*/, this.ok({ id: deviceID, status: flashResult.status })];
+                    case 7:
+                        file = postBody.file;
+                        if (!file) {
+                            throw new Error('Firmware file not provided');
+                        }
+                        originalname = file.originalname;
+                        if (!(originalname === 'binary' || originalname.endsWith('.bin'))) return [3 /*break*/, 9];
+                        return [4 /*yield*/, this._deviceManager.flashBinary(deviceID, file)];
+                    case 8:
+                        flashResult = _a.sent();
+                        return [2 /*return*/, this.ok({ id: deviceID, status: flashResult.status })];
+                    case 9: throw new HttpError_1.default('Did not update device');
                 }
-
-                throw new Error('Firmware file not provided');
-
-              case 22:
-                _ref = file, originalname = _ref.originalname;
-
-                if (!(originalname === 'binary' || (0, _endsWith["default"])(originalname).call(originalname, '.bin'))) {
-                  _context9.next = 28;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.callDeviceFunction = function (deviceIDorName, functionName, postBody) {
+        return __awaiter(this, void 0, void 0, function () {
+            var deviceID, result, device, error_3, errorMessage;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 4, , 5]);
+                        return [4 /*yield*/, this._deviceManager.getDeviceID(deviceIDorName)];
+                    case 1:
+                        deviceID = _a.sent();
+                        return [4 /*yield*/, this._deviceManager.callFunction(deviceID, functionName, postBody)];
+                    case 2:
+                        result = _a.sent();
+                        return [4 /*yield*/, this._deviceManager.getByID(deviceID)];
+                    case 3:
+                        device = _a.sent();
+                        return [2 /*return*/, this.ok((0, deviceToAPI_1.default)(device, result))];
+                    case 4:
+                        error_3 = _a.sent();
+                        errorMessage = error_3 instanceof Error ? error_3.message : JSON.stringify(error_3);
+                        if (errorMessage.indexOf('Unknown Function') >= 0) {
+                            throw new HttpError_1.default('Function not found', 404);
+                        }
+                        throw error_3;
+                    case 5: return [2 /*return*/];
                 }
-
-                _context9.next = 26;
-                return this._deviceManager.flashBinary(deviceID, file);
-
-              case 26:
-                _flashResult = _context9.sent;
-                return _context9.abrupt("return", this.ok({
-                  id: deviceID,
-                  status: _flashResult.status
-                }));
-
-              case 28:
-                throw new _HttpError["default"]('Did not update device');
-
-              case 29:
-              case "end":
-                return _context9.stop();
-            }
-          }
-        }, _callee8, this);
-      }));
-
-      function updateDevice(_x8, _x9) {
-        return _updateDevice.apply(this, arguments);
-      }
-
-      return updateDevice;
-    }()
-  }, {
-    key: "callDeviceFunction",
-    value: function () {
-      var _callDeviceFunction = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(deviceIDorName, functionName, postBody) {
-        var deviceID, result, device, errorMessage;
-        return _regenerator["default"].wrap(function _callee9$(_context10) {
-          while (1) {
-            switch (_context10.prev = _context10.next) {
-              case 0:
-                _context10.prev = 0;
-                _context10.next = 3;
-                return this._deviceManager.getDeviceID(deviceIDorName);
-
-              case 3:
-                deviceID = _context10.sent;
-                _context10.next = 6;
-                return this._deviceManager.callFunction(deviceID, functionName, postBody);
-
-              case 6:
-                result = _context10.sent;
-                _context10.next = 9;
-                return this._deviceManager.getByID(deviceID);
-
-              case 9:
-                device = _context10.sent;
-                return _context10.abrupt("return", this.ok((0, _deviceToAPI["default"])(device, result)));
-
-              case 13:
-                _context10.prev = 13;
-                _context10.t0 = _context10["catch"](0);
-                errorMessage = _context10.t0.message;
-
-                if (!((0, _indexOf["default"])(errorMessage).call(errorMessage, 'Unknown Function') >= 0)) {
-                  _context10.next = 18;
-                  break;
+            });
+        });
+    };
+    DevicesController.prototype.pingDevice = function (deviceIDorName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var deviceID, _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, this._deviceManager.getDeviceID(deviceIDorName)];
+                    case 1:
+                        deviceID = _b.sent();
+                        _a = this.ok;
+                        return [4 /*yield*/, this._deviceManager.ping(deviceID)];
+                    case 2: return [2 /*return*/, _a.apply(this, [_b.sent()])];
                 }
-
-                throw new _HttpError["default"]('Function not found', 404);
-
-              case 18:
-                throw _context10.t0;
-
-              case 19:
-              case "end":
-                return _context10.stop();
-            }
-          }
-        }, _callee9, this, [[0, 13]]);
-      }));
-
-      function callDeviceFunction(_x10, _x11, _x12) {
-        return _callDeviceFunction.apply(this, arguments);
-      }
-
-      return callDeviceFunction;
-    }()
-  }, {
-    key: "pingDevice",
-    value: function () {
-      var _pingDevice = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(deviceIDorName) {
-        var deviceID;
-        return _regenerator["default"].wrap(function _callee10$(_context11) {
-          while (1) {
-            switch (_context11.prev = _context11.next) {
-              case 0:
-                _context11.next = 2;
-                return this._deviceManager.getDeviceID(deviceIDorName);
-
-              case 2:
-                deviceID = _context11.sent;
-                _context11.t0 = this;
-                _context11.next = 6;
-                return this._deviceManager.ping(deviceID);
-
-              case 6:
-                _context11.t1 = _context11.sent;
-                return _context11.abrupt("return", _context11.t0.ok.call(_context11.t0, _context11.t1));
-
-              case 8:
-              case "end":
-                return _context11.stop();
-            }
-          }
-        }, _callee10, this);
-      }));
-
-      function pingDevice(_x13) {
-        return _pingDevice.apply(this, arguments);
-      }
-
-      return pingDevice;
-    }()
-  }]);
-  return DevicesController;
-}(_Controller2["default"]), ((0, _applyDecoratedDescriptor2["default"])(_class.prototype, "claimDevice", [_dec, _dec2], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "claimDevice"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "getAppFirmware", [_dec3, _dec4], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "getAppFirmware"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "compileSources", [_dec5, _dec6, _dec7], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "compileSources"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "unclaimDevice", [_dec8, _dec9], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "unclaimDevice"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "getDevices", [_dec10, _dec11], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "getDevices"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "getDevice", [_dec12, _dec13], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "getDevice"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "getVariableValue", [_dec14, _dec15], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "getVariableValue"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "updateDevice", [_dec16, _dec17, _dec18], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "updateDevice"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "callDeviceFunction", [_dec19, _dec20], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "callDeviceFunction"), _class.prototype), (0, _applyDecoratedDescriptor2["default"])(_class.prototype, "pingDevice", [_dec21, _dec22], (0, _getOwnPropertyDescriptor["default"])(_class.prototype, "pingDevice"), _class.prototype)), _class));
-var _default = DevicesController;
-exports["default"] = _default;
+            });
+        });
+    };
+    __decorate([
+        (0, httpVerb_1.default)('post'),
+        (0, route_1.default)('/v1/devices')
+    ], DevicesController.prototype, "claimDevice", null);
+    __decorate([
+        (0, httpVerb_1.default)('get'),
+        (0, route_1.default)('/v1/binaries/:binaryID')
+    ], DevicesController.prototype, "getAppFirmware", null);
+    __decorate([
+        (0, httpVerb_1.default)('post'),
+        (0, route_1.default)('/v1/binaries'),
+        (0, allowUpload_1.default)()
+    ], DevicesController.prototype, "compileSources", null);
+    __decorate([
+        (0, httpVerb_1.default)('delete'),
+        (0, route_1.default)('/v1/devices/:deviceIDorName')
+    ], DevicesController.prototype, "unclaimDevice", null);
+    __decorate([
+        (0, httpVerb_1.default)('get'),
+        (0, route_1.default)('/v1/devices')
+    ], DevicesController.prototype, "getDevices", null);
+    __decorate([
+        (0, httpVerb_1.default)('get'),
+        (0, route_1.default)('/v1/devices/:deviceIDorName')
+    ], DevicesController.prototype, "getDevice", null);
+    __decorate([
+        (0, httpVerb_1.default)('get'),
+        (0, route_1.default)('/v1/devices/:deviceIDorName/:varName/')
+    ], DevicesController.prototype, "getVariableValue", null);
+    __decorate([
+        (0, httpVerb_1.default)('put'),
+        (0, route_1.default)('/v1/devices/:deviceIDorName'),
+        (0, allowUpload_1.default)('file', 1)
+    ], DevicesController.prototype, "updateDevice", null);
+    __decorate([
+        (0, httpVerb_1.default)('post'),
+        (0, route_1.default)('/v1/devices/:deviceIDorName/:functionName')
+    ], DevicesController.prototype, "callDeviceFunction", null);
+    __decorate([
+        (0, httpVerb_1.default)('put'),
+        (0, route_1.default)('/v1/devices/:deviceIDorName/ping')
+    ], DevicesController.prototype, "pingDevice", null);
+    return DevicesController;
+}(Controller_1.default));
+exports.default = DevicesController;
+//# sourceMappingURL=DevicesController.js.map

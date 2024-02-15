@@ -1,290 +1,209 @@
 "use strict";
-
-var _Object$defineProperty = require("@babel/runtime-corejs3/core-js-stable/object/define-property");
-
-var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
-
-_Object$defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = void 0;
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime-corejs3/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/asyncToGenerator"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/createClass"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/defineProperty"));
-
-var _map = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/map"));
-
-var _stringify = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/json/stringify"));
-
-var _setTimeout2 = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/set-timeout"));
-
-var _forEach = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/for-each"));
-
-var _find = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/find"));
-
-var _endsWith = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/ends-with"));
-
-var _concat = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/concat"));
-
-var _includes = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/instance/includes"));
-
-var _promise = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/promise"));
-
-var _crypto = _interopRequireDefault(require("crypto"));
-
-var _fs = _interopRequireDefault(require("fs"));
-
-var _path = _interopRequireDefault(require("path"));
-
-var _mkdirp = _interopRequireDefault(require("mkdirp"));
-
-var _rmfr = _interopRequireDefault(require("rmfr"));
-
-var _child_process = require("child_process");
-
-var _settings = _interopRequireDefault(require("../settings"));
-
-var _logger = _interopRequireDefault(require("../lib/logger"));
-
-var logger = _logger["default"].createModuleLogger(module);
-
-var IS_COMPILATION_ENABLED = _fs["default"].existsSync(_settings["default"].FIRMWARE_REPOSITORY_DIRECTORY);
-
-var USER_APP_PATH = _path["default"].join(_settings["default"].FIRMWARE_REPOSITORY_DIRECTORY, 'user/applications');
-
-var BIN_PATH = _path["default"].join(_settings["default"].BUILD_DIRECTORY, 'bin');
-
-var MAKE_PATH = _path["default"].join(_settings["default"].FIRMWARE_REPOSITORY_DIRECTORY, 'main');
-
-var FILE_NAME_BY_KEY = new _map["default"]();
-
-var getKey = function getKey() {
-  return _crypto["default"].randomBytes(24).toString('hex').substring(0, 24);
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
-
-var getUniqueKey = function getUniqueKey() {
-  var key = getKey();
-
-  while (FILE_NAME_BY_KEY.has(key)) {
-    key = getKey();
-  }
-
-  return key;
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
 };
-
-var FirmwareCompilationManager = /*#__PURE__*/function () {
-  function FirmwareCompilationManager() {
-    (0, _classCallCheck2["default"])(this, FirmwareCompilationManager);
-  }
-
-  (0, _createClass2["default"])(FirmwareCompilationManager, null, [{
-    key: "firmwareDirectoryExists",
-    value: function firmwareDirectoryExists() {
-      return _fs["default"].existsSync(_settings["default"].FIRMWARE_REPOSITORY_DIRECTORY);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var crypto_1 = __importDefault(require("crypto"));
+var fs_1 = __importDefault(require("fs"));
+var path_1 = __importDefault(require("path"));
+var mkdirp_1 = __importDefault(require("mkdirp"));
+var rmfr_1 = __importDefault(require("rmfr"));
+var child_process_1 = require("child_process");
+var settings_1 = __importDefault(require("../settings"));
+var logger_1 = __importDefault(require("../lib/logger"));
+var logger = logger_1.default.createModuleLogger(module);
+var IS_COMPILATION_ENABLED = fs_1.default.existsSync(settings_1.default.FIRMWARE_REPOSITORY_DIRECTORY);
+var USER_APP_PATH = path_1.default.join(settings_1.default.FIRMWARE_REPOSITORY_DIRECTORY, 'user/applications');
+var BIN_PATH = path_1.default.join(settings_1.default.BUILD_DIRECTORY, 'bin');
+var MAKE_PATH = path_1.default.join(settings_1.default.FIRMWARE_REPOSITORY_DIRECTORY, 'main');
+var FILE_NAME_BY_KEY = new Map();
+var getKey = function () {
+    return crypto_1.default.randomBytes(24).toString('hex').substring(0, 24);
+};
+var getUniqueKey = function () {
+    var key = getKey();
+    while (FILE_NAME_BY_KEY.has(key)) {
+        key = getKey();
     }
-  }, {
-    key: "addFirmwareCleanupTask",
-    value: function addFirmwareCleanupTask(appFolderPath, config) {
-      var configPath = _path["default"].join(appFolderPath, 'config.json');
-
-      if (!_fs["default"].existsSync(configPath)) {
-        _fs["default"].writeFileSync(configPath, (0, _stringify["default"])(config));
-      }
-
-      var currentDate = new Date();
-      var difference = new Date(config.expires_at).getTime() - currentDate.getTime();
-      (0, _setTimeout2["default"])(function () {
-        return (0, _rmfr["default"])(appFolderPath);
-      }, difference);
+    return key;
+};
+var FirmwareCompilationManager = /** @class */ (function () {
+    function FirmwareCompilationManager() {
     }
-  }]);
-  return FirmwareCompilationManager;
-}();
-
-(0, _defineProperty2["default"])(FirmwareCompilationManager, "getBinaryForID", function (id) {
-  var _context2;
-
-  if (!FirmwareCompilationManager.firmwareDirectoryExists()) {
-    return null;
-  }
-
-  var binaryPath = _path["default"].join(BIN_PATH, id);
-
-  if (!_fs["default"].existsSync(binaryPath)) {
-    return null;
-  }
-
-  var binFileName = (0, _find["default"])(_context2 = _fs["default"].readdirSync(binaryPath)).call(_context2, function (file) {
-    return (0, _endsWith["default"])(file).call(file, '.bin');
-  });
-
-  if (!binFileName) {
-    return null;
-  }
-
-  return _fs["default"].readFileSync(_path["default"].join(binaryPath, binFileName));
-});
-(0, _defineProperty2["default"])(FirmwareCompilationManager, "compileSource", /*#__PURE__*/function () {
-  var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(platformID, files) {
-    var _context3;
-
-    var platformName, appFolder, appPath, id, binPath, makeProcess, errors, sizeInfo, date, config;
-    return _regenerator["default"].wrap(function _callee$(_context5) {
-      while (1) {
-        switch (_context5.prev = _context5.next) {
-          case 0:
-            if (FirmwareCompilationManager.firmwareDirectoryExists()) {
-              _context5.next = 2;
-              break;
-            }
-
-            return _context5.abrupt("return", null);
-
-          case 2:
-            platformName = {
-              '0': 'Core',
-              '10': 'Electron',
-              '103': 'Bluz',
-              '6': 'Photon',
-              '8': 'P1',
-              '88': 'Duo'
-            }[platformID];
-
-            if (platformName) {
-              _context5.next = 5;
-              break;
-            }
-
-            return _context5.abrupt("return", null);
-
-          case 5:
-            platformName = platformName.toLowerCase();
-            appFolder = (0, _concat["default"])(_context3 = "".concat(platformName, "_firmware_")).call(_context3, new Date().getTime()).toLowerCase();
-            appPath = _path["default"].join(USER_APP_PATH, appFolder);
-
-            _mkdirp["default"].sync(appPath);
-
-            (0, _forEach["default"])(files).call(files, function (file) {
-              var fileName = file.originalname;
-
-              var fileExtension = _path["default"].extname(fileName);
-
-              var iterator = 0;
-
-              var combinedPath = _path["default"].join(appPath, fileName);
-
-              while (_fs["default"].existsSync(combinedPath)) {
-                var _context4;
-
-                combinedPath = _path["default"].join(appPath, "".concat(_path["default"].basename(fileName, fileExtension)) + (0, _concat["default"])(_context4 = "_".concat(iterator++)).call(_context4, fileExtension) // eslint-disable-line no-plusplus
-                );
-              }
-
-              _fs["default"].writeFileSync(combinedPath, file.buffer);
-            });
-            id = getUniqueKey();
-            binPath = _path["default"].join(BIN_PATH, id);
-            makeProcess = (0, _child_process.spawn)('make', ["APP=".concat(appFolder), "PLATFORM_ID=".concat(platformID), "TARGET_DIR=".concat(_path["default"].relative(MAKE_PATH, binPath).replace(/\\/g, '/'))], {
-              cwd: MAKE_PATH
-            });
-            errors = [];
-            makeProcess.stderr.on('data', function (data) {
-              logger.error({
-                data: data
-              }, 'Error from MakeProcess');
-              errors.push("".concat(data));
-            });
-            sizeInfo = 'not implemented';
-            makeProcess.stdout.on('data', function (data) {
-              var output = "".concat(data);
-
-              if ((0, _includes["default"])(output).call(output, 'text\t')) {
-                sizeInfo = output;
-              }
-            });
-            _context5.next = 19;
-            return new _promise["default"](function (resolve) {
-              makeProcess.on('exit', function () {
-                return resolve();
-              });
-            });
-
-          case 19:
-            date = new Date();
-            date.setDate(date.getDate() + 1);
-            config = {
-              binary_id: id,
-              errors: errors,
-              // expire in one day
-              expires_at: date,
-              // TODO: this variable has a bunch of extra crap including file names.
-              // we should filter out the string to only show the file sizes
-              sizeInfo: sizeInfo
-            };
-            FirmwareCompilationManager.addFirmwareCleanupTask(appPath, config);
-            return _context5.abrupt("return", config);
-
-          case 24:
-          case "end":
-            return _context5.stop();
+    FirmwareCompilationManager.firmwareDirectoryExists = function () {
+        return fs_1.default.existsSync(settings_1.default.FIRMWARE_REPOSITORY_DIRECTORY);
+    };
+    FirmwareCompilationManager.addFirmwareCleanupTask = function (appFolderPath, config) {
+        var configPath = path_1.default.join(appFolderPath, 'config.json');
+        if (!fs_1.default.existsSync(configPath)) {
+            fs_1.default.writeFileSync(configPath, JSON.stringify(config));
         }
-      }
-    }, _callee);
-  }));
-
-  return function (_x, _x2) {
-    return _ref.apply(this, arguments);
-  };
+        var currentDate = new Date();
+        var difference = new Date(config.expires_at).getTime() - currentDate.getTime();
+        setTimeout(function () {
+            void (0, rmfr_1.default)(appFolderPath);
+        }, difference);
+    };
+    var _a;
+    _a = FirmwareCompilationManager;
+    FirmwareCompilationManager.getBinaryForID = function (id) {
+        if (!_a.firmwareDirectoryExists()) {
+            return null;
+        }
+        var binaryPath = path_1.default.join(BIN_PATH, id);
+        if (!fs_1.default.existsSync(binaryPath)) {
+            return null;
+        }
+        var binFileName = fs_1.default
+            .readdirSync(binaryPath)
+            .find(function (file) { return file.endsWith('.bin'); });
+        if (!binFileName) {
+            return null;
+        }
+        return fs_1.default.readFileSync(path_1.default.join(binaryPath, binFileName));
+    };
+    FirmwareCompilationManager.compileSource = function (platformID, files) { return __awaiter(void 0, void 0, void 0, function () {
+        var platformName, appFolder, appPath, id, binPath, makeProcess, errors, sizeInfo, date, config;
+        return __generator(_a, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    if (!_a.firmwareDirectoryExists()) {
+                        return [2 /*return*/, null];
+                    }
+                    platformName = {
+                        '0': 'Core',
+                        '10': 'Electron',
+                        '103': 'Bluz',
+                        '6': 'Photon',
+                        '8': 'P1',
+                        '88': 'Duo',
+                    }[platformID];
+                    if (!platformName) {
+                        return [2 /*return*/, null];
+                    }
+                    platformName = platformName.toLowerCase();
+                    appFolder = "".concat(platformName, "_firmware_").concat(new Date().getTime()).toLowerCase();
+                    appPath = path_1.default.join(USER_APP_PATH, appFolder);
+                    mkdirp_1.default.sync(appPath);
+                    files.forEach(function (file) {
+                        var fileName = file.originalname;
+                        var fileExtension = path_1.default.extname(fileName);
+                        var iterator = 0;
+                        var combinedPath = path_1.default.join(appPath, fileName);
+                        while (fs_1.default.existsSync(combinedPath)) {
+                            combinedPath = path_1.default.join(appPath, "".concat(path_1.default.basename(fileName, fileExtension)) +
+                                "_".concat(iterator++).concat(fileExtension));
+                        }
+                        fs_1.default.writeFileSync(combinedPath, file.buffer);
+                    });
+                    id = getUniqueKey();
+                    binPath = path_1.default.join(BIN_PATH, id);
+                    makeProcess = (0, child_process_1.spawn)('make', [
+                        "APP=".concat(appFolder),
+                        "PLATFORM_ID=".concat(platformID),
+                        "TARGET_DIR=".concat(path_1.default.relative(MAKE_PATH, binPath).replace(/\\/g, '/')),
+                    ], { cwd: MAKE_PATH });
+                    errors = [];
+                    makeProcess.stderr.on('data', function (data) {
+                        logger.error({ data: data }, 'Error from MakeProcess');
+                        errors.push("".concat(data));
+                    });
+                    sizeInfo = 'not implemented';
+                    makeProcess.stdout.on('data', function (data) {
+                        var output = "".concat(data);
+                        if (output.includes('text\t')) {
+                            sizeInfo = output;
+                        }
+                    });
+                    return [4 /*yield*/, new Promise(function (resolve) {
+                            makeProcess.on('exit', function () { return resolve(); });
+                        })];
+                case 1:
+                    _b.sent();
+                    date = new Date();
+                    date.setDate(date.getDate() + 1);
+                    config = {
+                        binary_id: id,
+                        errors: errors,
+                        // expire in one day
+                        expires_at: date,
+                        // TODO: this variable has a bunch of extra crap including file names.
+                        // we should filter out the string to only show the file sizes
+                        sizeInfo: sizeInfo,
+                    };
+                    _a.addFirmwareCleanupTask(appPath, config);
+                    return [2 /*return*/, config];
+            }
+        });
+    }); };
+    return FirmwareCompilationManager;
 }());
-
 if (IS_COMPILATION_ENABLED) {
-  var _context;
-
-  // Delete all expired binaries or queue them up to eventually be deleted.
-  if (!_fs["default"].existsSync(_settings["default"].BUILD_DIRECTORY)) {
-    _mkdirp["default"].sync(_settings["default"].BUILD_DIRECTORY);
-  }
-
-  if (!_fs["default"].existsSync(BIN_PATH)) {
-    _mkdirp["default"].sync(BIN_PATH);
-  }
-
-  (0, _forEach["default"])(_context = _fs["default"].readdirSync(USER_APP_PATH)).call(_context, function (file) {
-    var appFolder = _path["default"].join(USER_APP_PATH, file);
-
-    var configPath = _path["default"].join(appFolder, 'config.json');
-
-    if (!_fs["default"].existsSync(configPath)) {
-      return;
+    // Delete all expired binaries or queue them up to eventually be deleted.
+    if (!fs_1.default.existsSync(settings_1.default.BUILD_DIRECTORY)) {
+        mkdirp_1.default.sync(settings_1.default.BUILD_DIRECTORY);
     }
-
-    var configString = _fs["default"].readFileSync(configPath, 'utf8');
-
-    if (!configString) {
-      return;
+    if (!fs_1.default.existsSync(BIN_PATH)) {
+        mkdirp_1.default.sync(BIN_PATH);
     }
-
-    var config = JSON.parse(configString);
-
-    if (config.expires_at < new Date()) {
-      // TODO - clean up artifacts in the firmware folder. Every binary will have
-      // files in firmare/build/target/user & firmware/build/target/user-part
-      // It might make the most sense to just create a custom MAKE file to do this
-      (0, _rmfr["default"])(configPath);
-      (0, _rmfr["default"])(_path["default"].join(BIN_PATH, config.binary_id));
-    } else {
-      FirmwareCompilationManager.addFirmwareCleanupTask(appFolder, config);
-    }
-  });
+    fs_1.default.readdirSync(USER_APP_PATH).forEach(function (file) {
+        var appFolder = path_1.default.join(USER_APP_PATH, file);
+        var configPath = path_1.default.join(appFolder, 'config.json');
+        if (!fs_1.default.existsSync(configPath)) {
+            return;
+        }
+        var configString = fs_1.default.readFileSync(configPath, 'utf8');
+        if (!configString) {
+            return;
+        }
+        var config = JSON.parse(configString);
+        if (config.expires_at < new Date()) {
+            // TODO - clean up artifacts in the firmware folder. Every binary will have
+            // files in firmare/build/target/user & firmware/build/target/user-part
+            // It might make the most sense to just create a custom MAKE file to do this
+            (0, rmfr_1.default)(configPath);
+            (0, rmfr_1.default)(path_1.default.join(BIN_PATH, config.binary_id));
+        }
+        else {
+            FirmwareCompilationManager.addFirmwareCleanupTask(appFolder, config);
+        }
+    });
 }
-
-var _default = FirmwareCompilationManager;
-exports["default"] = _default;
+exports.default = FirmwareCompilationManager;
+//# sourceMappingURL=FirmwareCompilationManager.js.map

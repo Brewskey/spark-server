@@ -1,353 +1,204 @@
 "use strict";
-
-var _Object$defineProperty = require("@babel/runtime-corejs3/core-js-stable/object/define-property");
-
-var _interopRequireDefault = require("@babel/runtime-corejs3/helpers/interopRequireDefault");
-
-_Object$defineProperty(exports, "__esModule", {
-  value: true
-});
-
-exports["default"] = void 0;
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime-corejs3/regenerator"));
-
-var _map = _interopRequireDefault(require("@babel/runtime-corejs3/core-js-stable/map"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/asyncToGenerator"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/createClass"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime-corejs3/helpers/defineProperty"));
-
-var _nullthrows = _interopRequireDefault(require("nullthrows"));
-
-var _oauth2Server = require("oauth2-server");
-
-var _HttpError = _interopRequireDefault(require("../lib/HttpError"));
-
-var _settings = _interopRequireDefault(require("../settings"));
-
-var _logger = _interopRequireDefault(require("../lib/logger"));
-
-var logger = _logger["default"].createModuleLogger(module);
-
-var PermissionManager = /*#__PURE__*/function () {
-  function PermissionManager(deviceAttributeRepository, organizationRepository, userRepository, webhookRepository, oauthServer) {
-    var _this = this;
-
-    (0, _classCallCheck2["default"])(this, PermissionManager);
-    (0, _defineProperty2["default"])(this, "_organizationRepository", void 0);
-    (0, _defineProperty2["default"])(this, "_userRepository", void 0);
-    (0, _defineProperty2["default"])(this, "_repositoriesByEntityName", new _map["default"]());
-    (0, _defineProperty2["default"])(this, "_oauthServer", void 0);
-    (0, _defineProperty2["default"])(this, "checkPermissionsForEntityByID", /*#__PURE__*/function () {
-      var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(entityName, id) {
-        return _regenerator["default"].wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return _this.getEntityByID(entityName, id);
-
-              case 2:
-                return _context.abrupt("return", !!_context.sent);
-
-              case 3:
-              case "end":
-                return _context.stop();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
             }
-          }
-        }, _callee);
-      }));
-
-      return function (_x, _x2) {
-        return _ref.apply(this, arguments);
-      };
-    }());
-    this._organizationRepository = organizationRepository;
-    this._userRepository = userRepository;
-
-    this._repositoriesByEntityName.set('deviceAttributes', deviceAttributeRepository);
-
-    this._repositoriesByEntityName.set('webhook', webhookRepository);
-
-    this._oauthServer = oauthServer;
-    (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
-      return _regenerator["default"].wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return _this._init();
-
-            case 2:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, _callee2);
-    }))();
-  }
-
-  (0, _createClass2["default"])(PermissionManager, [{
-    key: "getAllEntitiesForCurrentUser",
-    value: function () {
-      var _getAllEntitiesForCurrentUser = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(entityName) {
-        var currentUser;
-        return _regenerator["default"].wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                currentUser = this._userRepository.getCurrentUser();
-                return _context3.abrupt("return", (0, _nullthrows["default"])(this._repositoriesByEntityName.get(entityName)).getAll(currentUser.id));
-
-              case 2:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function getAllEntitiesForCurrentUser(_x3) {
-        return _getAllEntitiesForCurrentUser.apply(this, arguments);
-      }
-
-      return getAllEntitiesForCurrentUser;
-    }()
-  }, {
-    key: "getEntityByID",
-    value: function () {
-      var _getEntityByID = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(entityName, id) {
-        var entity;
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return (0, _nullthrows["default"])(this._repositoriesByEntityName.get(entityName)).getByID(id);
-
-              case 2:
-                entity = _context4.sent;
-
-                if (entity) {
-                  _context4.next = 5;
-                  break;
-                }
-
-                throw new _HttpError["default"]('Entity does not exist');
-
-              case 5:
-                if (this.doesUserHaveAccess(entity)) {
-                  _context4.next = 7;
-                  break;
-                }
-
-                throw new _HttpError["default"]("User doesn't have access", 403);
-
-              case 7:
-                return _context4.abrupt("return", entity);
-
-              case 8:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4, this);
-      }));
-
-      function getEntityByID(_x4, _x5) {
-        return _getEntityByID.apply(this, arguments);
-      }
-
-      return getEntityByID;
-    }()
-  }, {
-    key: "_createDefaultAdminUser",
-    value: function () {
-      var _createDefaultAdminUser2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5() {
-        var token;
-        return _regenerator["default"].wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                _context5.prev = 0;
-                _context5.next = 3;
-                return this._userRepository.createWithCredentials({
-                  password: _settings["default"].DEFAULT_ADMIN_PASSWORD,
-                  username: _settings["default"].DEFAULT_ADMIN_USERNAME
-                }, 'administrator');
-
-              case 3:
-                _context5.next = 5;
-                return this._generateAdminToken();
-
-              case 5:
-                token = _context5.sent;
-                logger.info({
-                  token: token
-                }, 'New default admin user created');
-                _context5.next = 12;
-                break;
-
-              case 9:
-                _context5.prev = 9;
-                _context5.t0 = _context5["catch"](0);
-                logger.error({
-                  err: _context5.t0
-                }, 'Error during default admin user creating');
-
-              case 12:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this, [[0, 9]]);
-      }));
-
-      function _createDefaultAdminUser() {
-        return _createDefaultAdminUser2.apply(this, arguments);
-      }
-
-      return _createDefaultAdminUser;
-    }()
-  }, {
-    key: "doesUserHaveAccess",
-    value: function doesUserHaveAccess(_ref3) {
-      var ownerID = _ref3.ownerID;
-
-      var currentUser = this._userRepository.getCurrentUser();
-
-      return currentUser.role === 'administrator' || currentUser.id === ownerID;
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-  }, {
-    key: "_generateAdminToken",
-    value: function () {
-      var _generateAdminToken2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6() {
-        var request, response, tokenPayload;
-        return _regenerator["default"].wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                request = new _oauth2Server.Request({
-                  body: {
-                    client_id: 'spark-server',
-                    client_secret: 'spark-server',
-                    grant_type: 'password',
-                    password: _settings["default"].DEFAULT_ADMIN_PASSWORD,
-                    username: _settings["default"].DEFAULT_ADMIN_USERNAME
-                  },
-                  headers: {
-                    'content-type': 'application/x-www-form-urlencoded',
-                    'transfer-encoding': 'chunked'
-                  },
-                  method: 'POST',
-                  query: {}
-                });
-                response = new _oauth2Server.Response({
-                  body: {},
-                  headers: {}
-                });
-                _context6.next = 4;
-                return this._oauthServer.server.token(request, response, // oauth server doesn't allow us to use infinite access token
-                // so we pass some big value here
-                {
-                  accessTokenLifetime: 9999999999
-                });
-
-              case 4:
-                tokenPayload = _context6.sent;
-                return _context6.abrupt("return", tokenPayload.accessToken);
-
-              case 6:
-              case "end":
-                return _context6.stop();
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var nullthrows_1 = __importDefault(require("nullthrows"));
+var oauth2_server_1 = require("oauth2-server");
+var HttpError_1 = __importDefault(require("../lib/HttpError"));
+var settings_1 = __importDefault(require("../settings"));
+var logger_1 = __importDefault(require("../lib/logger"));
+var logger = logger_1.default.createModuleLogger(module);
+var PermissionManager = /** @class */ (function () {
+    function PermissionManager(deviceAttributeRepository, organizationRepository, userRepository, webhookRepository, oauthServer) {
+        var _this = this;
+        this._repositoriesByEntityName = new Map();
+        this.checkPermissionsForEntityByID = function (entityName, id) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, this.getEntityByID(entityName, id)];
+                case 1: return [2 /*return*/, !!(_a.sent())];
             }
-          }
-        }, _callee6, this);
-      }));
-
-      function _generateAdminToken() {
-        return _generateAdminToken2.apply(this, arguments);
-      }
-
-      return _generateAdminToken;
-    }()
-  }, {
-    key: "_init",
-    value: function () {
-      var _init2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7() {
-        var defaultAdminUser, organizations;
-        return _regenerator["default"].wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                _context7.next = 2;
-                return this._userRepository.getByUsername(_settings["default"].DEFAULT_ADMIN_USERNAME);
-
-              case 2:
-                defaultAdminUser = _context7.sent;
-
-                if (!defaultAdminUser) {
-                  _context7.next = 7;
-                  break;
+        }); }); };
+        this._organizationRepository = organizationRepository;
+        this._userRepository = userRepository;
+        this._repositoriesByEntityName.set('deviceAttributes', deviceAttributeRepository);
+        this._repositoriesByEntityName.set('webhook', webhookRepository);
+        this._oauthServer = oauthServer;
+        (function () { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._init()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
-
-                logger.info({
-                  token: defaultAdminUser.accessTokens[0].accessToken
-                }, 'Default Admin token');
-                _context7.next = 12;
-                break;
-
-              case 7:
-                _context7.next = 9;
-                return this._createDefaultAdminUser();
-
-              case 9:
-                _context7.next = 11;
-                return this._userRepository.getByUsername(_settings["default"].DEFAULT_ADMIN_USERNAME);
-
-              case 11:
-                defaultAdminUser = _context7.sent;
-
-              case 12:
-                _context7.next = 14;
-                return this._organizationRepository.getAll();
-
-              case 14:
-                organizations = _context7.sent;
-
-                if (!(!organizations.length && defaultAdminUser)) {
-                  _context7.next = 18;
-                  break;
+            });
+        }); })();
+    }
+    PermissionManager.prototype.getAllEntitiesForCurrentUser = function (entityName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var currentUser;
+            return __generator(this, function (_a) {
+                currentUser = this._userRepository.getCurrentUser();
+                return [2 /*return*/, (0, nullthrows_1.default)(this._repositoriesByEntityName.get(entityName)).getAll(currentUser.id)];
+            });
+        });
+    };
+    PermissionManager.prototype.getEntityByID = function (entityName, id) {
+        return __awaiter(this, void 0, void 0, function () {
+            var entity;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, (0, nullthrows_1.default)(this._repositoriesByEntityName.get(entityName)).getByID(id)];
+                    case 1:
+                        entity = (_a.sent());
+                        if (!entity) {
+                            throw new HttpError_1.default('Entity does not exist');
+                        }
+                        if (!this.doesUserHaveAccess(entity)) {
+                            throw new HttpError_1.default("User doesn't have access", 403);
+                        }
+                        return [2 /*return*/, entity];
                 }
-
-                _context7.next = 18;
-                return this._organizationRepository.create({
-                  name: 'DEFAULT ORG',
-                  user_ids: [defaultAdminUser.id]
-                });
-
-              case 18:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this);
-      }));
-
-      function _init() {
-        return _init2.apply(this, arguments);
-      }
-
-      return _init;
-    }()
-  }]);
-  return PermissionManager;
-}();
-
-var _default = PermissionManager;
-exports["default"] = _default;
+            });
+        });
+    };
+    PermissionManager.prototype._createDefaultAdminUser = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var token, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, this._userRepository.createWithCredentials({
+                                password: settings_1.default.DEFAULT_ADMIN_PASSWORD,
+                                username: settings_1.default.DEFAULT_ADMIN_USERNAME,
+                            }, 'administrator')];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this._generateAdminToken()];
+                    case 2:
+                        token = _a.sent();
+                        logger.info({ token: token }, 'New default admin user created');
+                        return [3 /*break*/, 4];
+                    case 3:
+                        error_1 = _a.sent();
+                        logger.error({ err: error_1 }, 'Error during default admin user creating');
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    PermissionManager.prototype.doesUserHaveAccess = function (_a) {
+        var ownerID = _a.ownerID;
+        var currentUser = this._userRepository.getCurrentUser();
+        return currentUser.role === 'administrator' || currentUser.id === ownerID;
+    };
+    PermissionManager.prototype._generateAdminToken = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var request, response, tokenPayload;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        request = new oauth2_server_1.Request({
+                            body: {
+                                client_id: 'spark-server',
+                                client_secret: 'spark-server',
+                                grant_type: 'password',
+                                password: settings_1.default.DEFAULT_ADMIN_PASSWORD,
+                                username: settings_1.default.DEFAULT_ADMIN_USERNAME,
+                            },
+                            headers: {
+                                'content-type': 'application/x-www-form-urlencoded',
+                                'transfer-encoding': 'chunked',
+                            },
+                            method: 'POST',
+                            query: {},
+                        });
+                        response = new oauth2_server_1.Response({ body: {}, headers: {} });
+                        return [4 /*yield*/, this._oauthServer.server.token(request, response, 
+                            // oauth server doesn't allow us to use infinite access token
+                            // so we pass some big value here
+                            { accessTokenLifetime: 9999999999 })];
+                    case 1:
+                        tokenPayload = _a.sent();
+                        return [2 /*return*/, tokenPayload.accessToken];
+                }
+            });
+        });
+    };
+    PermissionManager.prototype._init = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var defaultAdminUser, organizations;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this._userRepository.getByUsername(settings_1.default.DEFAULT_ADMIN_USERNAME)];
+                    case 1:
+                        defaultAdminUser = _a.sent();
+                        if (!defaultAdminUser) return [3 /*break*/, 2];
+                        logger.info({ token: defaultAdminUser.accessTokens[0].accessToken }, 'Default Admin token');
+                        return [3 /*break*/, 5];
+                    case 2: return [4 /*yield*/, this._createDefaultAdminUser()];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, this._userRepository.getByUsername(settings_1.default.DEFAULT_ADMIN_USERNAME)];
+                    case 4:
+                        defaultAdminUser = _a.sent();
+                        _a.label = 5;
+                    case 5: return [4 /*yield*/, this._organizationRepository.getAll()];
+                    case 6:
+                        organizations = _a.sent();
+                        if (!(!organizations.length && defaultAdminUser)) return [3 /*break*/, 8];
+                        return [4 /*yield*/, this._organizationRepository.create({
+                                name: 'DEFAULT ORG',
+                                user_ids: [defaultAdminUser.id],
+                            })];
+                    case 7:
+                        _a.sent();
+                        _a.label = 8;
+                    case 8: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return PermissionManager;
+}());
+exports.default = PermissionManager;
+//# sourceMappingURL=PermissionManager.js.map

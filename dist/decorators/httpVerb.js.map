@@ -1,0 +1,1 @@
+{"version":3,"file":"httpVerb.js","sourceRoot":"","sources":["../../src/decorators/httpVerb.ts"],"names":[],"mappings":";;AAGA,mBAAe,UAAiC,QAAkB;IAChE,OAAA,UAAC,MAAmB,EAAE,IAAuB;QAC1C,MAAM,CAAC,IAAI,CAAuC,CAAC,QAAQ,GAAG,QAAQ,CAAC;IAC1E,CAAC;AAFD,CAEC,EAAC"}
