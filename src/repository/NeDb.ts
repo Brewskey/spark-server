@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { mkdirp } from 'mkdirp';
+import mkdirp from 'mkdirp';
 import Datastore from 'nedb-core';
 import type { IBaseDatabase } from '../types';
 import type { CollectionName } from './collectionNames';

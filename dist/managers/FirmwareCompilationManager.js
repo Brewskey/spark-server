@@ -42,7 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var crypto_1 = __importDefault(require("crypto"));
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
-var mkdirp_1 = require("mkdirp");
+var mkdirp_1 = __importDefault(require("mkdirp"));
 var rmfr_1 = __importDefault(require("rmfr"));
 var child_process_1 = require("child_process");
 var settings_1 = __importDefault(require("../settings"));
@@ -120,7 +120,7 @@ var FirmwareCompilationManager = /** @class */ (function () {
                     platformName = platformName.toLowerCase();
                     appFolder = "".concat(platformName, "_firmware_").concat(new Date().getTime()).toLowerCase();
                     appPath = path_1.default.join(USER_APP_PATH, appFolder);
-                    mkdirp_1.mkdirp.sync(appPath);
+                    mkdirp_1.default.sync(appPath);
                     files.forEach(function (file) {
                         var fileName = file.originalname;
                         var fileExtension = path_1.default.extname(fileName);
@@ -177,10 +177,10 @@ var FirmwareCompilationManager = /** @class */ (function () {
 if (IS_COMPILATION_ENABLED) {
     // Delete all expired binaries or queue them up to eventually be deleted.
     if (!fs_1.default.existsSync(settings_1.default.BUILD_DIRECTORY)) {
-        mkdirp_1.mkdirp.sync(settings_1.default.BUILD_DIRECTORY);
+        mkdirp_1.default.sync(settings_1.default.BUILD_DIRECTORY);
     }
     if (!fs_1.default.existsSync(BIN_PATH)) {
-        mkdirp_1.mkdirp.sync(BIN_PATH);
+        mkdirp_1.default.sync(BIN_PATH);
     }
     fs_1.default.readdirSync(USER_APP_PATH).forEach(function (file) {
         var appFolder = path_1.default.join(USER_APP_PATH, file);

@@ -1,7 +1,7 @@
 /// <reference types="node" />
+import { LogLevel } from 'bunyan';
 import { IndexSpecification } from 'mongodb';
 import { IBaseRepository } from 'spark-protocol';
-import type { Settings as ProtocolSettings } from 'spark-protocol/dist/settings';
 export type Webhook = {
     auth?: {
         password: string;
@@ -80,10 +80,13 @@ export type UserCredentials = {
 };
 export type UserRole = 'administrator';
 export type ProtectedEntityName = 'deviceAttributes' | 'webhook';
-export type Settings = ProtocolSettings & {
+export type Settings = {
     ACCESS_TOKEN_LIFETIME: number;
+    CONNECTED_DEVICES_LOGGING_INTERVAL?: number;
     API_TIMEOUT: number;
+    BINARIES_DIRECTORY?: string;
     BUILD_DIRECTORY: string;
+    CRYPTO_ALGORITHM: string;
     DB_CONFIG: {
         DB_TYPE: 'nedb' | 'mongodb';
         OPTIONS?: Record<string, string>;
@@ -92,6 +95,8 @@ export type Settings = ProtocolSettings & {
     };
     DEFAULT_ADMIN_PASSWORD: string;
     DEFAULT_ADMIN_USERNAME: string;
+    DEVICE_DIRECTORY: string;
+    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: boolean;
     EXPRESS_SERVER_CONFIG: {
         PORT: number;
         SSL_CERTIFICATE_FILEPATH: string | null | undefined;
@@ -100,10 +105,20 @@ export type Settings = ProtocolSettings & {
     };
     FIRMWARE_DIRECTORY: string;
     FIRMWARE_REPOSITORY_DIRECTORY: string;
+    LOG_LEVEL: LogLevel;
     LOGIN_ROUTE: string;
+    SERVER_KEY_FILENAME: string;
+    SERVER_KEY_PASSWORD?: string;
+    SERVER_KEYS_DIRECTORY: string;
+    SHOW_VERBOSE_DEVICE_LOGS?: boolean;
+    TCP_DEVICE_SERVER_CONFIG: {
+        HOST: string;
+        PORT: number;
+    };
     USERS_DIRECTORY: string;
     WEBHOOK_TEMPLATE_PARAMETERS: Record<string, string>;
     WEBHOOKS_DIRECTORY: string;
+    ALLOW_DEVICE_TO_PROVIDE_PEM?: boolean;
 };
 export type RequestOptions = {
     auth?: {

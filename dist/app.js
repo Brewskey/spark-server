@@ -1,24 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -52,54 +32,17 @@ function createApp(container, settings, existingApp) {
     //   });
     //   return next();
     // };
-    app.use((0, bunyan_middleware_1.default)({
-        headerName: 'X-Request-Id',
-        level: 'debug',
-        logger: logger,
-        logName: 'req_id',
-        obscureHeaders: ['authorization'],
-        propertyName: 'reqId',
-    }));
-    app.use(function (req, res, next) {
-        var buffers = [];
-        var proxyHandler = {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            apply: function (target, thisArg, argumentsList) {
-                var contentType = res.getHeader('content-type');
-                if (typeof contentType === 'string' &&
-                    contentType.includes('json') &&
-                    argumentsList[0]) {
-                    buffers.push(argumentsList[0]);
-                }
-                return target.call.apply(target, __spreadArray([thisArg], argumentsList, false));
-            },
-        };
-        res.write = new Proxy(res.write, proxyHandler);
-        res.end = new Proxy(res.end, proxyHandler);
-        res.on('finish', function () {
-            var bodyResponse = Buffer.concat(buffers).toString('utf8');
-            try {
-                bodyResponse = JSON.parse(bodyResponse);
-            }
-            catch (_) {
-                /* intentionally ignore */
-            }
-            var headers = __assign({}, req.headers);
-            if (headers.authorization) {
-                headers.authorization = 'Bearer <removed>';
-            }
-            req.log.info({
-                msg: 'Request',
-                url: req.url,
-                method: req.method,
-                bodyRequest: req.body,
-                statusCode: res.statusCode,
-                bodyResponse: bodyResponse,
-                headers: headers,
-            });
-        });
-        next();
-    });
+    if (logger.debug()) {
+        app.use((0, bunyan_middleware_1.default)({
+            headerName: 'X-Request-Id',
+            level: 'debug',
+            logger: logger,
+            logName: 'req_id',
+            obscureHeaders: [],
+            propertyName: 'reqId',
+        }));
+        logger.warn('Request logging enabled');
+    }
     app.use(body_parser_1.default.json());
     app.use(body_parser_1.default.urlencoded({
         extended: true,

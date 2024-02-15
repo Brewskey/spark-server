@@ -2,10 +2,9 @@ import path from 'path';
 import fs from 'fs';
 import type { Settings } from './types';
 import { LogLevel } from 'bunyan';
-import settings from 'spark-protocol/dist/settings';
 
 const SETTINGS_OVERRIDE_PATH = path.join(process.cwd(), 'settings.json');
-let settingsOverrides: Partial<Settings> = {};
+let settingsOverrides: Record<string, unknown> = {};
 if (fs.existsSync(SETTINGS_OVERRIDE_PATH)) {
   settingsOverrides = JSON.parse(
     fs.readFileSync(SETTINGS_OVERRIDE_PATH).toString(),
@@ -14,11 +13,11 @@ if (fs.existsSync(SETTINGS_OVERRIDE_PATH)) {
 }
 
 const SETTINGS: Settings = {
-  ...settings,
   BUILD_DIRECTORY: path.join(process.cwd(), 'data/build'),
   DEFAULT_ADMIN_PASSWORD: 'adminPassword',
   DEFAULT_ADMIN_USERNAME: '__admin__',
   DEVICE_DIRECTORY: path.join(process.cwd(), 'data/deviceKeys'),
+  ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: true,
   FIRMWARE_DIRECTORY: path.join(process.cwd(), 'data/knownApps'),
   FIRMWARE_REPOSITORY_DIRECTORY: path.join(process.cwd(), '../spark-firmware'),
   SERVER_KEY_FILENAME: 'default_key.pem',
@@ -45,7 +44,6 @@ const SETTINGS: Settings = {
   TCP_DEVICE_SERVER_CONFIG: {
     HOST: 'localhost',
     PORT: 5683,
-    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: true,
   },
   // Override template parameters in webhooks with this object
   WEBHOOK_TEMPLATE_PARAMETERS: {
