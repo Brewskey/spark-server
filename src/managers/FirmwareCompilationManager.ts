@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import mkdirp from 'mkdirp';
+import { mkdirp } from 'mkdirp';
 import rmfr from 'rmfr';
 import { spawn } from 'child_process';
 import settings from '../settings';

@@ -66,7 +66,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs_1 = __importDefault(require("fs"));
-var mkdirp_1 = __importDefault(require("mkdirp"));
+var mkdirp_1 = require("mkdirp");
 var nedb_core_1 = __importDefault(require("nedb-core"));
 var collectionNames_1 = __importDefault(require("./collectionNames"));
 var promisify_1 = require("../lib/promisify");
@@ -180,7 +180,7 @@ var NeDb = /** @class */ (function (_super) {
         }); };
         _this.__runForCollection = function (collectionName, callback) { return callback(_this._database[collectionName]); };
         if (!fs_1.default.existsSync(path)) {
-            mkdirp_1.default.sync(path);
+            mkdirp_1.mkdirp.sync(path);
         }
         _this._database = {};
         Object.values(collectionNames_1.default).forEach(function (collectionName) {
