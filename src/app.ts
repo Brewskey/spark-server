@@ -51,7 +51,7 @@ function createApp<TApplication extends Application>(
       level: 'debug',
       logger,
       logName: 'req_id',
-      obscureHeaders: [],
+      obscureHeaders: ['authorization'],
       propertyName: 'reqId',
     }),
   );
@@ -84,6 +84,11 @@ function createApp<TApplication extends Application>(
       } catch (_) {
         /* intentionally ignore */
       }
+
+      const headers = { ...req.headers };
+      if (headers.authorization) {
+        headers.authorization = 'Bearer <removed>';
+      }
       req.log.info({
         msg: 'Request',
         url: req.url,
@@ -91,7 +96,7 @@ function createApp<TApplication extends Application>(
         bodyRequest: req.body,
         statusCode: res.statusCode,
         bodyResponse,
-        headers: req.headers,
+        headers,
       });
     });
     next();
