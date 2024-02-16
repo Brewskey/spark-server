@@ -18,7 +18,7 @@ jobs:
           access: public
           package: ./packages/spark-protocol
       - name: Publish @brewskey/spark-server
-      - uses: JS-DevTools/npm-publish@v3
+        uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_PUBLISH }}
           access: public
