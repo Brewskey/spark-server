@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 import settings from '../settings';
 import NeDb from '../repository/NeDb';
 import MongoDb from '../repository/MongoDb';
-import { DeviceKeyObject } from 'spark-protocol';
+import { DeviceKeyObject } from '@brewskey/spark-protocol';
 
 type DatabaseType = 'mongo' | 'nedb';
 

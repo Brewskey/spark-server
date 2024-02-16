@@ -1,4 +1,4 @@
-import type { EventPublisher } from 'spark-protocol';
+import type { EventPublisher } from '@brewskey/spark-protocol';
 import hogan from 'hogan.js';
 import request, { CoreOptions, UrlOptions } from 'request';
 import nullthrows from 'nullthrows';
@@ -13,7 +13,7 @@ import type {
 } from '../types';
 import settings from '../settings';
 import Logger from '../lib/logger';
-import { ProtocolEvent } from 'spark-protocol/dist/types';
+import { ProtocolEvent } from '@brewskey/spark-protocol';
 
 const logger = Logger.createModuleLogger(module);
 

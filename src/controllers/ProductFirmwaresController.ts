@@ -11,7 +11,7 @@ import {
   ProductFirmware,
   IProductDeviceRepository,
   IProductFirmwareRepository,
-} from 'spark-protocol';
+} from '@brewskey/spark-protocol';
 
 type ProductFirmwareUpload = {
   current: boolean;

@@ -1,4 +1,4 @@
-import { ProtocolEvent } from 'spark-protocol';
+import { ProtocolEvent } from '@brewskey/spark-protocol';
 
 export type EventAPIType = {
   coreid: string | null | undefined;

@@ -13,7 +13,7 @@ import cors from 'cors';
 import type { Settings } from './types';
 import Logger from './lib/logger';
 import routeConfig from './RouteConfig';
-import { ClaimCodeManager } from 'spark-protocol';
+import { ClaimCodeManager } from '@brewskey/spark-protocol';
 
 const logger = Logger.createModuleLogger(module);
 

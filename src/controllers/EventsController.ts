@@ -9,7 +9,7 @@ import serverSentEvents from '../decorators/serverSentEvents';
 import eventToApi from '../lib/eventToApi';
 import Logger from '../lib/logger';
 import { HttpResult } from './types';
-import { ProtocolEvent } from 'spark-protocol';
+import { ProtocolEvent } from '@brewskey/spark-protocol';
 
 const logger = Logger.createModuleLogger(module);
 

@@ -10,7 +10,10 @@ import HttpError from '../lib/HttpError';
 import settings from '../settings';
 import Logger from '../lib/logger';
 import ExpressOAuthServer from 'express-oauth-server';
-import { IBaseRepository, IDeviceAttributeRepository } from 'spark-protocol';
+import {
+  IBaseRepository,
+  IDeviceAttributeRepository,
+} from '@brewskey/spark-protocol';
 
 const logger = Logger.createModuleLogger(module);
 

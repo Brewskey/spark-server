@@ -1,5 +1,5 @@
 import type { Container } from 'constitute';
-import { defaultBindings } from 'spark-protocol';
+import { defaultBindings } from '@brewskey/spark-protocol';
 import OAuthServer from 'express-oauth-server';
 import type { Settings } from './types';
 import OAuthModel from './OAuthModel';

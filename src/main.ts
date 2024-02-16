@@ -3,7 +3,7 @@ import fs from 'fs';
 import http from 'http';
 import https from 'https';
 import os from 'os';
-import { filterFalsyValues, type DeviceServer } from 'spark-protocol';
+import { filterFalsyValues, type DeviceServer } from '@brewskey/spark-protocol';
 import createApp from './app';
 import defaultBindings from './defaultBindings';
 import settings from './settings';

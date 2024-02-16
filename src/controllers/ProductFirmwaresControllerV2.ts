@@ -7,7 +7,7 @@ import {
   IProductDeviceRepository,
   IProductFirmwareRepository,
   ProductFirmware,
-} from 'spark-protocol';
+} from '@brewskey/spark-protocol';
 import { HttpResult } from './types';
 
 type APIProductFirmware = Omit<ProductFirmware, 'data'> & {

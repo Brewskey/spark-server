@@ -8,7 +8,7 @@ import {
   IDeviceAttributeRepository,
   IProductDeviceRepository,
   filterFalsyValues,
-} from 'spark-protocol';
+} from '@brewskey/spark-protocol';
 
 // getByID, deleteByID and update uses model.deviceID as ID for querying
 class DeviceAttributeDatabaseRepository

@@ -17,7 +17,7 @@ import {
   IProductDeviceRepository,
   IProductFirmwareRepository,
   ProductFirmware,
-} from 'spark-protocol';
+} from '@brewskey/spark-protocol';
 
 const MISSING_FIELDS = [
   'description',

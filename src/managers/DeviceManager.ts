@@ -5,8 +5,8 @@ import type {
   EventPublisher,
   IDeviceAttributeRepository,
   IDeviceKeyRepository,
-} from 'spark-protocol';
-import { SPARK_SERVER_EVENTS } from 'spark-protocol';
+} from '@brewskey/spark-protocol';
+import { SPARK_SERVER_EVENTS } from '@brewskey/spark-protocol';
 import type PermissionManager from './PermissionManager';
 import type { IDeviceFirmwareRepository } from '../types';
 import HttpError from '../lib/HttpError';

@@ -1,6 +1,6 @@
 import { IndexSpecification } from 'mongodb';
-import { IBaseRepository } from 'spark-protocol';
-import type { Settings as ProtocolSettings } from 'spark-protocol/dist/settings';
+import { IBaseRepository } from '@brewskey/spark-protocol';
+import type { Settings as ProtocolSettings } from '@brewskey/spark-protocol';
 
 export type Webhook = {
   auth?: {

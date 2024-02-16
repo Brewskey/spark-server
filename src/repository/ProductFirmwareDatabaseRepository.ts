@@ -4,7 +4,10 @@ import type { IBaseDatabase } from '../types';
 import COLLECTION_NAMES from './collectionNames';
 import BaseRepository from './BaseRepository';
 import Logger from '../lib/logger';
-import { IProductFirmwareRepository, ProductFirmware } from 'spark-protocol';
+import {
+  IProductFirmwareRepository,
+  ProductFirmware,
+} from '@brewskey/spark-protocol';
 
 const logger = Logger.createModuleLogger(module);
 

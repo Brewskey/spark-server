@@ -1,4 +1,4 @@
-import { FileManager } from 'spark-protocol';
+import { FileManager } from '@brewskey/spark-protocol';
 import type { IDeviceFirmwareRepository } from '../types';
 
 class DeviceFirmwareFileRepository implements IDeviceFirmwareRepository {
