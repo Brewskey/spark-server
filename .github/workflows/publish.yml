@@ -11,6 +11,13 @@ jobs:
       - run: npm ci --include=optional
       - run: npm run build:all
       # - run: npm run test:all
+      - name: Publish @brewskey/spark-protocol
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.NPM_PUBLISH }}
+          access: public
+          package: ./packages/spark-protocol
+      - name: Publish @brewskey/spark-server
       - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_PUBLISH }}
