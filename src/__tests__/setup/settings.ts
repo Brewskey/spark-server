@@ -1,10 +1,10 @@
 import { LogLevel } from 'bunyan';
 import path from 'path';
 import { Settings } from '../../types';
-import settings from 'spark-protocol/dist/settings';
+import { SETTINGS as PROTOCOL_SETTINGS } from '@brewskey/spark-protocol';
 
 const SETTINGS: Settings & { CUSTOM_FIRMWARE_DIRECTORY: string } = {
-  ...settings,
+  ...PROTOCOL_SETTINGS,
   BUILD_DIRECTORY: path.join(__dirname, '../__test_data__/build'),
   CUSTOM_FIRMWARE_DIRECTORY: path.join(__dirname, '../__test_data__'),
   DEFAULT_ADMIN_PASSWORD: 'adminPassword',

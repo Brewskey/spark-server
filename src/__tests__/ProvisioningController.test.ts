@@ -8,7 +8,7 @@ import {
   IDeviceAttributeRepository,
   IDeviceKeyRepository,
   SPARK_SERVER_EVENTS,
-} from 'spark-protocol';
+} from '@brewskey/spark-protocol';
 import { IUserRepository, User } from '../types';
 import nullthrows from 'nullthrows';
 

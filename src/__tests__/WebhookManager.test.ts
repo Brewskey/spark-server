@@ -2,7 +2,7 @@ import type { Webhook } from '../types';
 
 import sinon from 'sinon';
 
-import { EventPublisher, ProtocolEvent } from 'spark-protocol';
+import { EventPublisher, ProtocolEvent } from '@brewskey/spark-protocol';
 import WebhookFileRepository from '../repository/WebhookFileRepository';
 import WebhookManager, {
   WebhookEventContext,

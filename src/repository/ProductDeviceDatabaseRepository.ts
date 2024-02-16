@@ -3,7 +3,7 @@ import type { IBaseDatabase, ProductDevice } from '../types';
 
 import COLLECTION_NAMES from './collectionNames';
 import BaseRepository from './BaseRepository';
-import { IProductDeviceRepository } from 'spark-protocol';
+import { IProductDeviceRepository } from '@brewskey/spark-protocol';
 
 class ProductDeviceDatabaseRepository
   extends BaseRepository<ProductDevice>

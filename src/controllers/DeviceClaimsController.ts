@@ -1,4 +1,4 @@
-import type { ClaimCodeManager } from 'spark-protocol';
+import type { ClaimCodeManager } from '@brewskey/spark-protocol';
 import nullthrows from 'nullthrows';
 import type DeviceManager from '../managers/DeviceManager';
 import Controller from './Controller';

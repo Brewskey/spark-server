@@ -1,4 +1,8 @@
-import type { EventData, EventPublisher, ProtocolEvent } from 'spark-protocol';
+import type {
+  EventData,
+  EventPublisher,
+  ProtocolEvent,
+} from '@brewskey/spark-protocol';
 
 type FilterOptions = {
   connectionID?: string | null | undefined;

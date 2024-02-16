@@ -1,5 +1,5 @@
 import * as uuid from 'uuid';
-import { JSONFileManager } from 'spark-protocol';
+import { JSONFileManager } from '@brewskey/spark-protocol';
 import HttpError from '../lib/HttpError';
 import type { IWebhookRepository, Webhook } from '../types';
 

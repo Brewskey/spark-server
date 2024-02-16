@@ -3,7 +3,10 @@ import type { IBaseDatabase } from '../types';
 
 import COLLECTION_NAMES from './collectionNames';
 import BaseRepository from './BaseRepository';
-import { DeviceKeyObject, IDeviceKeyRepository } from 'spark-protocol';
+import {
+  DeviceKeyObject,
+  IDeviceKeyRepository,
+} from '@brewskey/spark-protocol';
 
 // getByID, deleteByID and update uses model.deviceID as ID for querying
 class DeviceKeyDatabaseRepository

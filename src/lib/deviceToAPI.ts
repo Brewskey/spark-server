@@ -1,4 +1,4 @@
-import { DeviceAttributes } from 'spark-protocol';
+import { DeviceAttributes } from '@brewskey/spark-protocol';
 
 export type DeviceAPIType = {
   cellular: boolean;

@@ -20,7 +20,7 @@ import {
   IDeviceAttributeRepository,
   IProductDeviceRepository,
   IProductFirmwareRepository,
-} from 'spark-protocol';
+} from '@brewskey/spark-protocol';
 
 const POST_MISSING_FIELDS = [
   'description',

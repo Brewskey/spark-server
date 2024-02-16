@@ -1,1 +1,0 @@
-{"version":3,"file":"serverSentEvents.js","sourceRoot":"","sources":["../../src/decorators/serverSentEvents.ts"],"names":[],"mappings":";;AAEA,sCAAsC;AACtC,mBAAe;IACb,OAAA,UACE,MAAmB,EACnB,IAAuB;QAEtB,MAAM,CAAC,IAAI,CAAmC,CAAC,gBAAgB,GAAG,IAAI,CAAC;IAC1E,CAAC;AALD,CAKC,EAAC"}
