@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsc",
     "build:deps": "npx lerna run build",
-    "build:all": "npm run build && npm run build",
+    "build:all": "npm run build:deps && npm run build",
     "build:clean": "rimraf ./build",
     "build:watch": "tsc --watch src --watch ../spark-protocol/dist --ignore data",
     "lint": "eslint --fix --max-warnings 0 ./src",
@@ -45,6 +45,7 @@
     "start:warn": "ts-node ./src/main.ts --trace-warnings | bunyan",
     "test": "jest",
     "test:deps": "npx lerna run test",
+    "test:all": "npm run test:deps && npm run test",
     "test:watch": "jest --watch",
     "watch": "tsc --watch",
     "update-firmware": "node ./node_modules/spark-protocol/dist/scripts/update-firmware-binaries",
