@@ -26,6 +26,9 @@
     }
   ],
   "main": "./dist/exports.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "build:deps": "npx lerna run build",
