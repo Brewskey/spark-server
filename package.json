@@ -26,7 +26,6 @@
     }
   ],
   "main": "./dist/exports.js",
-  "private": "false",
   "scripts": {
     "build": "tsc",
     "build:deps": "npx lerna run build",
