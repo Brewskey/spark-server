@@ -55,13 +55,14 @@ class DeviceAttributeDatabaseRepository
       .filter(filterFalsyValues);
   };
 
-  getByID: (deviceID: string) => Promise<DeviceAttributes | null | undefined> =
-    async (deviceID: string): Promise<DeviceAttributes | null | undefined> =>
-      this._parseVariables(
-        await this._database.findOne(this._collectionName, {
-          deviceID: deviceID.toLowerCase(),
-        }),
-      );
+  getByID = async (
+    deviceID: string,
+  ): Promise<DeviceAttributes | null | undefined> =>
+    this._parseVariables(
+      await this._database.findOne(this._collectionName, {
+        deviceID: deviceID.toLowerCase(),
+      }),
+    );
 
   getByName = async (name: string): Promise<DeviceAttributes | undefined> =>
     this._parseVariables(

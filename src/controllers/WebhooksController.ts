@@ -10,6 +10,7 @@ import { HttpResult } from './types';
 const validateWebhookMutator = (
   webhookMutator: WebhookMutator,
 ): HttpError | null | undefined => {
+  console.error(webhookMutator);
   if (!webhookMutator.event) {
     return new HttpError('no event name provided');
   }

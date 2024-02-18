@@ -714,6 +714,7 @@ class Device extends EventEmitter {
                 'URI filter did not match',
               );
             }
+            reject(new Error('URI filter did not match'));
             return;
           }
 
@@ -729,6 +730,7 @@ class Device extends EventEmitter {
                 'Tokens did not match',
               );
             }
+            reject(new Error('Tokens did not match'));
             return;
           }
           cleanUpListeners();
