@@ -43,9 +43,9 @@ export type OTAUpdate = {
 };
 
 class FirmwareManager {
-  static getMissingModules(
+  static async getMissingModules(
     systemInformation: SystemInformation,
-  ): FirmwareSetting[] | null | undefined {
+  ): Promise<FirmwareSetting[] | null | undefined> {
     return FirmwareManager._getMissingModule(systemInformation);
   }
 
@@ -53,8 +53,7 @@ class FirmwareManager {
     systemInformation: SystemInformation,
   ): Promise<OTAUpdate | null | undefined> {
     const missingDependencies =
-      FirmwareManager._getMissingModule(systemInformation);
-
+      await FirmwareManager._getMissingModule(systemInformation);
     if (!missingDependencies?.length) {
       return null;
     }
@@ -74,7 +73,6 @@ class FirmwareManager {
         }
 
         const systemFile = fs.readFileSync(dependencyPath);
-        const fn = dependency.prefixInfo.moduleFunction;
         return {
           allModuleFunctions: [
             ...acc.allModuleFunctions,
@@ -112,48 +110,50 @@ class FirmwareManager {
     );
   }
 
-  static _getMissingModule(
+  static async _getMissingModule(
     systemInformation: SystemInformation,
-  ): FirmwareSetting[] | null | undefined {
+  ): Promise<FirmwareSetting[] | null | undefined> {
     const platformID = systemInformation.p;
 
-    // Check CRC to see if there are any bad modules
-    const parser = new HalDescribeParser();
-    let knownMissingDependencies = parser
-      .getModules(systemInformation)
-      .filter((module) => !module.hasIntegrity())
-      .map((module) => module.toDescribe());
+    // Fix 204 version deps. 204 doesn't exist so map it to 207
+    systemInformation.m.forEach((moduleDependency: ModuleDependency) => {
+      moduleDependency.d.forEach((subDependency: ModuleSubDependency) => {
+        if (subDependency.v === 204) {
+          subDependency.v = 207;
+        }
+      });
+    });
 
-    if (knownMissingDependencies.length) {
-      logger.info('Bad CRC for firmware');
-    } else {
-      // find missing dependencies
-      const dr = new HalDependencyResolver();
-      knownMissingDependencies =
-        dr.findAnyMissingDependencies(systemInformation);
-    }
+    // find missing dependencies
+    const dr = new HalDependencyResolver();
+    const knownMissingDependencies =
+      dr.findAnyMissingDependencies(systemInformation);
 
     if (!knownMissingDependencies.length) {
       return [];
     }
 
+    const iter = 0;
     const findSettingForFirmwareModule = (
       dependency: FirmwareModule,
-    ): FirmwareSetting | undefined =>
-      FirmwareSettings.find(
+    ): FirmwareSetting | undefined => {
+      return FirmwareSettings.find(
         ({ prefixInfo }: { prefixInfo: FirmwarePrefixInfo }): boolean =>
           prefixInfo.platformID === platformID &&
           prefixInfo.moduleVersion === dependency.version &&
+          dependency.func != null &&
           prefixInfo.moduleFunction === NUMBER_BY_FUNCTION[dependency.func] &&
           prefixInfo.moduleIndex === parseInt(dependency.name, 10),
       );
+    };
 
     const addRealDependencies = (
       dependency: FirmwareModule,
     ): FirmwareModule | null => {
       const setting = findSettingForFirmwareModule(dependency);
       if (!setting) {
-        logger.error('Cannot find firmware for module', {
+        logger.error({
+          msg: 'Cannot find firmware for module',
           systemInformation,
           dependency,
         });

@@ -208,9 +208,10 @@ class DeviceServer {
       await FirmwareManager.getOtaSystemUpdateConfig(systemInformation);
     if (!config) {
       const missingModules =
-        FirmwareManager.getMissingModules(systemInformation);
+        await FirmwareManager.getMissingModules(systemInformation);
       if (missingModules?.length) {
-        logger.error('Device has missing modules but no OTA update', {
+        logger.error({
+          msg: 'Device has missing modules but no OTA update',
           deviceID,
           systemInformation: JSON.stringify(systemInformation),
           missingModules: JSON.stringify(missingModules),
@@ -534,6 +535,8 @@ class DeviceServer {
       const eventName = eventData.name.toLowerCase();
 
       let shouldSwallowEvent = false;
+
+      logger.error(eventData);
 
       // All spark events except special events should be hidden from the
       // event stream.
@@ -1112,7 +1115,8 @@ class DeviceServer {
     }
 
     const systemInformation = device.getSystemInformation();
-    const missingModules = FirmwareManager.getMissingModules(systemInformation);
+    const missingModules =
+      await FirmwareManager.getMissingModules(systemInformation);
 
     if (missingModules?.length) {
       logger.info('Device missing dependencies', {
