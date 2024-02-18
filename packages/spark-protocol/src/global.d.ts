@@ -78,22 +78,24 @@ declare module 'binary-version-reader' {
     f: string;
     n: string;
     v: number;
+    _?: string;
   };
   type ModuleDependency = {
     s: number;
     l: 'm' | 'f';
     vc: number;
     vv: number;
-    f: 'b' | 's' | 'u';
-    n: string;
-    v: number;
+    u?: string;
+    f?: 'b' | 's' | 'u';
+    n?: string;
+    v?: number;
     d: ModuleSubDependency[];
   };
   type SystemInformation = {
     f: [];
     v: Record<string, number>;
     p: PlatformType;
-    m: SystemModule;
+    m: ModuleDependency[];
   };
 
   class HalModuleParser {
