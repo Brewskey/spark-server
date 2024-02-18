@@ -1,0 +1,31 @@
+{
+  "name": "@brewskey/particle-collider",
+  "version": "1.0.0",
+  "description": "spark-server stress tester",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node ./src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brewskey/particle-collider.git"
+  },
+  "author": "Brewskey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Brewskey/particle-collider/issues"
+  },
+  "homepage": "https://github.com/Brewskey/particle-collider#readme",
+  "dependencies": {
+    "chalk": "^4",
+    "coap-packet": "^1.1.1",
+    "node-rsa": "^1.1.1",
+    "nodemon": "^3.0.3",
+    "nullthrows": "^1.1.1",
+    "particle-api-js": "^10.4.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

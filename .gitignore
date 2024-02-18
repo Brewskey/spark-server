@@ -33,6 +33,10 @@ __test_data__
 *.der
 *.pem
 *.pub.pem
-
-# build folder
 build
+.env
+
+settings.json
+temp
+path
+dist

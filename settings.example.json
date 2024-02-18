@@ -1,0 +1,10 @@
+{
+  "DB_CONFIG": {
+    "DB_TYPE": "mongodb",
+    "OPTIONS": {
+      "reconnectTries": 60,
+      "reconnectInterval": 1000
+    },
+    "URL": "mongodb://localhost:27020"
+  }
+}
