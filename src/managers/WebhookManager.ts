@@ -320,6 +320,7 @@ class WebhookManager {
           name: webhook.event,
           requestOptions,
           responseBody,
+          responseEventData,
           webhook,
         },
         'Webhook',

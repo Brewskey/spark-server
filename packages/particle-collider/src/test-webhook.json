@@ -1,0 +1,11 @@
+{
+  "event": "test-webhook",
+  "requestType": "POST",
+  "responseTopic": "hook-response/test-webhook/{{PARTICLE_DEVICE_ID}}",
+  "json": {
+    "PARTICLE_DEVICE_ID": "{{PARTICLE_DEVICE_ID}}",
+    "PARTICLE_EVENT_VALUE": "{{PARTICLE_EVENT_VALUE}}",
+    "PARTICLE_PUBLISHED_AT": "{{PARTICLE_PUBLISHED_AT}}",
+    "payload": "{{payload}}"
+  }
+}

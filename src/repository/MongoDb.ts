@@ -135,6 +135,10 @@ class MongoDb<
         const resultItem = await collection.findOne(
           this.__translateQuery(query),
         );
+
+        if (!resultItem) {
+          console.error(new Error(), collectionName, query);
+        }
         return nullthrows(
           this.__translateResultItem(resultItem as unknown as TEntity),
         );

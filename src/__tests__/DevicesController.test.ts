@@ -388,7 +388,7 @@ describe('DevicesController', () => {
 
   test('should start device flashing process with known application', async () => {
     const knownAppName = 'knownAppName';
-    const knownAppBuffer = new Buffer(knownAppName);
+    const knownAppBuffer = Buffer.from(knownAppName);
 
     const deviceFirmwareStub = sinon
       .stub(

@@ -1,0 +1,69 @@
+{
+  "root": true,
+  "parserOptions": {
+    "project": "./tsconfig.json",
+  },
+  "plugins": ["@typescript-eslint", "import", "prettier"],
+  "extends": [
+    "airbnb-typescript/base",
+    "prettier",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
+  ],
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+    "eol-last": 2,
+    "import/first": 0,
+    "import/newline-after-import": 0,
+    "import/no-duplicates": 0,
+    "import/no-extraneous-dependencies": 0,
+    "import/no-named-as-default": 0,
+    "import/no-unresolved": 2,
+    "import/prefer-default-export": 0,
+    "newline-per-chained-call": 0,
+    "no-confusing-arrow": 0,
+    "no-console": 0,
+    "no-duplicate-imports": 0,
+    "no-mixed-operators": 0,
+    "no-underscore-dangle": 0,
+    "no-use-before-define": 0,
+    "class-methods-use-this": "off",
+    "no-promise-executor-return": "off",
+    "quotes": [
+      2,
+      "single",
+      {
+        "avoidEscape": true,
+      },
+    ],
+    "semi": 2,
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn", // or "error"
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_",
+      },
+    ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": ["parameter", "variable"],
+        "leadingUnderscore": "forbid",
+        "filter": {
+          // keep this one open for destructuring
+          "regex": "_*",
+          "match": false,
+        },
+        "format": null,
+      },
+      {
+        "selector": "parameter",
+        "leadingUnderscore": "require",
+        "format": null,
+        "modifiers": ["unused"],
+      },
+    ],
+  },
+}

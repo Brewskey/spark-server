@@ -1,6 +1,6 @@
 {
   "name": "@brewskey/spark-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -81,7 +81,6 @@
     "body-parser": "^1.20.2",
     "bunyan": "^1.8.15",
     "bunyan-middleware": "^1.0.2",
-    "chalk": "^5.3.0",
     "constitute": "^1.6.2",
     "cors": "^2.8.5",
     "csv": "^6.3.6",
