@@ -1,32 +1,29 @@
+import { filterFalsyValues } from '@brewskey/spark-protocol';
 import EventEmitter from 'events';
 import {
   Collection,
   Db,
+  DeleteResult,
+  Document,
   IndexSpecification,
   MongoClient,
   MongoClientOptions,
-  Document,
-  DeleteResult,
 } from 'mongodb';
-import type { IBaseDatabase } from '../types';
-import BaseMongoDb from './BaseMongoDb';
-import Logger from '../lib/logger';
 import nullthrows from 'nullthrows';
-import { filterFalsyValues } from '@brewskey/spark-protocol';
+
+import Logger from '../lib/logger';
+import BaseMongoDb from './BaseMongoDb';
 
 const logger = Logger.createModuleLogger(module);
 
 const DB_READY_EVENT = 'dbReady';
 
 class MongoDb<
-    TEntity extends { id: string; created_at: number } = Document & {
-      id: string;
-      created_at: number;
-    },
-  >
-  extends BaseMongoDb
-  implements IBaseDatabase<TEntity>
-{
+  TEntity extends { id: string; created_at: number } = Document & {
+    id: string;
+    created_at: number;
+  },
+> extends BaseMongoDb {
   _database!: Db;
 
   _statusEventEmitter: EventEmitter = new EventEmitter();

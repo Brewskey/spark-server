@@ -1,13 +1,13 @@
-import { Packet, ParsedPacket } from 'coap-packet';
 import crc32 from 'buffer-crc32';
+import { Packet, ParsedPacket } from 'coap-packet';
 import nullthrows from 'nullthrows';
-import { FileTransferStore } from './FileTransferStore';
 
+import type Device from '../clients/Device';
 import BufferStream from './BufferStream';
 import CoapMessages from './CoapMessages';
-import type Device from '../clients/Device';
-import ProtocolErrors from './ProtocolErrors';
+import { FileTransferStore } from './FileTransferStore';
 import Logger from './logger';
+import ProtocolErrors from './ProtocolErrors';
 const logger = Logger.createModuleLogger(module);
 //
 // UpdateBegin — sent by Server to initiate an OTA firmware update
@@ -101,7 +101,7 @@ class Flasher {
       await Promise.race([
         // Fail after 60 of trying to flash
         new Promise(
-          (resolve: (_: unknown) => void, reject: (error: Error) => void) => {
+          (_resolve: (_: unknown) => void, reject: (error: Error) => void) => {
             setTimeout(
               (): void => reject(new Error('Update timed out')),
               60 * 1000,

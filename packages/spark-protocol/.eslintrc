@@ -3,7 +3,13 @@
   "parserOptions": {
     "project": "./tsconfig.json",
   },
-  "plugins": ["@typescript-eslint", "import", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "prettier",
+    "unused-imports",
+    "simple-import-sort",
+  ],
   "extends": [
     "airbnb-typescript/base",
     "prettier",
@@ -38,13 +44,37 @@
     ],
     "semi": 2,
     "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "warn", // or "error"
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "warn",
       {
-        "argsIgnorePattern": "^_",
+        "vars": "all",
         "varsIgnorePattern": "^_",
-        "caughtErrorsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_",
       },
     ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": ["parameter", "variable"],
+        "leadingUnderscore": "forbid",
+        "filter": {
+          // keep this one open for destructuring
+          "regex": "_*",
+          "match": false,
+        },
+        "format": null,
+      },
+      {
+        "selector": "parameter",
+        "leadingUnderscore": "require",
+        "format": null,
+        "modifiers": ["unused"],
+      },
+    ],
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
   },
 }

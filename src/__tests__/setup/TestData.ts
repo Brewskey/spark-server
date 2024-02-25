@@ -1,11 +1,13 @@
 import crypto from 'crypto';
-import * as uuid from 'uuid';
-import NodeRSA from 'node-rsa';
 import fs from 'fs';
-import settings from './settings';
+import NodeRSA from 'node-rsa';
+import * as uuid from 'uuid';
+
 import type { UserCredentials } from '../../types';
+import settings from './settings';
 
 const uuidSet = new Set();
+let iter = 0;
 
 type CreateCustomFirmwareResult = {
   filePath: string;
@@ -62,6 +64,11 @@ class TestData {
     uuidSet.add(newID);
     return newID;
   };
+
+  static getNumericID(): number {
+    iter += 1;
+    return iter;
+  }
 
   static getPublicKey: () => string = (): string => {
     const key = new NodeRSA({ b: 1024 });

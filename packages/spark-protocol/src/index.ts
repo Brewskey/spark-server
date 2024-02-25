@@ -1,14 +1,34 @@
-export { default as DeviceAttributeFileRepository } from './repository/DeviceAttributeFileRepository';
-export { default as DeviceKeyFileRepository } from './repository/DeviceKeyFileRepository';
-export { default as ClaimCodeManager } from './lib/ClaimCodeManager';
-export { default as EventPublisher } from './lib/EventPublisher';
-export { default as DeviceServer } from './server/DeviceServer';
-export { default as FileManager } from './repository/FileManager';
-export { default as JSONFileManager } from './repository/JSONFileManager';
-export { default as ServerKeyFileRepository } from './repository/ServerKeyFileRepository';
+import path from 'path';
+
 export { default as Device } from './clients/Device';
 export { default as defaultBindings } from './defaultBindings';
-export { default as SPARK_SERVER_EVENTS } from './lib/SparkServerEvents';
+export * from './entity/DeviceAttributes.entity';
+export * from './entity/DeviceKeyObject.entity';
+export * from './entity/Organization.entity';
+export * from './entity/Product.entity';
+export * from './entity/ProductConfig.entity';
+export * from './entity/ProductDevice.entity';
+export * from './entity/ProductFirmware.entity';
+export * from './entity/User.entity';
+export * from './entity/Webhook.entity';
 export { filterFalsyValues } from './filterFalsyValues';
+export { default as ClaimCodeManager } from './lib/ClaimCodeManager';
+export { default as EventPublisher } from './lib/EventPublisher';
+export { default as SPARK_SERVER_EVENTS } from './lib/SparkServerEvents';
+export { DeviceAttributeRepository } from './repository/DeviceAttributeRepository';
+export { DeviceKeyObjectRepository } from './repository/DeviceKeyObjectRepository';
+export { default as FileManager } from './repository/FileManager';
+export { ProductDeviceRepository } from './repository/ProductDeviceRepository';
+export { ProductFirmwareRepository } from './repository/ProductFirmwareRepository';
+export { RepositoryBase } from './repository/RepositoryBase';
+export { default as ServerKeyFileRepository } from './repository/ServerKeyFileRepository';
+export { default as DeviceServer, NAME_GENERATOR } from './server/DeviceServer';
 export { default as SETTINGS, Settings } from './settings';
+export const TYPEORM_ENTITIES = path.join(__dirname, 'entity/*entity{.ts,.js}');
+export const TYPEORM_MIGRATIONS = path.join(__dirname, 'migration/*{.ts,.js}');
+export const TYPEORM_SUBSCRIBERS = path.join(
+  __dirname,
+  'subscriber/*{.ts,.js}',
+);
+export { objectAssign } from './objectAssign';
 export * from './types';

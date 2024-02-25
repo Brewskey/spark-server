@@ -1,3 +1,8 @@
+import { ClaimCodeManager } from '@brewskey/spark-protocol';
+import bodyParser from 'body-parser';
+import bunyanMiddleware from 'bunyan-middleware';
+import type { Container } from 'constitute';
+import cors from 'cors';
 import type {
   Application as $Application,
   Application,
@@ -5,15 +10,11 @@ import type {
   Request,
   Response,
 } from 'express';
-import type { Container } from 'constitute';
-import bodyParser from 'body-parser';
 import express from 'express';
-import bunyanMiddleware from 'bunyan-middleware';
-import cors from 'cors';
-import type { Settings } from './types';
+
 import Logger from './lib/logger';
 import routeConfig from './RouteConfig';
-import { ClaimCodeManager } from '@brewskey/spark-protocol';
+import type { Settings } from './types';
 
 const logger = Logger.createModuleLogger(module);
 

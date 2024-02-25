@@ -1,26 +1,35 @@
-import request from 'supertest';
-import sinon from 'sinon';
-import ouathClients from '../oauthClients.json';
-import { createTestApp } from './setup/createTestApp';
-import TestData from './setup/TestData';
 import {
+  DeviceAttributeRepository,
+  DeviceKeyObjectRepository,
   EventPublisher,
-  IDeviceAttributeRepository,
-  IDeviceKeyRepository,
   SPARK_SERVER_EVENTS,
+  User,
 } from '@brewskey/spark-protocol';
-import { IUserRepository, User } from '../types';
+import { Container } from 'constitute';
 import nullthrows from 'nullthrows';
+import sinon from 'sinon';
+import request from 'supertest';
+
+import ouathClients from '../oauthClients.json';
+import UserRepository from '../repository/UserRepository';
+import { AppAndContainer, createTestApp } from './setup/createTestApp';
+import TestData from './setup/TestData';
+import { getTestDataSource } from './setup/TestDataSource';
 
 describe('ProvisioningController', () => {
-  const app = createTestApp();
-  const container = app.container;
+  const dataSource = getTestDataSource();
+  let app: AppAndContainer;
+  let container: Container;
   let DEVICE_ID: string;
   let TEST_PUBLIC_KEY: string;
   let testUser: User;
   let userToken: string;
 
   beforeAll(async () => {
+    await dataSource.initialize();
+    app = createTestApp(dataSource);
+    container = app.container;
+
     const USER_CREDENTIALS = TestData.getUser();
     DEVICE_ID = TestData.getID();
     TEST_PUBLIC_KEY = TestData.getPublicKey();
@@ -47,8 +56,8 @@ describe('ProvisioningController', () => {
 
     testUser = nullthrows(
       await container
-        .constitute<IUserRepository>('IUserRepository')
-        .getByUsername(USER_CREDENTIALS.username),
+        .constitute<UserRepository>('UserRepository')
+        .getByUsernameOrFail(USER_CREDENTIALS.username),
     );
 
     const tokenResponse = await request(app)
@@ -100,13 +109,13 @@ describe('ProvisioningController', () => {
 
   afterAll(async () => {
     await container
-      .constitute<IUserRepository>('IUserRepository')
+      .constitute<UserRepository>('UserRepository')
       .deleteByID(testUser.id);
     await container
-      .constitute<IDeviceAttributeRepository>('IDeviceAttributeRepository')
+      .constitute<DeviceAttributeRepository>('DeviceAttributeRepository')
       .deleteByID(DEVICE_ID);
     await container
-      .constitute<IDeviceKeyRepository>('IDeviceKeyRepository')
+      .constitute<DeviceKeyObjectRepository>('DeviceKeyObjectRepository')
       .deleteByID(DEVICE_ID);
   });
 });

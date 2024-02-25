@@ -1,6 +1,6 @@
 import hogan from 'hogan.js';
-import type { CoapMessageTypes } from './CoapMessage';
 
+import type { CoapMessageTypes } from './CoapMessage';
 import CoapMessage from './CoapMessage';
 
 export type MessageSpecificationType = {

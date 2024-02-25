@@ -1,10 +1,11 @@
-import type DeviceManager from '../managers/DeviceManager';
+import { DeviceKeyAlgorithm } from '@brewskey/spark-protocol';
 
-import Controller from './Controller';
 import httpVerb from '../decorators/httpVerb';
 import route from '../decorators/route';
 import deviceToAPI, { DeviceAPIType } from '../lib/deviceToAPI';
 import HttpError from '../lib/HttpError';
+import type DeviceManager from '../managers/DeviceManager';
+import Controller from './Controller';
 import { HttpResult } from './types';
 
 class ProvisioningController extends Controller {
@@ -21,7 +22,7 @@ class ProvisioningController extends Controller {
   async provision(
     deviceID: string,
     postBody: {
-      algorithm: 'ecc' | 'rsa';
+      algorithm: DeviceKeyAlgorithm;
       filename: 'cli';
       order: string; // not sure what this is used for,
       publicKey: string;
@@ -35,7 +36,7 @@ class ProvisioningController extends Controller {
       deviceID,
       this.user.id,
       postBody.publicKey,
-      postBody.algorithm,
+      postBody.algorithm ?? DeviceKeyAlgorithm.RSA,
     );
 
     if (!device) {

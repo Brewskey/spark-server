@@ -1,30 +1,40 @@
-import request from 'supertest';
-import sinon from 'sinon';
-import ouathClients from '../oauthClients.json';
-import { createTestApp } from './setup/createTestApp';
-import TestData from './setup/TestData';
 import {
+  DeviceAttributeRepository,
   DeviceAttributes,
+  DeviceKeyObjectRepository,
   EventPublisher,
-  IDeviceAttributeRepository,
-  IDeviceKeyRepository,
   SPARK_SERVER_EVENTS,
+  User,
 } from '@brewskey/spark-protocol';
-import { IDeviceFirmwareRepository, IUserRepository, User } from '../types';
+import { Container } from 'constitute';
 import nullthrows from 'nullthrows';
+import sinon from 'sinon';
+import request from 'supertest';
+import { Repository } from 'typeorm';
+
+import ouathClients from '../oauthClients.json';
+import DeviceFirmwareFileRepository from '../repository/DeviceFirmwareFileRepository';
+import UserRepository from '../repository/UserRepository';
+import { AppAndContainer, createTestApp } from './setup/createTestApp';
+import TestData from './setup/TestData';
+import { getTestDataSource } from './setup/TestDataSource';
 
 describe('DevicesController', () => {
-  const app = createTestApp();
-  const container = app.container;
+  const dataSource = getTestDataSource();
+  let app: AppAndContainer;
+  let container: Container;
   let customFirmwareFilePath: string;
 
   const USER_CREDENTIALS = TestData.getUser();
+  const USER_CREDENTIALS2 = TestData.getUser();
   const CONNECTED_DEVICE_ID = TestData.getID();
   const DISCONNECTED_DEVICE_ID = TestData.getID();
   let testUser: User;
   let userToken: string;
+  let userToken2: string;
   let connectedDeviceToApiAttributes: Record<string, unknown>;
   let disconnectedDeviceToApiAttributes: Record<string, unknown>;
+  let deviceAttributesRepository: Repository<DeviceAttributes>;
 
   const TEST_LAST_HEARD = new Date();
   const TEST_DEVICE_FUNCTIONS = ['testFunction'];
@@ -33,6 +43,14 @@ describe('DevicesController', () => {
   const TEST_VARIABLE_RESULT = 'resultValue';
 
   beforeAll(async () => {
+    await dataSource.initialize();
+    app = createTestApp(dataSource);
+    container = app.container;
+
+    deviceAttributesRepository = container.constitute<
+      Repository<DeviceAttributes>
+    >('DeviceAttributes.Repository');
+
     sinon
       .stub(
         container.constitute<EventPublisher>('EventPublisher'),
@@ -106,11 +124,12 @@ describe('DevicesController', () => {
     customFirmwareFilePath = filePath;
 
     await request(app).post('/v1/users').send(USER_CREDENTIALS);
+    await request(app).post('/v1/users').send(USER_CREDENTIALS2);
 
     testUser = nullthrows(
       await container
-        .constitute<IUserRepository>('IUserRepository')
-        .getByUsername(USER_CREDENTIALS.username),
+        .constitute<UserRepository>('UserRepository')
+        .getByUsernameOrFail(USER_CREDENTIALS.username),
     );
 
     const tokenResponse = await request(app)
@@ -125,6 +144,18 @@ describe('DevicesController', () => {
       });
 
     userToken = tokenResponse.body.access_token;
+
+    const tokenResponse2 = await request(app)
+      .post('/oauth/token')
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .send({
+        client_id: ouathClients[0].clientId,
+        client_secret: ouathClients[0].clientSecret,
+        grant_type: 'password',
+        password: USER_CREDENTIALS2.password,
+        username: USER_CREDENTIALS2.username,
+      });
+    userToken2 = tokenResponse2.body.access_token;
 
     if (!userToken) {
       throw new Error('test user creation fails');
@@ -195,7 +226,7 @@ describe('DevicesController', () => {
     expect(response.body.ownerID).toEqual(
       disconnectedDeviceToApiAttributes.ownerID,
     );
-    expect(response.body.variables).toBeNull();
+    expect(response.body.variables).toMatchObject({});
   });
 
   test('should throw an error if device not found', async () => {
@@ -204,7 +235,7 @@ describe('DevicesController', () => {
       .query({ access_token: userToken });
 
     expect(response.status).toEqual(404);
-    expect(response.body.error).toEqual('No device found');
+    expect(response.body.error).toEqual('Could not find DeviceAttributes');
   });
 
   test('should return all devices', async () => {
@@ -268,24 +299,13 @@ describe('DevicesController', () => {
   });
 
   test('should throw an error if device belongs to somebody else', async () => {
-    const deviceAttributesStub = sinon
-      .stub(
-        container.constitute<IDeviceAttributeRepository>(
-          'IDeviceAttributeRepository',
-        ),
-        'getByID',
-      )
-      .resolves({ ownerID: TestData.getID() } as unknown as DeviceAttributes);
-
     const claimDeviceResponse = await request(app)
       .post('/v1/devices')
       .set('Content-Type', 'application/x-www-form-urlencoded')
       .send({
-        access_token: userToken,
+        access_token: userToken2,
         id: CONNECTED_DEVICE_ID,
       });
-
-    deviceAttributesStub.restore();
 
     expect(claimDeviceResponse.status).toEqual(400);
     expect(claimDeviceResponse.body.error).toEqual(
@@ -294,6 +314,13 @@ describe('DevicesController', () => {
   });
 
   test('should return function call result and device attributes', async () => {
+    const attributes = await deviceAttributesRepository.findOneByOrFail({
+      deviceID: CONNECTED_DEVICE_ID,
+    });
+    await deviceAttributesRepository.save({
+      ...attributes,
+      isConnected: true,
+    });
     const callFunctionResponse = await request(app)
       .post(`/v1/devices/${CONNECTED_DEVICE_ID}/${TEST_DEVICE_FUNCTIONS[0]}`)
       .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -392,8 +419,8 @@ describe('DevicesController', () => {
 
     const deviceFirmwareStub = sinon
       .stub(
-        container.constitute<IDeviceFirmwareRepository>(
-          'IDeviceFirmwareRepository',
+        container.constitute<DeviceFirmwareFileRepository>(
+          'DeviceFirmwareFileRepository',
         ),
         'getByName',
       )
@@ -472,19 +499,21 @@ describe('DevicesController', () => {
   afterAll(async () => {
     await TestData.deleteCustomFirmwareBinary(customFirmwareFilePath);
     await container
-      .constitute<IUserRepository>('IUserRepository')
+      .constitute<UserRepository>('UserRepository')
       .deleteByID(testUser.id);
     await container
-      .constitute<IDeviceAttributeRepository>('IDeviceAttributeRepository')
+      .constitute<DeviceAttributeRepository>('DeviceAttributeRepository')
       .deleteByID(CONNECTED_DEVICE_ID);
     await container
-      .constitute<IDeviceKeyRepository>('IDeviceKeyRepository')
+      .constitute<DeviceKeyObjectRepository>('DeviceKeyObjectRepository')
       .deleteByID(CONNECTED_DEVICE_ID);
     await container
-      .constitute<IDeviceAttributeRepository>('IDeviceAttributeRepository')
+      .constitute<DeviceAttributeRepository>('DeviceAttributeRepository')
       .deleteByID(DISCONNECTED_DEVICE_ID);
     await container
-      .constitute<IDeviceKeyRepository>('IDeviceKeyRepository')
+      .constitute<DeviceKeyObjectRepository>('DeviceKeyObjectRepository')
       .deleteByID(DISCONNECTED_DEVICE_ID);
+
+    await dataSource.destroy();
   });
 });

@@ -1,39 +1,48 @@
+import {
+  DeviceAttributeRepository,
+  DeviceAttributes,
+  User,
+  UserRole,
+  Webhook,
+} from '@brewskey/spark-protocol';
+import ExpressOAuthServer from 'express-oauth-server';
 import nullthrows from 'nullthrows';
 import { Request, Response } from 'oauth2-server';
-import type {
-  IOrganizationRepository,
-  IUserRepository,
-  IWebhookRepository,
-  ProtectedEntityName,
-} from '../types';
+import { FindManyOptions } from 'typeorm';
+
 import HttpError from '../lib/HttpError';
-import settings from '../settings';
 import Logger from '../lib/logger';
-import ExpressOAuthServer from 'express-oauth-server';
-import {
-  IBaseRepository,
-  IDeviceAttributeRepository,
-} from '@brewskey/spark-protocol';
+import OrganizationRepository from '../repository/OrganizationRepository';
+import UserRepository from '../repository/UserRepository';
+import WebhookRepository from '../repository/WebhookRepository';
+import settings from '../settings';
+import type { ProtectedEntityName } from '../types';
 
 const logger = Logger.createModuleLogger(module);
 
 class PermissionManager {
-  _organizationRepository: IOrganizationRepository;
+  _organizationRepository: OrganizationRepository;
 
-  _userRepository: IUserRepository;
+  _userRepository: UserRepository;
 
   _repositoriesByEntityName: Map<
     ProtectedEntityName,
-    IBaseRepository<unknown>
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      findOneByIDOrFail: (id: any) => Promise<unknown>;
+      find(
+        options?: FindManyOptions<{ ownerID: number }> | undefined,
+      ): Promise<unknown[]>;
+    }
   > = new Map();
 
   _oauthServer: ExpressOAuthServer;
 
   constructor(
-    deviceAttributeRepository: IDeviceAttributeRepository,
-    organizationRepository: IOrganizationRepository,
-    userRepository: IUserRepository,
-    webhookRepository: IWebhookRepository,
+    deviceAttributeRepository: DeviceAttributeRepository,
+    organizationRepository: OrganizationRepository,
+    userRepository: UserRepository,
+    webhookRepository: WebhookRepository,
     oauthServer: ExpressOAuthServer,
   ) {
     this._organizationRepository = organizationRepository;
@@ -50,33 +59,33 @@ class PermissionManager {
     })();
   }
 
-  checkPermissionsForEntityByID: (
+  async checkPermissionsForEntityByID(
     entityName: ProtectedEntityName,
-    id: string,
-  ) => Promise<boolean> = async (
-    entityName: ProtectedEntityName,
-    id: string,
-  ): Promise<boolean> => !!(await this.getEntityByID(entityName, id));
+    id: string | number,
+  ): Promise<boolean> {
+    return !!(await this.getEntityByID(entityName, id));
+  }
 
   async getAllEntitiesForCurrentUser<TResult>(
     entityName: ProtectedEntityName,
   ): Promise<Array<TResult>> {
-    const currentUser = this._userRepository.getCurrentUser();
-    return nullthrows(this._repositoriesByEntityName.get(entityName)).getAll(
-      currentUser.id,
-    ) as Promise<TResult[]>;
+    // TODO - filter for current user
+    // return nullthrows(this._repositoriesByEntityName.get(entityName)).find({
+    //   where: { ownerID: currentUser.id },
+    // }) as Promise<TResult[]>;
+
+    return nullthrows(
+      this._repositoriesByEntityName.get(entityName),
+    ).find() as Promise<TResult[]>;
   }
 
-  async getEntityByID<TResult extends { ownerID: string | null | undefined }>(
+  async getEntityByID<TResult extends Webhook | DeviceAttributes>(
     entityName: ProtectedEntityName,
-    id: string,
+    id: number | string,
   ): Promise<TResult> {
     const entity = (await nullthrows(
       this._repositoriesByEntityName.get(entityName),
-    ).getByID(id)) as TResult;
-    if (!entity) {
-      throw new HttpError('Entity does not exist');
-    }
+    ).findOneByIDOrFail(id)) as unknown as TResult;
 
     if (!this.doesUserHaveAccess(entity)) {
       throw new HttpError("User doesn't have access", 403);
@@ -92,7 +101,7 @@ class PermissionManager {
           password: settings.DEFAULT_ADMIN_PASSWORD,
           username: settings.DEFAULT_ADMIN_USERNAME,
         },
-        'administrator',
+        UserRole.Administrator,
       );
 
       const token = await this._generateAdminToken();
@@ -103,13 +112,27 @@ class PermissionManager {
     }
   }
 
-  doesUserHaveAccess({
-    ownerID,
-  }: {
-    ownerID: string | undefined | null;
-  }): boolean {
-    const currentUser = this._userRepository.getCurrentUser();
-    return currentUser.role === 'administrator' || currentUser.id === ownerID;
+  doesUserHaveAccess(
+    {
+      ownerID,
+    }: {
+      ownerID: number | undefined | null;
+    },
+    currentUser: User = {
+      id: 0,
+      role: UserRole.Administrator,
+      organizations: null,
+      accessTokens: [],
+      passwordHash: '',
+      salt: '',
+      userName: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ): boolean {
+    return (
+      currentUser.role === UserRole.Administrator || currentUser.id === ownerID
+    );
   }
 
   async _generateAdminToken(): Promise<string> {
@@ -153,17 +176,17 @@ class PermissionManager {
       );
     } else {
       await this._createDefaultAdminUser();
-      defaultAdminUser = await this._userRepository.getByUsername(
+      defaultAdminUser = await this._userRepository.getByUsernameOrFail(
         settings.DEFAULT_ADMIN_USERNAME,
       );
     }
 
     // Set up the organization
-    const organizations = await this._organizationRepository.getAll();
+    const organizations = await this._organizationRepository.find();
     if (!organizations.length && defaultAdminUser) {
       await this._organizationRepository.create({
         name: 'DEFAULT ORG',
-        user_ids: [defaultAdminUser.id],
+        users: [defaultAdminUser],
       });
     }
   }

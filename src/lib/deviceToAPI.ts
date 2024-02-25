@@ -1,12 +1,12 @@
-import { DeviceAttributes } from '@brewskey/spark-protocol';
+import { DeviceAttributes, Platform } from '@brewskey/spark-protocol';
 
 export type DeviceAPIType = {
   cellular: boolean;
   connected: boolean;
-  current_build_target: number;
+  current_build_target: number | null;
   functions?: Array<string> | null | undefined;
   id: string;
-  imei?: string;
+  imei: string | null;
   last_app: string | null | undefined;
   last_heard: Date | null | undefined;
   last_iccid?: string;
@@ -20,23 +20,30 @@ export type DeviceAPIType = {
   variables: Record<string, unknown> | null | undefined;
 };
 
-const DEVICE_DEFAULT = {
-  connected: false,
-  current_build_target: -1,
+const DEVICE_DEFAULT: DeviceAttributes = {
+  isConnected: false,
+  currentBuildTarget: null,
   deviceID: '',
   functions: null,
   imei: '',
   ip: null,
   isCellular: false,
-  last_iccid: '',
+  lastIccid: undefined,
   lastFlashedAppName: null,
   lastHeard: null,
   name: '',
   particleProductId: -1,
-  platformId: -1,
+  platformId: Platform.CORE,
   productFirmwareVersion: -1,
-  variables: null,
-} as const;
+  variables: {},
+  appHash: null,
+  claimCode: null,
+  ownerID: null,
+  registrar: null,
+  reservedFlags: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
 
 const deviceToAPI = (
   device: DeviceAttributes | null | undefined,
@@ -49,19 +56,14 @@ const deviceToAPI = (
 
   return {
     cellular: mergedDevice.isCellular,
-    connected: mergedDevice.connected || false,
-    current_build_target: parseInt(
-      (mergedDevice.currentBuildTarget != null
-        ? mergedDevice.currentBuildTarget
-        : mergedDevice.current_build_target
-      ).toString(),
-    ),
+    connected: mergedDevice.isConnected || false,
+    current_build_target: mergedDevice.currentBuildTarget,
     functions: mergedDevice.functions || null,
     id: mergedDevice.deviceID,
     imei: mergedDevice.imei,
     last_app: mergedDevice.lastFlashedAppName,
     last_heard: mergedDevice.lastHeard,
-    last_iccid: mergedDevice.last_iccid,
+    last_iccid: mergedDevice.lastIccid,
     last_ip_address: mergedDevice.ip,
     name: mergedDevice.name,
     platform_id: mergedDevice.platformId,

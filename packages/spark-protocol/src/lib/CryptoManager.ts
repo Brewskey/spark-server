@@ -1,14 +1,16 @@
 import crypto from 'crypto';
 import NodeRSA from 'node-rsa';
-import type { IDeviceKeyRepository, ServerKeyRepository } from '../types';
 
+import { DeviceKeyAlgorithm } from '../entity/DeviceKeyObject.entity';
+import { DeviceKeyObjectRepository } from '../repository/DeviceKeyObjectRepository';
+import type { ServerKeyRepository } from '../types';
 import CryptoStream from './CryptoStream';
 import DeviceKey from './DeviceKey';
 
 const HASH_TYPE = 'sha1';
 
 class CryptoManager {
-  _deviceKeyRepository: IDeviceKeyRepository;
+  _deviceKeyRepository: DeviceKeyObjectRepository;
 
   _serverKeyRepository: ServerKeyRepository;
 
@@ -17,7 +19,7 @@ class CryptoManager {
   _serverKeyPassword: string | null | undefined;
 
   constructor(
-    deviceKeyRepository: IDeviceKeyRepository,
+    deviceKeyRepository: DeviceKeyObjectRepository,
     serverKeyRepository: ServerKeyRepository,
     serverKeyPassword?: string | null,
   ) {
@@ -100,11 +102,13 @@ class CryptoManager {
   async createDevicePublicKey(
     deviceID: string,
     publicKeyPem: string,
+    algorithm: DeviceKeyAlgorithm = DeviceKeyAlgorithm.RSA,
   ): Promise<DeviceKey> {
     const output = new DeviceKey(publicKeyPem);
     await this._deviceKeyRepository.updateByID(deviceID, {
       deviceID,
-      key: publicKeyPem,
+      key: Buffer.from(publicKeyPem),
+      algorithm,
     });
 
     return output;
@@ -121,12 +125,13 @@ class CryptoManager {
   async getDevicePublicKey(
     deviceID: string,
   ): Promise<DeviceKey | null | undefined> {
-    const publicKeyObject = await this._deviceKeyRepository.getByID(deviceID);
+    const publicKeyObject =
+      await this._deviceKeyRepository.findOneByID(deviceID);
     if (!publicKeyObject) {
       return null;
     }
 
-    return new DeviceKey(publicKeyObject.key);
+    return new DeviceKey(publicKeyObject.key.toString());
   }
 
   getRandomBytes(size: number): Promise<Buffer> {

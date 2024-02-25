@@ -1,6 +1,7 @@
 import * as uuid from 'uuid';
 
 const uuidSet = new Set();
+let iter = 0;
 
 class TestData {
   static getID(): string {
@@ -11,6 +12,11 @@ class TestData {
 
     uuidSet.add(newID);
     return newID;
+  }
+
+  static getNumericID(): number {
+    iter += 1;
+    return iter;
   }
 }
 

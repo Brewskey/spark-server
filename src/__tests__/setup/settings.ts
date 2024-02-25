@@ -1,7 +1,8 @@
+import { SETTINGS as PROTOCOL_SETTINGS } from '@brewskey/spark-protocol';
 import { LogLevel } from 'bunyan';
 import path from 'path';
+
 import { Settings } from '../../types';
-import { SETTINGS as PROTOCOL_SETTINGS } from '@brewskey/spark-protocol';
 
 const SETTINGS: Settings & { CUSTOM_FIRMWARE_DIRECTORY: string } = {
   ...PROTOCOL_SETTINGS,
@@ -35,7 +36,7 @@ const SETTINGS: Settings & { CUSTOM_FIRMWARE_DIRECTORY: string } = {
   TCP_DEVICE_SERVER_CONFIG: {
     HOST: 'localhost',
     PORT: 5683,
-    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: true,
+    ENABLE_SYSTEM_FIRMWMARE_AUTOUPDATES: true,
   },
   DB_CONFIG: {
     PATH: path.join(__dirname, '../__test_data__/db'),

@@ -1,7 +1,7 @@
-import Controller from './Controller';
-import HttpError from '../lib/HttpError';
 import httpVerb from '../decorators/httpVerb';
 import route from '../decorators/route';
+import HttpError from '../lib/HttpError';
+import Controller from './Controller';
 
 class OauthClientsController extends Controller {
   @httpVerb('post')

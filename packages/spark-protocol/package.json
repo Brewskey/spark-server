@@ -30,14 +30,16 @@
   ],
   "license": "LGPL-3.0",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist/migration && tsc",
     "lint": "eslint --fix --quiet -- src",
     "lint-staged": "lint-staged",
     "prettify": "prettier --write src/*/**.ts",
     "start": "tsc --watch",
     "update-firmware": "ts-node ./src/scripts/update-firmware-binaries.ts",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm -- migration:generate ./src/migration/Initialize -d ./src/__tests__/setup/TestDataSource.ts"
   },
   "bin": {
     "update-firmware": "dist/scripts/update-firmware-binaries.js"
@@ -59,7 +61,11 @@
     "node-rsa": "^1.1.1",
     "nullthrows": "^1.1.1",
     "promise-retry": "^2.0.1",
+    "reflect-metadata": "^0.2.1",
     "request": "^2.83.0",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.20",
+    "typeorm-naming-strategies": "^4.1.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

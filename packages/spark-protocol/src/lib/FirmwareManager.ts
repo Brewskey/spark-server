@@ -1,16 +1,17 @@
-import fs from 'fs';
-import path from 'path';
 import {
+  FirmwareModule,
+  FirmwarePrefixInfo,
+  FirmwareSetting,
   HalDependencyResolver,
   HalDescribeParser,
-  FirmwareModule,
-  FirmwareSetting,
-  SystemInformation,
   ModuleDependency,
-  FirmwarePrefixInfo,
   ModuleSubDependency,
+  SystemInformation,
 } from 'binary-version-reader';
+import fs from 'fs';
 import nullthrows from 'nullthrows';
+import path from 'path';
+
 import protocolSettings from '../settings';
 import Logger from './logger';
 const logger = Logger.createModuleLogger(module);

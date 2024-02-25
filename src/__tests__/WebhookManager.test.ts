@@ -1,23 +1,42 @@
-import type { Webhook } from '../types';
-
+import {
+  EventPublisher,
+  ProtocolEvent,
+  Webhook,
+} from '@brewskey/spark-protocol';
+import { CoreOptions, UrlOptions } from 'request';
 import sinon from 'sinon';
 
-import { EventPublisher, ProtocolEvent } from '@brewskey/spark-protocol';
-import WebhookFileRepository from '../repository/WebhookFileRepository';
+import PermissionManager from '../managers/PermissionManager';
 import WebhookManager, {
   WebhookEventContext,
 } from '../managers/WebhookManager';
+import WebhookRepository from '../repository/WebhookRepository';
 import TestData from './setup/TestData';
-import PermissionManager from '../managers/PermissionManager';
-import { CoreOptions, UrlOptions } from 'request';
+import { getTestDataSource } from './setup/TestDataSource';
 
 const WEBHOOK_BASE: Webhook = {
   event: 'test-event',
   requestType: 'POST',
   url: 'https://webhook-test.com/67fcfefd07229639ddc49a1ba71816f2',
-  created_at: new Date(),
-  id: 'test-id',
-  ownerID: 'test-owner-id',
+  id: 1,
+  auth: null,
+  deviceID: null,
+  errorResponseTopic: null,
+  form: null,
+  headers: null,
+  json: null,
+  isFromMyDevices: false,
+  hasNoDefaults: false,
+  ownerID: 1,
+  organizationID: null,
+  organization: null,
+  productIdOrSlug: null,
+  query: null,
+  shouldRejectUnauthorized: false,
+  responseTemplate: null,
+  responseTopic: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 };
 
 const getEvent = (data?: string): ProtocolEvent<WebhookEventContext> => ({
@@ -26,7 +45,7 @@ const getEvent = (data?: string): ProtocolEvent<WebhookEventContext> => ({
   name: 'test-event',
   publishedAt: new Date(),
   ttl: 60,
-  userID: TestData.getID(),
+  userID: TestData.getNumericID(),
   isPublic: false,
   isInternal: false,
 });
@@ -41,13 +60,15 @@ const getDefaultRequestData = <TData>(
 });
 
 describe('WebhookManager', () => {
-  let repository: WebhookFileRepository;
+  const dataSource = getTestDataSource();
+  let repository: WebhookRepository;
   let eventPublisher: EventPublisher;
   const permissionManager: PermissionManager = Object.create(PermissionManager);
 
-  beforeAll(() => {
-    repository = new WebhookFileRepository('');
-    repository.getAll = sinon.stub().returns([]);
+  beforeAll(async () => {
+    await dataSource.initialize();
+    repository = new WebhookRepository(dataSource.getRepository(Webhook));
+    repository.find = sinon.stub().returns([]);
     eventPublisher = new EventPublisher();
     eventPublisher.publish = sinon.stub();
   });

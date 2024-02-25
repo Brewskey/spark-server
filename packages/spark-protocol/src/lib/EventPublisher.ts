@@ -1,8 +1,9 @@
 import EventEmitter from 'events';
-import * as uuid from 'uuid';
-import type { EventData, ProtocolEvent, PublishOptions } from '../types';
-import settings from '../settings';
 import nullthrows from 'nullthrows';
+import * as uuid from 'uuid';
+
+import settings from '../settings';
+import type { ProtocolEvent, PublishOptions } from '../types';
 
 export const getRequestEventName = (eventName: string): string =>
   `${eventName}/request`;
@@ -10,17 +11,17 @@ export const getRequestEventName = (eventName: string): string =>
 const LISTEN_FOR_RESPONSE_TIMEOUT = 15000;
 
 type FilterOptions = {
-  connectionID?: string | null | undefined;
-  deviceID?: string;
-  listenToBroadcastedEvents?: boolean;
-  listenToInternalEvents?: boolean;
-  mydevices?: boolean;
-  userID?: string;
+  connectionID?: string | null;
+  deviceID?: string | null;
+  shouldListenToBroadcastedEvents?: boolean;
+  shouldListenToInternalEvents?: boolean;
+  isFromMyDevices?: boolean;
+  userID?: number | null;
 };
 
 type SubscriptionOptions = {
   filterOptions?: FilterOptions;
-  once?: boolean;
+  shouldOnlyListenOnces?: boolean;
   subscriberID?: string;
   subscriptionTimeout?: number;
   timeoutHandler?: () => void;
@@ -38,7 +39,10 @@ class EventPublisher extends EventEmitter {
   _subscriptionsByID: Map<string, Subscription<any>> = new Map();
 
   publish<TEventContextData>(
-    eventData: EventData<TEventContextData>,
+    eventData: Omit<
+      ProtocolEvent<TEventContextData>,
+      keyof PublishOptions | 'publishedAt'
+    >,
     options?: PublishOptions | null,
   ) {
     const ttl =
@@ -61,7 +65,10 @@ class EventPublisher extends EventEmitter {
   }
 
   async publishAndListenForResponse<TEventResponseData, TEventContextData>(
-    eventData: EventData<TEventContextData>,
+    eventData: Omit<
+      ProtocolEvent<TEventContextData>,
+      keyof PublishOptions | 'publishedAt'
+    >,
   ): Promise<TEventResponseData & { error?: Error | undefined }> {
     const eventID = uuid.v4();
     const requestEventName = `${getRequestEventName(
@@ -83,7 +90,7 @@ class EventPublisher extends EventEmitter {
         ): Promise<void> => resolve(nullthrows(event.context));
 
         this.subscribe(responseEventName, responseListener, {
-          once: true,
+          shouldOnlyListenOnces: true,
           subscriptionTimeout: LISTEN_FOR_RESPONSE_TIMEOUT,
           timeoutHandler: (): void =>
             reject(new Error(`Response timeout for event: ${eventData.name}`)),
@@ -114,8 +121,12 @@ class EventPublisher extends EventEmitter {
     ) => Promise<TResponse>,
     options: SubscriptionOptions = {},
   ): string {
-    const { filterOptions, once, subscriptionTimeout, timeoutHandler } =
-      options;
+    const {
+      filterOptions,
+      shouldOnlyListenOnces,
+      subscriptionTimeout,
+      timeoutHandler,
+    } = options;
 
     let subscriptionID = uuid.v4();
     while (this._subscriptionsByID.has(subscriptionID)) {
@@ -144,7 +155,7 @@ class EventPublisher extends EventEmitter {
       this.once(eventNamePrefix, (): void => clearTimeout(timeout));
     }
 
-    if (once) {
+    if (shouldOnlyListenOnces) {
       this.once(eventNamePrefix, (event) => {
         this._subscriptionsByID.delete(subscriptionID);
         listener(event);
@@ -193,7 +204,10 @@ class EventPublisher extends EventEmitter {
     filterOptions: FilterOptions,
   ): (event: ProtocolEvent<TEventContextData>) => void {
     return (event: ProtocolEvent<TEventContextData>) => {
-      if (event.isInternal && filterOptions.listenToInternalEvents === false) {
+      if (
+        event.isInternal &&
+        filterOptions.shouldListenToInternalEvents === false
+      ) {
         return;
       }
       // filter private events from another devices
@@ -215,7 +229,10 @@ class EventPublisher extends EventEmitter {
       }
 
       // filter mydevices events
-      if (filterOptions.mydevices && filterOptions.userID !== event.userID) {
+      if (
+        filterOptions.isFromMyDevices &&
+        filterOptions.userID !== event.userID
+      ) {
         return;
       }
 
@@ -226,7 +243,7 @@ class EventPublisher extends EventEmitter {
 
       // filter broadcasted events
       if (
-        filterOptions.listenToBroadcastedEvents === false &&
+        filterOptions.shouldListenToBroadcastedEvents === false &&
         event.broadcasted
       ) {
         return;

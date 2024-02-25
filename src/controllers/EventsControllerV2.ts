@@ -1,15 +1,15 @@
-import type EventManager from '../managers/EventManager';
-import type DeviceManager from '../managers/DeviceManager';
+import { ProtocolEvent } from '@brewskey/spark-protocol';
 
-import Controller from './Controller';
 import anonymous from '../decorators/anonymous';
-import route from '../decorators/route';
 import httpVerb from '../decorators/httpVerb';
+import route from '../decorators/route';
 import serverSentEvents from '../decorators/serverSentEvents';
 import eventToApi from '../lib/eventToApi';
 import Logger from '../lib/logger';
+import type DeviceManager from '../managers/DeviceManager';
+import type EventManager from '../managers/EventManager';
+import Controller from './Controller';
 import { HttpResult } from './types';
-import { ProtocolEvent } from '@brewskey/spark-protocol';
 const logger = Logger.createModuleLogger(module);
 
 const KEEP_ALIVE_INTERVAL = 9000;
@@ -128,7 +128,7 @@ class EventsControllerV2 extends Controller {
     this.response.on('end', closeStreamHandler);
   }
 
-  _getUserFilter(): { userID?: string } {
+  _getUserFilter(): { userID?: number } {
     return this.user.role === 'administrator' ? {} : { userID: this.user.id };
   }
 

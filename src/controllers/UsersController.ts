@@ -1,17 +1,19 @@
+import { TokenObject } from '@brewskey/spark-protocol';
 import basicAuthParser from 'basic-auth-parser';
-import type { IUserRepository, TokenObject, UserCredentials } from '../types';
 
-import Controller from './Controller';
-import HttpError from '../lib/HttpError';
 import anonymous from '../decorators/anonymous';
 import httpVerb from '../decorators/httpVerb';
 import route from '../decorators/route';
+import HttpError from '../lib/HttpError';
+import UserRepository from '../repository/UserRepository';
+import type { UserCredentials } from '../types';
+import Controller from './Controller';
 import { HttpResult } from './types';
 
 class UsersController extends Controller {
-  _userRepository: IUserRepository;
+  _userRepository: UserRepository;
 
-  constructor(userRepository: IUserRepository) {
+  constructor(userRepository: UserRepository) {
     super();
     this._userRepository = userRepository;
   }
@@ -48,7 +50,7 @@ class UsersController extends Controller {
     );
     const user = await this._userRepository.validateLogin(username, password);
 
-    this._userRepository.deleteAccessToken(user.id, token);
+    await this._userRepository.deleteAccessToken(user.id, token);
 
     return this.ok({ ok: true });
   }

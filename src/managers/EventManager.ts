@@ -1,8 +1,4 @@
-import type {
-  EventData,
-  EventPublisher,
-  ProtocolEvent,
-} from '@brewskey/spark-protocol';
+import type { EventPublisher, ProtocolEvent } from '@brewskey/spark-protocol';
 
 type FilterOptions = {
   connectionID?: string | null | undefined;
@@ -10,7 +6,7 @@ type FilterOptions = {
   listenToBroadcastedEvents?: boolean;
   listenToInternalEvents?: boolean;
   mydevices?: boolean;
-  userID?: string;
+  userID?: number | null;
 };
 
 class EventManager {
@@ -34,7 +30,7 @@ class EventManager {
     this._eventPublisher.unsubscribe(subscriptionID);
   }
 
-  publish<TEventContextData>(eventData: EventData<TEventContextData>) {
+  publish<TEventContextData>(eventData: ProtocolEvent<TEventContextData>) {
     this._eventPublisher.publish(eventData);
   }
 }

@@ -1,5 +1,5 @@
-import EventPublisher from './EventPublisher';
 import type { ProtocolEvent } from '../types';
+import EventPublisher from './EventPublisher';
 
 class EventProvider {
   _eventPublisher: EventPublisher;
@@ -12,13 +12,13 @@ class EventProvider {
     callback: (event: ProtocolEvent<TEventContextData>) => void,
     eventNamePrefix: string = '*',
   ) {
-    this._eventPublisher.subscribe(
+    this._eventPublisher.subscribe<TEventContextData, void>(
       eventNamePrefix,
       this._onNewEvent(callback),
       {
         filterOptions: {
-          listenToBroadcastedEvents: false,
-          listenToInternalEvents: false,
+          shouldListenToBroadcastedEvents: false,
+          shouldListenToInternalEvents: false,
         },
       },
     );

@@ -1,56 +1,57 @@
-import type { Socket } from 'net';
-import net from 'net';
+import type { ParsedPacket as CoapPacket } from 'coap-packet';
 import crypto from 'crypto';
-import nullthrows from 'nullthrows';
 import moment from 'moment';
 import Moniker from 'moniker';
-import type { ParsedPacket as CoapPacket } from 'coap-packet';
-import type {
-  AttributesEventContext,
-  EventData,
-  FlashEventContext,
-  FunctionEventContext,
-  IDeviceAttributeRepository,
-  IProductDeviceRepository,
-  IProductFirmwareRepository,
-  PingEventContext,
-  ProductDevice,
-  ProtocolEvent,
-  PublishOptions,
-  ShouldShowSignalEventContext,
-  VariableEventContext,
-} from '../types';
-import type ClaimCodeManager from '../lib/ClaimCodeManager';
-import type CryptoManager from '../lib/CryptoManager';
-import type EventPublisher from '../lib/EventPublisher';
-import settings from '../settings';
-
-import Handshake from '../lib/Handshake';
+import type { Server, Socket } from 'net';
+import net from 'net';
+import nullthrows from 'nullthrows';
 
 import Device from '../clients/Device';
-
-import FirmwareManager from '../lib/FirmwareManager';
-import CoapMessages from '../lib/CoapMessages';
-import { getRequestEventName } from '../lib/EventPublisher';
-import SPARK_SERVER_EVENTS from '../lib/SparkServerEvents';
 import {
   DEVICE_EVENT_NAMES,
   DEVICE_MESSAGE_EVENTS_NAMES,
   DEVICE_STATUS_MAP,
   SYSTEM_EVENT_NAMES,
 } from '../clients/Device';
+import { ProductDevice } from '../entity/ProductDevice.entity';
+import type ClaimCodeManager from '../lib/ClaimCodeManager';
+import CoapMessages from '../lib/CoapMessages';
+import type CryptoManager from '../lib/CryptoManager';
+import type EventPublisher from '../lib/EventPublisher';
+import { getRequestEventName } from '../lib/EventPublisher';
+import FirmwareManager from '../lib/FirmwareManager';
+import Handshake from '../lib/Handshake';
 import Logger from '../lib/logger';
+import SPARK_SERVER_EVENTS from '../lib/SparkServerEvents';
+import { DeviceAttributeRepository } from '../repository/DeviceAttributeRepository';
+import { ProductDeviceRepository } from '../repository/ProductDeviceRepository';
+import { ProductFirmwareRepository } from '../repository/ProductFirmwareRepository';
+import settings from '../settings';
+import type {
+  AttributesEventContext,
+  FlashEventContext,
+  FunctionEventContext,
+  PingEventContext,
+  ProtocolEvent,
+  PublishOptions,
+  ShouldShowSignalEventContext,
+  VariableEventContext,
+} from '../types';
 
 const { SOCKET_TIMEOUT } = settings;
 
 const logger = Logger.createModuleLogger(module);
 
-type DeviceServerConfig = {
+export type DeviceServerConfig = {
+  ENABLE_SYSTEM_FIRMWMARE_AUTOUPDATES: boolean;
   HOST: string;
   PORT: number;
 };
 
-const NAME_GENERATOR = Moniker.generator([Moniker.adjective, Moniker.noun]);
+export const NAME_GENERATOR = Moniker.generator([
+  Moniker.adjective,
+  Moniker.noun,
+]);
 
 const SPECIAL_EVENTS = [
   SYSTEM_EVENT_NAMES.APP_HASH,
@@ -77,34 +78,39 @@ class DeviceServer {
 
   _cryptoManager: CryptoManager;
 
-  _deviceAttributeRepository: IDeviceAttributeRepository;
+  _deviceAttributeRepository: DeviceAttributeRepository;
 
   _devicesById: Map<string, Device> = new Map();
 
   _eventPublisher: EventPublisher;
 
-  _productDeviceRepository: IProductDeviceRepository;
+  _productDeviceRepository: ProductDeviceRepository;
 
-  _productFirmwareRepository: IProductFirmwareRepository;
+  _productFirmwareRepository: ProductFirmwareRepository;
 
   _allowDeviceToProvidePem: boolean;
 
   _socketQueue: Array<Socket> = [];
 
+  private _server!: Server;
+
+  private _processSocketsInterval!: NodeJS.Timeout;
+
+  private _loggingInterval!: NodeJS.Timeout;
+
   constructor(
-    deviceAttributeRepository: IDeviceAttributeRepository,
-    productDeviceRepository: IProductDeviceRepository,
-    productFirmwareRepository: IProductFirmwareRepository,
+    deviceAttributeRepository: DeviceAttributeRepository,
+    productDeviceRepository: ProductDeviceRepository,
+    productFirmwareRepository: ProductFirmwareRepository,
     claimCodeManager: ClaimCodeManager,
     cryptoManager: CryptoManager,
     eventPublisher: EventPublisher,
     deviceServerConfig: DeviceServerConfig,
-    areSystemFirmwareAutoupdatesEnabled: boolean,
     connectedDevicesLoggingInterval: number,
     allowDeviceToProvidePem: boolean,
   ) {
     this._areSystemFirmwareAutoupdatesEnabled =
-      areSystemFirmwareAutoupdatesEnabled;
+      deviceServerConfig.ENABLE_SYSTEM_FIRMWMARE_AUTOUPDATES;
     this._connectedDevicesLoggingInterval = connectedDevicesLoggingInterval;
     this._config = deviceServerConfig;
     this._cryptoManager = cryptoManager;
@@ -157,20 +163,20 @@ class DeviceServer {
       this._onFlashProductFirmware.bind(this),
     );
 
-    const server = net.createServer((socket: Socket): void =>
+    this._server = net.createServer((socket: Socket): void =>
       process.nextTick(() => {
         socket.setTimeout(SOCKET_TIMEOUT);
         this._enqueueSocketForHandshake(socket);
       }),
     );
 
-    setInterval(() => {
+    this._processSocketsInterval = setInterval(() => {
       this._processSockets();
     }, 100);
 
-    setInterval(
+    this._loggingInterval = setInterval(
       (): void =>
-        server.getConnections((error: Error | null, count: number) => {
+        this._server.getConnections((error: Error | null, count: number) => {
           const logParams = {
             devices: this._devicesById.size,
             sockets: count,
@@ -189,12 +195,12 @@ class DeviceServer {
       this._connectedDevicesLoggingInterval,
     );
 
-    server.on('error', (error: Error): void =>
+    this._server.on('error', (error: Error): void =>
       logger.error({ err: error }, 'something blew up'),
     );
 
     const serverPort = this._config.PORT.toString();
-    server.listen(serverPort, (): void =>
+    this._server.listen(serverPort, (): void =>
       logger.info({ serverPort }, 'Server started'),
     );
   }
@@ -385,7 +391,7 @@ class DeviceServer {
         await this._checkProductFirmwareForUpdate(device /* appModule */);
 
         const existingAttributes =
-          await this._deviceAttributeRepository.getByID(deviceID);
+          await this._deviceAttributeRepository.findOneByID(deviceID);
 
         const {
           claimCode,
@@ -393,7 +399,7 @@ class DeviceServer {
           imei,
           isCellular,
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          last_iccid,
+          lastIccid,
           name,
           ownerID,
           registrar,
@@ -405,8 +411,7 @@ class DeviceServer {
           currentBuildTarget,
           imei,
           isCellular,
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          last_iccid,
+          lastIccid,
           lastHeard: new Date(),
           name: name || NAME_GENERATOR.choose(),
           ownerID,
@@ -477,7 +482,9 @@ class DeviceServer {
     this._eventPublisher.unsubscribeBySubscriberID(deviceID);
 
     if (device.getStatus() === DEVICE_STATUS_MAP.READY) {
-      await this._deviceAttributeRepository.updateByID(deviceID, attributes);
+      await this._deviceAttributeRepository.updateByID(deviceID, {
+        ...attributes,
+      });
     }
 
     this.publishSpecialEvent(
@@ -516,17 +523,20 @@ class DeviceServer {
   ) {
     let deviceID = null;
     let name = null;
-    let ownerID = null;
+    let ownerID: number | null = null;
     try {
       await device.hasStatus(DEVICE_STATUS_MAP.READY);
       ({ deviceID, name, ownerID } = device.getAttributes());
 
-      const eventData: EventData<void> = {
+      const eventData: ProtocolEvent<void> = {
         connectionID: device.getConnectionKey(),
         data: packet.payload.toString('utf8'),
         deviceID,
         name: CoapMessages.getUriPath(packet).substr(3),
         ttl: CoapMessages.getMaxAge(packet),
+        publishedAt: new Date(),
+        isPublic: false,
+        isInternal: false,
       };
       const publishOptions: PublishOptions = {
         isInternal: false,
@@ -690,6 +700,7 @@ class DeviceServer {
       ownerID: claimRequestUserID,
     });
     await this._deviceAttributeRepository.updateByID(deviceID, {
+      deviceID,
       claimCode,
       ownerID: claimRequestUserID,
     });
@@ -738,7 +749,7 @@ class DeviceServer {
           },
           'device wasnt subscribed to event: the device is unclaimed.',
         );
-        ownerID = '--unclaimed--';
+        ownerID = -1;
       }
 
       const isSystemEvent = messageName.startsWith('spark');
@@ -749,7 +760,7 @@ class DeviceServer {
         {
           filterOptions: {
             connectionID: isSystemEvent ? device.getConnectionKey() : undefined,
-            mydevices: isFromMyDevices,
+            isFromMyDevices,
             userID: ownerID,
           },
           subscriberID: deviceID,
@@ -1034,12 +1045,9 @@ class DeviceServer {
     // NOTE - In a giant system, this is probably a bad idea but
     // we can worry about scaling this later. It will also be
     // inefficient if there is any horizontal scaling :/
-    const productDevices =
-      await this._productDeviceRepository.getAllByProductID(
-        productID,
-        0,
-        Number.MAX_VALUE,
-      );
+    const productDevices = await this._productDeviceRepository.find({
+      where: { productID },
+    });
 
     // TODO - FIgure out if this breaks things for large amounts
     // of devices. We will probably need to test with
@@ -1060,9 +1068,9 @@ class DeviceServer {
   async _flashDevice(productDevice?: ProductDevice | null) {
     if (
       !productDevice ||
-      productDevice.denied ||
-      productDevice.development ||
-      productDevice.quarantined
+      productDevice.isDenied ||
+      productDevice.isDevelopment ||
+      productDevice.isQuarantined
     ) {
       return;
     }
@@ -1090,16 +1098,21 @@ class DeviceServer {
     }
 
     if (lockedFirmwareVersion !== null) {
-      productFirmware =
-        await this._productFirmwareRepository.getByVersionForProduct(
-          productDevice.productID,
-          nullthrows(lockedFirmwareVersion),
-        );
+      productFirmware = await this._productFirmwareRepository.findOne({
+        where: {
+          productID: productDevice.productID,
+          version: lockedFirmwareVersion,
+        },
+      });
     } else {
-      productFirmware =
-        await this._productFirmwareRepository.getCurrentForProduct(
-          productDevice.productID,
-        );
+      productFirmware = await this._productFirmwareRepository.findOne({
+        where: {
+          productID: productDevice.productID,
+        },
+        order: {
+          version: 'desc',
+        },
+      });
     }
 
     if (!productFirmware) {
@@ -1108,7 +1121,7 @@ class DeviceServer {
 
     // TODO - check appHash as well.  We should be saving this alongside the firmware
     if (
-      productFirmware.product_id === particleProductId &&
+      productFirmware.productID === particleProductId &&
       productFirmware.version === productFirmwareVersion
     ) {
       return;
@@ -1133,11 +1146,12 @@ class DeviceServer {
       ...loggingInfo,
     });
     await device.flash(productFirmware.data);
-    const oldProductFirmware =
-      await this._productFirmwareRepository.getByVersionForProduct(
-        productDevice.productID,
-        productFirmwareVersion,
-      );
+    const oldProductFirmware = await this._productFirmwareRepository.findOne({
+      where: {
+        productID: productDevice.productID,
+        version: productFirmwareVersion,
+      },
+    });
 
     // Update the number of devices on the firmware versions
     if (oldProductFirmware) {
@@ -1160,7 +1174,7 @@ class DeviceServer {
     eventName: string,
     data: string | null | undefined,
     deviceID: string,
-    userID?: string | null,
+    userID?: number | null,
     isInternal: boolean = false,
   ) {
     if (!userID) {
@@ -1174,6 +1188,17 @@ class DeviceServer {
     } as const;
     process.nextTick(() => {
       this._eventPublisher.publish(eventData, { isInternal, isPublic: false });
+    });
+  }
+
+  onShutdown(): void {
+    this._claimCodeManager.onShutdown();
+    clearInterval(this._loggingInterval);
+    clearInterval(this._processSocketsInterval);
+    this._server?.close((error) => {
+      if (error) {
+        logger.error(error, 'DeviceServer shutdown error');
+      }
     });
   }
 }

@@ -1,19 +1,17 @@
+import { Singleton } from 'constitute';
 import fs from 'fs';
 import { mkdirp } from 'mkdirp';
+import { IndexSpecification } from 'mongodb';
 import Datastore from 'nedb-core';
-import type { IBaseDatabase } from '../types';
-import type { CollectionName } from './collectionNames';
-import COLLECTION_NAMES from './collectionNames';
+import nullthrows from 'nullthrows';
+
 import { promisify } from '../lib/promisify';
 import BaseMongoDb from './BaseMongoDb';
-import { IndexSpecification } from 'mongodb';
-import nullthrows from 'nullthrows';
-import { Singleton } from 'constitute';
+import COLLECTION_NAMES, { type CollectionName } from './collectionNames';
 
-class NeDb<TEntity extends { id: string } = { id: string }>
-  extends BaseMongoDb
-  implements IBaseDatabase<TEntity>
-{
+class NeDb<
+  TEntity extends { id: string } = { id: string },
+> extends BaseMongoDb {
   static constitute() {
     return Singleton.with(['DATABASE_PATH']);
   }

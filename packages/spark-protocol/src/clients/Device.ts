@@ -1,24 +1,25 @@
-import type { Socket } from 'net';
-import type { Duplex } from 'stream';
+import { SystemInformation } from 'binary-version-reader';
+import BunyanLogger from 'bunyan';
 import type {
-  ParsedPacket as CoapPacket,
   Option as CoapOption,
+  ParsedPacket as CoapPacket,
 } from 'coap-packet';
 import EventEmitter from 'events';
+import type { Socket } from 'net';
 import nullthrows from 'nullthrows';
-import type { DeviceAttributes, ProtocolEvent } from '../types';
-import type Handshake from '../lib/Handshake';
-import type { MessageType } from '../lib/MessageSpecifications';
+import type { Duplex } from 'stream';
 
+import { DeviceAttributes } from '../entity/DeviceAttributes.entity';
 import CoapMessage from '../lib/CoapMessage';
-import CryptoManager from '../lib/CryptoManager';
 import CoapMessages from '../lib/CoapMessages';
-import Flasher from '../lib/Flasher';
-import settings from '../settings';
-import Logger from '../lib/logger';
-import BunyanLogger from 'bunyan';
+import CryptoManager from '../lib/CryptoManager';
 import { FileTransferStore } from '../lib/FileTransferStore';
-import { SystemInformation } from 'binary-version-reader';
+import Flasher from '../lib/Flasher';
+import type Handshake from '../lib/Handshake';
+import Logger from '../lib/logger';
+import type { MessageType } from '../lib/MessageSpecifications';
+import settings from '../settings';
+import type { ProtocolEvent } from '../types';
 
 type FunctionState = {
   f: Array<string> | null | undefined;
@@ -150,10 +151,16 @@ class Device extends EventEmitter {
     productFirmwareVersion: 0,
     registrar: null,
     reservedFlags: 0,
-    variables: null,
-    lastFlashedAppName: undefined,
-    timestamp: new Date(),
-    connected: false,
+    variables: {},
+    lastFlashedAppName: null,
+    isConnected: false,
+    claimCode: null,
+    currentBuildTarget: null,
+    imei: null,
+    isCellular: false,
+    lastIccid: undefined,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   _attributesFromDevice: AttributesFromDevice = {
@@ -389,7 +396,7 @@ class Device extends EventEmitter {
 
       this.updateAttributes({
         functions: nullthrows(functionState).f,
-        variables: nullthrows(functionState).v,
+        variables: nullthrows(functionState).v ?? {},
       });
 
       this.setStatus(DEVICE_STATUS_MAP.GOT_DESCRIPTION);
@@ -988,9 +995,7 @@ class Device extends EventEmitter {
     packet: CoapPacket,
   ): Buffer | null | undefined {
     // grab the variable type, if the device doesn't say, assume it's a 'string'
-    const variableType =
-      (this._attributes.variables && this._attributes.variables[name]) ||
-      'string';
+    const variableType = this._attributes.variables[name] || 'string';
 
     let result: Buffer | null | undefined = null;
     try {

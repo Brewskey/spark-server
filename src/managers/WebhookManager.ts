@@ -1,19 +1,19 @@
-import type { EventPublisher } from '@brewskey/spark-protocol';
-import hogan from 'hogan.js';
-import request, { CoreOptions, UrlOptions } from 'request';
-import nullthrows from 'nullthrows';
-import throttle from 'lodash/throttle';
-import HttpError from '../lib/HttpError';
-import type PermissionManager from './PermissionManager';
 import type {
-  IWebhookRepository,
-  RequestType,
+  EventPublisher,
+  ProtocolEvent,
   Webhook,
-  WebhookMutator,
-} from '../types';
-import settings from '../settings';
+} from '@brewskey/spark-protocol';
+import hogan from 'hogan.js';
+import throttle from 'lodash/throttle';
+import nullthrows from 'nullthrows';
+import request, { CoreOptions, UrlOptions } from 'request';
+
+import HttpError from '../lib/HttpError';
 import Logger from '../lib/logger';
-import { ProtocolEvent } from '@brewskey/spark-protocol';
+import WebhookRepository from '../repository/WebhookRepository';
+import settings from '../settings';
+import type { MutateWebhookDTO, RequestType } from '../types';
+import type PermissionManager from './PermissionManager';
 
 const logger = Logger.createModuleLogger(module);
 
@@ -65,41 +65,60 @@ const WEBHOOK_DEFAULTS = {
 } as const;
 
 class WebhookManager {
-  _eventPublisher: EventPublisher;
+  _subscriptionIDsByWebhookID: Map<number, string> = new Map();
 
-  _subscriptionIDsByWebhookID: Map<string, string> = new Map();
-
-  _errorsCountByWebhookID: Map<string, number> = new Map();
-
-  _webhookRepository: IWebhookRepository;
-
-  _permissionManager: PermissionManager;
+  _errorsCountByWebhookID: Map<number, number> = new Map();
 
   constructor(
-    eventPublisher: EventPublisher,
-    permissionManager: PermissionManager,
-    webhookRepository: IWebhookRepository,
+    private readonly eventPublisher: EventPublisher,
+    private readonly permissionManager: PermissionManager,
+    private readonly webhookRepository: WebhookRepository,
   ) {
-    this._eventPublisher = eventPublisher;
-    this._permissionManager = permissionManager;
-    this._webhookRepository = webhookRepository;
-
     (async () => {
       await this._init();
     })();
   }
 
-  async create(model: WebhookMutator): Promise<Webhook> {
-    const webhook = await this._webhookRepository.create({
+  async create({
+    mydevices,
+    noDefaults,
+    rejectUnauthorized,
+    auth,
+    deviceID,
+    errorResponseTopic,
+    form,
+    headers,
+    json,
+    productIdOrSlug,
+    query,
+    responseTemplate,
+    responseTopic,
+    ...model
+  }: MutateWebhookDTO): Promise<Webhook> {
+    const webhook = await this.webhookRepository.create({
       ...WEBHOOK_DEFAULTS,
       ...model,
+      auth: auth ?? null,
+      deviceID: deviceID ?? null,
+      errorResponseTopic: errorResponseTopic ?? null,
+      form: form ?? null,
+      headers: headers ?? null,
+      json: json ?? null,
+      organizationID: null,
+      productIdOrSlug: productIdOrSlug ?? null,
+      query: query ?? null,
+      responseTemplate: responseTemplate ?? null,
+      responseTopic: responseTopic ?? null,
+      isFromMyDevices: mydevices ?? false,
+      hasNoDefaults: noDefaults ?? false,
+      shouldRejectUnauthorized: rejectUnauthorized ?? false,
     });
     this._subscribeWebhook(webhook);
     return webhook;
   }
 
-  async deleteByID(webhookID: string) {
-    const webhook = await this._permissionManager.getEntityByID(
+  async deleteByID(webhookID: number) {
+    const webhook = await this.permissionManager.getEntityByID(
       'webhook',
       webhookID,
     );
@@ -107,16 +126,16 @@ class WebhookManager {
       throw new HttpError('no webhook found', 404);
     }
 
-    await this._webhookRepository.deleteByID(webhookID);
+    await this.webhookRepository.deleteByID(webhookID);
     this._unsubscribeWebhookByID(webhookID);
   }
 
   async getAll(): Promise<Array<Webhook>> {
-    return this._permissionManager.getAllEntitiesForCurrentUser('webhook');
+    return this.permissionManager.getAllEntitiesForCurrentUser('webhook');
   }
 
-  async getByID(webhookID: string): Promise<Webhook> {
-    const webhook = await this._permissionManager.getEntityByID<Webhook>(
+  async getByID(webhookID: number): Promise<Webhook> {
+    const webhook = await this.permissionManager.getEntityByID<Webhook>(
       'webhook',
       webhookID,
     );
@@ -128,21 +147,21 @@ class WebhookManager {
   }
 
   async _init() {
-    const allWebhooks = await this._webhookRepository.getAll();
+    const allWebhooks = await this.webhookRepository.find();
     allWebhooks.forEach((webhook: Webhook): void =>
       this._subscribeWebhook(webhook),
     );
   }
 
   _subscribeWebhook(webhook: Webhook) {
-    const subscriptionID = this._eventPublisher.subscribe(
+    const subscriptionID = this.eventPublisher.subscribe(
       webhook.event,
       this._onNewWebhookEvent(webhook),
       {
         filterOptions: {
           deviceID: webhook.deviceID,
-          listenToBroadcastedEvents: false,
-          mydevices: webhook.mydevices,
+          shouldListenToBroadcastedEvents: false,
+          isFromMyDevices: webhook.isFromMyDevices,
           userID: webhook.ownerID,
         },
       },
@@ -150,13 +169,13 @@ class WebhookManager {
     this._subscriptionIDsByWebhookID.set(webhook.id, subscriptionID);
   }
 
-  _unsubscribeWebhookByID(webhookID: string) {
+  _unsubscribeWebhookByID(webhookID: number) {
     const subscriptionID = this._subscriptionIDsByWebhookID.get(webhookID);
     if (!subscriptionID) {
       return;
     }
 
-    this._eventPublisher.unsubscribe(subscriptionID);
+    this.eventPublisher.unsubscribe(subscriptionID);
     this._subscriptionIDsByWebhookID.delete(webhookID);
   }
 
@@ -173,7 +192,7 @@ class WebhookManager {
           return;
         }
 
-        this._eventPublisher.publish(
+        this.eventPublisher.publish(
           {
             data: 'Too many errors, webhook disabled',
             name: this._compileErrorResponseTopic(webhook, event),
@@ -245,23 +264,23 @@ class WebhookManager {
         auth: requestAuth,
         body:
           requestJson && !isGetRequest
-            ? this._getRequestData(requestJson, event, webhook.noDefaults)
+            ? this._getRequestData(requestJson, event, webhook.hasNoDefaults)
             : undefined,
         form:
           !requestJson && !isGetRequest
             ? this._getRequestData(
                 requestFormData,
                 event,
-                webhook.noDefaults,
+                webhook.hasNoDefaults,
               ) || event.data
             : undefined,
         headers: requestHeaders,
         json: true,
         method: validateRequestType(nullthrows(requestType)),
         qs: isGetRequest
-          ? this._getRequestData(requestQuery, event, webhook.noDefaults)
+          ? this._getRequestData(requestQuery, event, webhook.hasNoDefaults)
           : requestQuery,
-        strictSSL: webhook.rejectUnauthorized,
+        strictSSL: webhook.shouldRejectUnauthorized,
         url: nullthrows(requestUrl),
       };
 
@@ -301,7 +320,7 @@ class WebhookManager {
           (responseTopic && `${responseTopic}/${index}`) ||
           `hook-response/${event.name}/${index}`;
 
-        this._eventPublisher.publish(
+        this.eventPublisher.publish(
           {
             data: chunk.toString(),
             name: responseEventName,
@@ -359,7 +378,7 @@ class WebhookManager {
         ) => {
           this._incrementWebhookErrorCounter(webhook.id);
 
-          this._eventPublisher.publish(
+          this.eventPublisher.publish(
             {
               data:
                 responseError != null
@@ -396,7 +415,7 @@ class WebhookManager {
 
             this._resetWebhookErrorCounter(webhook.id);
 
-            this._eventPublisher.publish(
+            this.eventPublisher.publish(
               {
                 name: `hook-sent/${event.name}`,
                 userID: event.userID,
@@ -454,13 +473,13 @@ class WebhookManager {
   };
 
   _compileTemplate = (
-    template: string | undefined,
+    template: string | null,
     variables: Record<string, unknown>,
   ): string | undefined =>
-    template && hogan.compile(template).render(variables);
+    template != null ? hogan.compile(template).render(variables) : undefined;
 
   _compileJsonTemplate = (
-    template: Record<string, unknown> | undefined,
+    template: Record<string, unknown> | null,
     variables: Record<string, unknown>,
   ): Record<string, unknown> | undefined => {
     if (!template) {
@@ -489,18 +508,14 @@ class WebhookManager {
     );
   };
 
-  _incrementWebhookErrorCounter: (webhookID: string) => void = (
-    webhookID: string,
-  ) => {
+  _incrementWebhookErrorCounter(webhookID: number) {
     const errorsCount = this._errorsCountByWebhookID.get(webhookID) || 0;
     this._errorsCountByWebhookID.set(webhookID, errorsCount + 1);
-  };
+  }
 
-  _resetWebhookErrorCounter: (webhookID: string) => void = (
-    webhookID: string,
-  ) => {
+  _resetWebhookErrorCounter(webhookID: number) {
     this._errorsCountByWebhookID.set(webhookID, 0);
-  };
+  }
 }
 
 export default WebhookManager;

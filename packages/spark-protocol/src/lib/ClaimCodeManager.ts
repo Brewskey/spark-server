@@ -4,7 +4,7 @@ const CLAIM_CODE_LENGTH = 63;
 const CLAIM_CODE_TTL = 5000 * 60; // 5 min
 
 class ClaimCodeManager {
-  _userIDByClaimCode: Map<string, string> = new Map();
+  _userIDByClaimCode: Map<string, number> = new Map();
 
   _timers: Map<string, NodeJS.Timeout> = new Map();
 
@@ -15,7 +15,7 @@ class ClaimCodeManager {
       .substring(0, CLAIM_CODE_LENGTH);
   }
 
-  createClaimCode(userID: string): string {
+  createClaimCode(userID: number): string {
     let claimCode = this._generateClaimCode();
 
     while (this._userIDByClaimCode.has(claimCode)) {
@@ -52,7 +52,7 @@ class ClaimCodeManager {
     return this._userIDByClaimCode.delete(claimCode);
   }
 
-  getUserIDByClaimCode(claimCode: string): string | null | undefined {
+  getUserIDByClaimCode(claimCode: string): number | null | undefined {
     return this._userIDByClaimCode.get(claimCode);
   }
 }

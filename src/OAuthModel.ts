@@ -1,39 +1,56 @@
-import oauthClients from './oauthClients.json';
+import { TokenObject, User } from '@brewskey/spark-protocol';
 
-import type { Client, IUserRepository, TokenObject, User } from './types';
+import oauthClients from './oauthClients.json';
+import UserRepository from './repository/UserRepository';
+import type { Client } from './types';
 
 const OAUTH_CLIENTS = oauthClients as Client[];
 
-type AccessToken = (TokenObject & { user: User }) | null;
+type AccessToken = {
+  accessToken: string;
+  accessTokenExpiresAt: Date;
+  clientId: string;
+  refreshToken?: string;
+  refreshTokenExpiresAt: Date | undefined;
+  userId: number;
+  user: User;
+};
 
 class OauthModel {
-  _userRepository: IUserRepository;
+  _userRepository: UserRepository;
 
-  constructor(userRepository: IUserRepository) {
+  constructor(userRepository: UserRepository) {
     this._userRepository = userRepository;
   }
 
-  getAccessToken: (arg1: string) => Promise<AccessToken | null | undefined> =
-    async (bearerToken: string): Promise<AccessToken | null | undefined> => {
-      const user = await this._userRepository.getByAccessToken(bearerToken);
-      if (!user) {
-        return null;
-      }
+  getAccessToken = async (
+    bearerToken: string,
+  ): Promise<AccessToken | null | undefined> => {
+    const user = await this._userRepository.getByAccessToken(bearerToken);
+    if (!user) {
+      return null;
+    }
 
-      const userTokenObject = user.accessTokens.find(
-        (tokenObject: TokenObject): boolean =>
-          tokenObject.accessToken === bearerToken,
-      );
+    const userTokenObject = user.accessTokens.find(
+      (tokenObject: TokenObject): boolean =>
+        tokenObject.accessToken === bearerToken,
+    );
 
-      if (!userTokenObject) {
-        return null;
-      }
+    if (!userTokenObject) {
+      return null;
+    }
 
-      return {
-        ...userTokenObject,
-        user,
-      };
+    return {
+      ...userTokenObject,
+      accessTokenExpiresAt: new Date(userTokenObject.accessTokenExpiresAt),
+      refreshTokenExpiresAt: userTokenObject.refreshTokenExpiresAt
+        ? new Date(userTokenObject.refreshTokenExpiresAt)
+        : undefined,
+      clientId: 'spark-server',
+      user,
+      userId: user.id,
     };
+  };
 
   getClient = (clientId: string, clientSecret: string): Client | undefined =>
     OAUTH_CLIENTS.find(
@@ -46,16 +63,16 @@ class OauthModel {
     password: string,
   ): Promise<User> => this._userRepository.validateLogin(username, password);
 
-  saveToken = (
+  saveToken = async (
     tokenObject: TokenObject,
     client: Client,
     user: User,
-  ): {
+  ): Promise<{
     accessToken: string;
     client: Client;
     user: User;
-  } => {
-    this._userRepository.saveAccessToken(user.id, tokenObject);
+  }> => {
+    await this._userRepository.saveAccessToken(user.id, tokenObject);
     return {
       accessToken: tokenObject.accessToken,
       client,

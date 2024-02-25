@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { DeviceKeyAlgorithm, DeviceKeyObject } from '@brewskey/spark-protocol';
 import fs from 'fs';
 import { ObjectId } from 'mongodb';
 
-import settings from '../settings';
-import NeDb from '../repository/NeDb';
 import MongoDb from '../repository/MongoDb';
-import { DeviceKeyObject } from '@brewskey/spark-protocol';
+import NeDb from '../repository/NeDb';
+import settings from '../settings';
 
 type DatabaseType = 'mongo' | 'nedb';
 
@@ -142,10 +142,13 @@ const insertUsers = async (
     await Promise.all(
       getFiles(settings.DEVICE_DIRECTORY, '.pub.pem')
         .map(
-          ({ fileName, fileBuffer }: FileObject): DeviceKeyObject => ({
-            algorithm: 'rsa',
+          ({
+            fileName,
+            fileBuffer,
+          }: FileObject): Omit<DeviceKeyObject, 'createdAt' | 'updatedAt'> => ({
+            algorithm: DeviceKeyAlgorithm.RSA,
             deviceID: fileName.substring(0, fileName.indexOf('.pub.pem')),
-            key: fileBuffer.toString(),
+            key: fileBuffer,
           }),
         )
         .map(insertItem(database, 'deviceKeys')),

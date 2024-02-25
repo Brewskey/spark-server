@@ -1,35 +1,36 @@
 import type { Container } from 'constitute';
+import { DataSource } from 'typeorm';
 
-import DeviceAttributeFileRepository from './repository/DeviceAttributeFileRepository';
-import DeviceKeyFileRepository from './repository/DeviceKeyFileRepository';
-import DeviceServer from './server/DeviceServer';
-import EventPublisher from './lib/EventPublisher';
-import EventProvider from './lib/EventProvider';
+import { DeviceAttributes } from './entity/DeviceAttributes.entity';
+import { DeviceKeyObject } from './entity/DeviceKeyObject.entity';
+import { ProductDevice } from './entity/ProductDevice.entity';
+import { ProductFirmware } from './entity/ProductFirmware.entity';
 import ClaimCodeManager from './lib/ClaimCodeManager';
 import CryptoManager from './lib/CryptoManager';
-import MockProductDeviceRepository from './repository/MockProductDeviceRepository';
-import MockProductFirmwareRepository from './repository/MockProductFirmwareRepository';
-import ServerKeyFileRepository from './repository/ServerKeyFileRepository';
-import protocolSettings from './settings';
+import EventProvider from './lib/EventProvider';
+import EventPublisher from './lib/EventPublisher';
 import FirmwareManager from './lib/FirmwareManager';
+import { DeviceAttributeRepository } from './repository/DeviceAttributeRepository';
+import { DeviceKeyObjectRepository } from './repository/DeviceKeyObjectRepository';
+import { ProductDeviceRepository } from './repository/ProductDeviceRepository';
+import { ProductFirmwareRepository } from './repository/ProductFirmwareRepository';
+import ServerKeyFileRepository from './repository/ServerKeyFileRepository';
+import DeviceServer, { DeviceServerConfig } from './server/DeviceServer';
+import protocolSettings from './settings';
 
-type ServerSettings = {
+type ProtocolSettings = {
   BINARIES_DIRECTORY?: string;
   CONNECTED_DEVICES_LOGGING_INTERVAL: number;
   DEVICE_DIRECTORY: string;
-  ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: boolean;
   SERVER_KEY_FILENAME: string;
   SERVER_KEY_PASSWORD?: string;
   SERVER_KEYS_DIRECTORY: string;
-  TCP_DEVICE_SERVER_CONFIG: {
-    HOST: string;
-    PORT: number;
-  };
+  TCP_DEVICE_SERVER_CONFIG: DeviceServerConfig;
 };
 
 const defaultBindings = (
   container: Container,
-  serverSettings: ServerSettings,
+  serverSettings: ProtocolSettings,
 ) => {
   const mergedSettings = { ...protocolSettings, ...serverSettings } as const;
   FirmwareManager.initialize(mergedSettings.BINARIES_DIRECTORY);
@@ -39,10 +40,6 @@ const defaultBindings = (
   container.bindValue(
     'CONNECTED_DEVICES_LOGGING_INTERVAL',
     mergedSettings.CONNECTED_DEVICES_LOGGING_INTERVAL,
-  );
-  container.bindValue(
-    'ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES',
-    mergedSettings.ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES,
   );
   container.bindValue(
     'SERVER_KEY_FILENAME',
@@ -65,21 +62,29 @@ const defaultBindings = (
     mergedSettings.ALLOW_DEVICE_TO_PROVIDE_PEM,
   );
 
-  // Repository
-  container.bindClass(
-    'IDeviceAttributeRepository',
-    DeviceAttributeFileRepository,
-    ['DEVICE_DIRECTORY'],
-  );
-
-  container.bindClass('IDeviceKeyRepository', DeviceKeyFileRepository, [
-    'DEVICE_DIRECTORY',
-  ]);
-  container.bindClass('IProductDeviceRepository', MockProductDeviceRepository);
-  container.bindClass(
-    'IProductFirmwareRepository',
-    MockProductFirmwareRepository,
-  );
+  const dataSource = container.constitute<DataSource>('DataSource');
+  [
+    {
+      entity: DeviceAttributes,
+      repository: DeviceAttributeRepository,
+    },
+    {
+      entity: DeviceKeyObject,
+      repository: DeviceKeyObjectRepository,
+    },
+    {
+      entity: ProductDevice,
+      repository: ProductDeviceRepository,
+    },
+    {
+      entity: ProductFirmware,
+      repository: ProductFirmwareRepository,
+    },
+  ].forEach(({ entity, repository }) => {
+    const repositoryKey = entity.name + '.Repository';
+    container.bindValue(repositoryKey, dataSource.getRepository(entity));
+    container.bindClass(repository.name, repository, [repositoryKey]);
+  });
 
   container.bindClass('ServerKeyRepository', ServerKeyFileRepository, [
     'SERVER_KEYS_DIRECTORY',
@@ -91,21 +96,20 @@ const defaultBindings = (
   container.bindClass('EVENT_PROVIDER', EventProvider, ['EventPublisher']);
   container.bindClass('ClaimCodeManager', ClaimCodeManager, []);
   container.bindClass('CryptoManager', CryptoManager, [
-    'IDeviceKeyRepository',
+    'DeviceKeyObjectRepository',
     'ServerKeyRepository',
     'SERVER_KEY_PASSWORD',
   ]);
 
   // Device server
   container.bindClass('DeviceServer', DeviceServer, [
-    'IDeviceAttributeRepository',
-    'IProductDeviceRepository',
-    'IProductFirmwareRepository',
+    'DeviceAttributeRepository',
+    'ProductDeviceRepository',
+    'ProductFirmwareRepository',
     'ClaimCodeManager',
     'CryptoManager',
     'EventPublisher',
     'TCP_DEVICE_SERVER_CONFIG',
-    'ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES',
     'CONNECTED_DEVICES_LOGGING_INTERVAL',
     'ALLOW_DEVICE_TO_PROVIDE_PEM',
   ]);

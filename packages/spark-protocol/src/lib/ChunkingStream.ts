@@ -1,4 +1,5 @@
 import { Transform } from 'stream';
+
 import Logger from './logger';
 const logger = Logger.createModuleLogger(module);
 
@@ -6,8 +7,6 @@ const logger = Logger.createModuleLogger(module);
  Our job here is to accept messages in whole chunks, and put their length in front
  as we send them out, and parse them back into those size chunks as we read them in.
  * */
-/* eslint-disable no-bitwise */
-
 const MSG_LENGTH_BYTES = 2;
 const messageLengthBytes = (
   message: Buffer | string,
@@ -50,7 +49,7 @@ class ChunkingStream extends Transform {
 
   _processOutput(
     buffer: Buffer | string,
-    encoding: string,
+    _encoding: string,
     callback: () => void,
   ) {
     const tempBuffer =

@@ -1,9 +1,10 @@
-import path from 'path';
-import fs from 'fs';
-import type { Settings } from './types';
-import { LogLevel } from 'bunyan';
 import { SETTINGS as PROTOCOL_SETTINGS } from '@brewskey/spark-protocol';
+import { LogLevel } from 'bunyan';
 import bunyan from 'bunyan';
+import fs from 'fs';
+import path from 'path';
+
+import type { Settings } from './types';
 
 const logger = bunyan.createLogger({
   name: path.basename(module.filename),
@@ -51,7 +52,7 @@ const SETTINGS: Settings = {
   TCP_DEVICE_SERVER_CONFIG: {
     HOST: 'localhost',
     PORT: 5683,
-    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: true,
+    ENABLE_SYSTEM_FIRMWMARE_AUTOUPDATES: true,
   },
   // Override template parameters in webhooks with this object
   WEBHOOK_TEMPLATE_PARAMETERS: {

@@ -1,6 +1,7 @@
-import SETTINGS from '../settings';
-import FirmwareManager from '../lib/FirmwareManager';
 import { SystemInformation } from 'binary-version-reader';
+
+import FirmwareManager from '../lib/FirmwareManager';
+import SETTINGS from '../settings';
 
 describe('FirmwareManager', () => {
   beforeAll(() => {

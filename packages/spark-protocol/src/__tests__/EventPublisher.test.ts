@@ -1,10 +1,10 @@
+import nullthrows from 'nullthrows';
 import sinon from 'sinon';
-import TestData from './setup/TestData';
 
 import EventPublisher from '../lib/EventPublisher';
 import { getRequestEventName } from '../lib/EventPublisher';
 import { ProtocolEvent } from '../types';
-import nullthrows from 'nullthrows';
+import TestData from './setup/TestData';
 
 const delay = (milliseconds: number) =>
   new Promise(
@@ -28,7 +28,7 @@ describe('EventPublisher', () => {
     const handler = sinon.spy();
     const eventData = {
       name: TEST_EVENT_NAME,
-      userID: TestData.getID(),
+      userID: TestData.getNumericID(),
     } as const;
 
     eventPublisher.subscribe(eventData.name, handler, {
@@ -46,11 +46,11 @@ describe('EventPublisher', () => {
     const handler = sinon.spy();
     const eventData = {
       name: TEST_EVENT_NAME,
-      userID: TestData.getID(),
+      userID: TestData.getNumericID(),
     } as const;
 
     eventPublisher.subscribe(eventData.name, handler, {
-      filterOptions: { userID: TestData.getID() },
+      filterOptions: { userID: TestData.getNumericID() },
     });
 
     eventPublisher.publish(eventData, { isPublic: true });
@@ -64,11 +64,11 @@ describe('EventPublisher', () => {
     const handler = sinon.spy();
     const eventData = {
       name: TEST_EVENT_NAME,
-      userID: TestData.getID(),
+      userID: TestData.getNumericID(),
     } as const;
 
     eventPublisher.subscribe(eventData.name, handler, {
-      filterOptions: { userID: TestData.getID() },
+      filterOptions: { userID: TestData.getNumericID() },
     });
 
     eventPublisher.publish(eventData, { isPublic: false });
@@ -85,7 +85,7 @@ describe('EventPublisher', () => {
     } as const;
 
     eventPublisher.subscribe(eventData.name, handler, {
-      filterOptions: { listenToInternalEvents: false },
+      filterOptions: { shouldListenToInternalEvents: false },
     });
 
     eventPublisher.publish(eventData, { isInternal: true });
@@ -100,7 +100,7 @@ describe('EventPublisher', () => {
     const connectionID = '123';
     const eventData = {
       name: TEST_EVENT_NAME,
-      userID: TestData.getID(),
+      userID: TestData.getNumericID(),
     } as const;
 
     eventPublisher.subscribe(eventData.name, handler, {
@@ -116,7 +116,7 @@ describe('EventPublisher', () => {
   test('should filter event by deviceID', async () => {
     const eventPublisher = new EventPublisher();
     const handler = sinon.spy();
-    const ownerID = TestData.getID();
+    const ownerID = TestData.getNumericID();
     const deviceEvent = {
       name: TEST_EVENT_NAME,
       userID: ownerID,
@@ -146,7 +146,7 @@ describe('EventPublisher', () => {
   test('should filter broadcasted events', async () => {
     const eventPublisher = new EventPublisher();
     const handler = sinon.spy();
-    const ownerID = TestData.getID();
+    const ownerID = TestData.getNumericID();
     const deviceEvent = {
       broadcasted: true,
       deviceID: TestData.getID(),
@@ -156,7 +156,7 @@ describe('EventPublisher', () => {
 
     eventPublisher.subscribe(deviceEvent.name, handler, {
       filterOptions: {
-        listenToBroadcastedEvents: false,
+        shouldListenToBroadcastedEvents: false,
       },
     });
 
@@ -169,7 +169,7 @@ describe('EventPublisher', () => {
   test('should listen for mydevices events only', async () => {
     const eventPublisher = new EventPublisher();
     const handler = sinon.spy();
-    const ownerID = TestData.getID();
+    const ownerID = TestData.getNumericID();
 
     const myDevicePublicEvent = {
       name: TEST_EVENT_NAME,
@@ -185,13 +185,13 @@ describe('EventPublisher', () => {
 
     const anotherOwnerPublicEvent = {
       name: TEST_EVENT_NAME,
-      userID: TestData.getID(),
+      userID: TestData.getNumericID(),
       deviceID: TestData.getID(),
     } as const;
 
     eventPublisher.subscribe(TEST_EVENT_NAME, handler, {
       filterOptions: {
-        mydevices: true,
+        isFromMyDevices: true,
         userID: ownerID,
       },
     });

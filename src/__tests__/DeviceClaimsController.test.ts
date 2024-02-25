@@ -1,26 +1,29 @@
-import request from 'supertest';
-import sinon from 'sinon';
-import ouathClients from '../oauthClients.json';
-import { createTestApp } from './setup/createTestApp';
-import TestData from './setup/TestData';
 import {
+  ClaimCodeManager,
   EventPublisher,
-  IDeviceAttributeRepository,
-  IDeviceKeyRepository,
   SPARK_SERVER_EVENTS,
 } from '@brewskey/spark-protocol';
-import { IUserRepository, User } from '../types';
-import nullthrows from 'nullthrows';
+import { Container } from 'constitute';
+import sinon from 'sinon';
+import request from 'supertest';
+
+import ouathClients from '../oauthClients.json';
+import { AppAndContainer, createTestApp } from './setup/createTestApp';
+import TestData from './setup/TestData';
+import { getTestDataSource } from './setup/TestDataSource';
 
 describe('DeviceClaimsController', () => {
-  const app = createTestApp();
-  const container = app.container;
+  const dataSource = getTestDataSource();
+  let app: AppAndContainer;
+  let container: Container;
   let DEVICE_ID: string;
-  let testUser: User;
   let userToken: string;
   let deviceToApiAttributes: Record<string, unknown>;
 
   beforeAll(async () => {
+    await dataSource.initialize();
+    app = createTestApp(dataSource);
+    container = app.container;
     const USER_CREDENTIALS = TestData.getUser();
     DEVICE_ID = TestData.getID();
 
@@ -45,12 +48,6 @@ describe('DeviceClaimsController', () => {
       });
 
     await request(app).post('/v1/users').send(USER_CREDENTIALS);
-
-    testUser = nullthrows(
-      await container
-        .constitute<IUserRepository>('IUserRepository')
-        .getByUsername(USER_CREDENTIALS.username),
-    );
 
     const tokenResponse = await request(app)
       .post('/oauth/token')
@@ -92,14 +89,9 @@ describe('DeviceClaimsController', () => {
   });
 
   afterAll(async () => {
+    await dataSource.destroy();
     await container
-      .constitute<IUserRepository>('IUserRepository')
-      .deleteByID(testUser.id);
-    await container
-      .constitute<IDeviceAttributeRepository>('IDeviceAttributeRepository')
-      .deleteByID(DEVICE_ID);
-    await container
-      .constitute<IDeviceKeyRepository>('IDeviceKeyRepository')
-      .deleteByID(DEVICE_ID);
+      .constitute<ClaimCodeManager>('ClaimCodeManager')
+      .onShutdown();
   });
 });

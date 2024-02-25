@@ -1,5 +1,6 @@
-import { Transform } from 'stream';
 import crypto from 'crypto';
+import { Transform } from 'stream';
+
 import settings from '../settings';
 import Logger from './logger';
 

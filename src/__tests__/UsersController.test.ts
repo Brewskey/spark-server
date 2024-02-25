@@ -1,44 +1,53 @@
-import type {
-  IUserRepository,
-  TokenObject,
-  User,
-  UserCredentials,
-} from '../types';
-
-import request from 'supertest';
-import ouathClients from '../oauthClients.json';
-import { createTestApp } from './setup/createTestApp';
-import TestData from './setup/TestData';
+import { TokenObject, User } from '@brewskey/spark-protocol';
+import { Container } from 'constitute';
 import nullthrows from 'nullthrows';
+import request from 'supertest';
+
+import ouathClients from '../oauthClients.json';
+import UserRepository from '../repository/UserRepository';
+import type { UserCredentials } from '../types';
+import { AppAndContainer, createTestApp } from './setup/createTestApp';
+import TestData from './setup/TestData';
+import { getTestDataSource } from './setup/TestDataSource';
 
 describe('UsersController', () => {
-  const app = createTestApp();
-  const container = app.container;
+  const dataSource = getTestDataSource();
+  let app: AppAndContainer;
+  let container: Container;
   let USER_CREDENTIALS: UserCredentials;
   let user: User;
   let userToken: string;
 
-  test('should create new user', async () => {
-    USER_CREDENTIALS = TestData.getUser();
+  beforeAll(async () => {
+    await dataSource.initialize();
+    app = createTestApp(dataSource);
+    container = app.container;
+  });
 
+  beforeEach(() => {
+    USER_CREDENTIALS = TestData.getUser();
+  });
+
+  test('should create new user', async () => {
     const response = await request(app)
       .post('/v1/users')
       .send(USER_CREDENTIALS);
 
     user = nullthrows(
       await container
-        .constitute<IUserRepository>('IUserRepository')
-        .getByUsername(USER_CREDENTIALS.username),
+        .constitute<UserRepository>('UserRepository')
+        .getByUsernameOrFail(USER_CREDENTIALS.username),
     );
 
     expect(response.status).toEqual(200);
-    expect(user.username === USER_CREDENTIALS.username).toBeTruthy();
+    expect(user.userName).toEqual(USER_CREDENTIALS.username);
     expect(
-      user.id && user.passwordHash && user.salt && user.created_at,
+      user.id && user.passwordHash && user.salt && user.createdAt,
     ).toBeTruthy();
   });
 
   test('should throw an error if username already in use', async () => {
+    await request(app).post('/v1/users').send(USER_CREDENTIALS);
     const response = await request(app)
       .post('/v1/users')
       .send(USER_CREDENTIALS);
@@ -49,6 +58,7 @@ describe('UsersController', () => {
   });
 
   test('should login the user', async () => {
+    await request(app).post('/v1/users').send(USER_CREDENTIALS);
     const response = await request(app)
       .post('/oauth/token')
       .set('Content-Type', 'application/x-www-form-urlencoded')
@@ -67,6 +77,18 @@ describe('UsersController', () => {
   });
 
   test('should return all access tokens for the user', async () => {
+    await request(app).post('/v1/users').send(USER_CREDENTIALS);
+    await request(app)
+      .post('/oauth/token')
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .send({
+        client_id: ouathClients[0].clientId,
+        client_secret: ouathClients[0].clientSecret,
+        grant_type: 'password',
+        password: USER_CREDENTIALS.password,
+        username: USER_CREDENTIALS.username,
+      });
+
     const response = await request(app)
       .get('/v1/access_tokens')
       .auth(USER_CREDENTIALS.username, USER_CREDENTIALS.password);
@@ -78,6 +100,7 @@ describe('UsersController', () => {
   });
 
   test('should delete the access token for the user', async () => {
+    await request(app).post('/v1/users').send(USER_CREDENTIALS);
     const deleteResponse = await request(app)
       .delete(`/v1/access_tokens/${userToken}`)
       .auth(USER_CREDENTIALS.username, USER_CREDENTIALS.password);
@@ -98,8 +121,6 @@ describe('UsersController', () => {
   });
 
   afterAll(async () => {
-    await container
-      .constitute<IUserRepository>('IUserRepository')
-      .deleteByID(user.id);
+    await dataSource.destroy();
   });
 });

@@ -1,14 +1,15 @@
+import { type DeviceServer, filterFalsyValues } from '@brewskey/spark-protocol';
 import { Container } from 'constitute';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
+import nullthrows from 'nullthrows';
 import os from 'os';
-import { filterFalsyValues, type DeviceServer } from '@brewskey/spark-protocol';
+
 import createApp from './app';
 import defaultBindings from './defaultBindings';
-import settings from './settings';
 import Logger from './lib/logger';
-import nullthrows from 'nullthrows';
+import settings from './settings';
 
 const logger = Logger.createModuleLogger(module);
 

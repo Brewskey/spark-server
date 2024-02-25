@@ -1,18 +1,20 @@
+import type { Container } from 'constitute';
 import type {
   Application as $Application,
-  Response as $Response,
+  NextFunction,
   Request,
   RequestHandler,
-  NextFunction,
+  Response as $Response,
 } from 'express';
-import type { Container } from 'constitute';
-import nullthrows from 'nullthrows';
+import ExpressOAuthServer from 'express-oauth-server';
 import multer, { Field } from 'multer';
-import HttpError from './lib/HttpError';
-import { IUserRepository, type Settings } from './types';
-import Logger from './lib/logger';
-import OAuthServer from 'express-oauth-server';
+import nullthrows from 'nullthrows';
+import { EntityNotFoundError } from 'typeorm';
+
 import Controller from './controllers/Controller';
+import HttpError from './lib/HttpError';
+import Logger from './lib/logger';
+import type { Settings } from './types';
 
 const logger = Logger.createModuleLogger(module);
 
@@ -30,7 +32,7 @@ const maybe =
   };
 
 const injectUserMiddleware =
-  (container: Container): RequestHandler =>
+  (): RequestHandler =>
   (request: Request, response: $Response, next: NextFunction) => {
     const oauthInfo = response.locals.oauth;
     if (oauthInfo) {
@@ -38,9 +40,6 @@ const injectUserMiddleware =
       const user = token && token.user;
       // eslint-disable-next-line no-param-reassign
       (request as unknown as { user: Record<string, unknown> }).user = user;
-      container
-        .constitute<IUserRepository>('IUserRepository')
-        .setCurrentUser(user);
     }
     next();
   };
@@ -72,7 +71,7 @@ export default (
       ? multer().fields(allowedUploads)
       : multer().any();
 
-  const oauth = container.constitute<OAuthServer>('OAuthServer');
+  const oauth = container.constitute<ExpressOAuthServer>('ExpressOAuthServer');
 
   app.post(settings.LOGIN_ROUTE, oauth.token());
 
@@ -122,7 +121,7 @@ export default (
             route,
             maybe(oauth.authenticate(), !anonymous),
             maybe(serverSentEventsMiddleware(), serverSentEvents),
-            injectUserMiddleware(container),
+            injectUserMiddleware(),
             maybe(filesMiddleware(allowedUploads), allowedUploads?.length != 0),
             async (request: Request, response: $Response) => {
               const argumentNames = (route.match(/:[\w]*/g) || []).map(
@@ -189,8 +188,16 @@ export default (
                 }
               } catch (error) {
                 logger.error(error);
+
+                let status = 400;
+                let message = error;
+                if (error instanceof EntityNotFoundError) {
+                  status = 404;
+                  message = `Could not find ${(error.entityClass as unknown as { name: string }).name}`;
+                }
                 const httpError = new HttpError(
-                  error as unknown as string | Error | HttpError,
+                  message as unknown as string | Error | HttpError,
+                  status,
                 );
                 response.status(httpError.status).json({
                   error: httpError.message,

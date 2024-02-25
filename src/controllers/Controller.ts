@@ -1,5 +1,6 @@
-import type { Response as $Response, Request } from 'express';
-import type { User } from '../types';
+import { User } from '@brewskey/spark-protocol';
+import type { Request, Response as $Response } from 'express';
+
 import type { HttpResult } from './types';
 
 export default class Controller {

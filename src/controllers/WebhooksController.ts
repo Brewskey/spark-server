@@ -1,22 +1,23 @@
-import type { Webhook, WebhookMutator } from '../types';
-import type WebhookManager from '../managers/WebhookManager';
+import { Webhook } from '@brewskey/spark-protocol';
 
-import Controller from './Controller';
-import HttpError from '../lib/HttpError';
 import httpVerb from '../decorators/httpVerb';
 import route from '../decorators/route';
+import HttpError from '../lib/HttpError';
+import type WebhookManager from '../managers/WebhookManager';
+import { MutateWebhookDTO } from '../types';
+import Controller from './Controller';
 import { HttpResult } from './types';
 
-const validateWebhookMutator = (
-  webhookMutator: WebhookMutator,
+const validateMutateWebhookDTO = (
+  dto: MutateWebhookDTO,
 ): HttpError | null | undefined => {
-  if (!webhookMutator.event) {
+  if (!dto.event) {
     return new HttpError('no event name provided');
   }
-  if (!webhookMutator.url) {
+  if (!dto.url) {
     return new HttpError('no url provided');
   }
-  if (!webhookMutator.requestType) {
+  if (!dto.requestType) {
     return new HttpError('no requestType provided');
   }
 
@@ -40,22 +41,22 @@ class WebhooksController extends Controller {
 
   @httpVerb('get')
   @route('/v1/webhooks/:webhookID')
-  async getByID(webhookID: string): Promise<HttpResult<Webhook>> {
+  async getByID(webhookID: number): Promise<HttpResult<Webhook>> {
     return this.ok(await this._webhookManager.getByID(webhookID));
   }
 
   @httpVerb('post')
   @route('/v1/webhooks')
-  async create(model: WebhookMutator): Promise<
+  async create(model: MutateWebhookDTO): Promise<
     HttpResult<{
       created_at: Date;
       event: string;
-      id: string;
+      id: number;
       ok: true;
       url: string;
     }>
   > {
-    const validateError = validateWebhookMutator(model);
+    const validateError = validateMutateWebhookDTO(model);
     if (validateError) {
       throw validateError;
     }
@@ -66,7 +67,7 @@ class WebhooksController extends Controller {
     });
 
     return this.ok({
-      created_at: newWebhook.created_at,
+      created_at: newWebhook.createdAt,
       event: newWebhook.event,
       id: newWebhook.id,
       ok: true,
@@ -76,7 +77,7 @@ class WebhooksController extends Controller {
 
   @httpVerb('delete')
   @route('/v1/webhooks/:webhookID')
-  async deleteByID(webhookID: string): Promise<HttpResult<{ ok: true }>> {
+  async deleteByID(webhookID: number): Promise<HttpResult<{ ok: true }>> {
     await this._webhookManager.deleteByID(webhookID);
     return this.ok({ ok: true });
   }

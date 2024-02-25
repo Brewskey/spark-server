@@ -1,0 +1,16 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    },
+    {
+      "path": "../Brewskey.DeviceCloud",
+    },
+  ],
+  "settings": {
+    "javascript.validate.enable": false,
+    "typescript.tsdk": "node_modules\\typescript\\lib",
+    "javascript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifier": "relative",
+  },
+}

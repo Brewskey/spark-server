@@ -1,17 +1,15 @@
 import { LogLevel } from 'bunyan';
 import path from 'path';
 
+import { DeviceServerConfig } from './server/DeviceServer';
+
 export type Settings = {
   BINARIES_DIRECTORY: string;
   DEFAULT_EVENT_TTL: number;
   DEVICE_DIRECTORY: string;
-  TCP_DEVICE_SERVER_CONFIG: {
-    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: boolean;
-    HOST: string;
-    PORT: number;
-  };
+  TCP_DEVICE_SERVER_CONFIG: DeviceServerConfig;
   SERVER_KEY_FILENAME: string;
-  SERVER_KEY_PASSWORD: string | null | undefined;
+  SERVER_KEY_PASSWORD: string | undefined;
   SERVER_KEYS_DIRECTORY: string;
   CRYPTO_ALGORITHM: string;
   LOG_LEVEL: LogLevel;
@@ -32,12 +30,12 @@ const SETTINGS: Settings = {
   DEFAULT_EVENT_TTL: 60,
   DEVICE_DIRECTORY: path.join(ROOT_DIR, 'data/deviceKeys'),
   TCP_DEVICE_SERVER_CONFIG: {
-    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES: true,
+    ENABLE_SYSTEM_FIRMWMARE_AUTOUPDATES: true,
     HOST: 'localhost',
     PORT: 5683,
   },
   SERVER_KEY_FILENAME: 'default_key.pem',
-  SERVER_KEY_PASSWORD: null as string | null | undefined,
+  SERVER_KEY_PASSWORD: undefined,
   SERVER_KEYS_DIRECTORY: path.join(ROOT_DIR, 'data/users'),
 
   CRYPTO_ALGORITHM: 'aes-128-cbc',

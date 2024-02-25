@@ -1,43 +1,29 @@
-/* eslint-disable */
-import type {
-  IUserRepository,
-  IWebhookRepository,
-  User,
-  Webhook,
-  WebhookMutator,
-} from '../types';
-
+import { Webhook } from '@brewskey/spark-protocol';
 import request from 'supertest';
+
 import ouathClients from '../oauthClients.json';
-import { createTestApp } from './setup/createTestApp';
+import { MutateWebhookDTO } from '../types';
+import { AppAndContainer, createTestApp } from './setup/createTestApp';
 import TestData from './setup/TestData';
-import nullthrows from 'nullthrows';
+import { getTestDataSource } from './setup/TestDataSource';
 
 describe('WebhookController', () => {
-  const app = createTestApp();
-  const container = app.container;
-  const WEBHOOK_MODEL: WebhookMutator = {
+  const dataSource = getTestDataSource();
+  let app: AppAndContainer;
+  const WEBHOOK_MODEL: MutateWebhookDTO = {
     event: 'testEvent',
     requestType: 'GET',
     url: 'http://webhooktest.com/',
-    ownerID: 'test-owner-id',
+    ownerID: 1,
   };
 
-  let testUser: User;
   let userToken: string;
-  let testWebhook: Webhook;
 
   beforeAll(async () => {
+    await dataSource.initialize();
+    app = createTestApp(dataSource);
     const USER_CREDENTIALS = TestData.getUser();
-    const userResponse = await request(app)
-      .post('/v1/users')
-      .send(USER_CREDENTIALS);
-
-    testUser = nullthrows(
-      await container
-        .constitute<IUserRepository>('IUserRepository')
-        .getByUsername(USER_CREDENTIALS.username),
-    );
+    await request(app).post('/v1/users').send(USER_CREDENTIALS);
 
     const tokenResponse = await request(app)
       .post('/oauth/token')
@@ -67,7 +53,7 @@ describe('WebhookController', () => {
         url: WEBHOOK_MODEL.url,
       });
 
-    testWebhook = response.body;
+    const testWebhook = response.body;
 
     expect(response.status).toEqual(200);
     expect(testWebhook.id && testWebhook.event && testWebhook.url).toBeTruthy();
@@ -124,6 +110,15 @@ describe('WebhookController', () => {
   });
 
   test('should return webhook object by id', async () => {
+    const { body: testWebhook } = await request(app)
+      .post('/v1/webhooks')
+      .query({ access_token: userToken })
+      .send({
+        event: WEBHOOK_MODEL.event,
+        requestType: WEBHOOK_MODEL.requestType,
+        url: WEBHOOK_MODEL.url,
+      });
+
     const response = await request(app)
       .get(`/v1/webhooks/${testWebhook.id}`)
       .query({ access_token: userToken });
@@ -135,6 +130,15 @@ describe('WebhookController', () => {
   });
 
   test('should delete webhook', async () => {
+    const { body: testWebhook } = await request(app)
+      .post('/v1/webhooks')
+      .query({ access_token: userToken })
+      .send({
+        event: WEBHOOK_MODEL.event,
+        requestType: WEBHOOK_MODEL.requestType,
+        url: WEBHOOK_MODEL.url,
+      });
+
     const deleteResponse = await request(app)
       .delete(`/v1/webhooks/${testWebhook.id}`)
       .query({ access_token: userToken });
@@ -154,14 +158,5 @@ describe('WebhookController', () => {
         (webhook: Webhook): boolean => webhook.id === testWebhook.id,
       ),
     ).toBeFalsy();
-  });
-
-  afterAll(async () => {
-    await container
-      .constitute<IWebhookRepository>('IWebhookRepository')
-      .deleteByID(testWebhook.id);
-    await container
-      .constitute<IUserRepository>('IUserRepository')
-      .deleteByID(testUser.id);
   });
 });

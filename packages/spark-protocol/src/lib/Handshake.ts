@@ -1,11 +1,11 @@
 import type { Socket } from 'net';
-import type { Stream, Duplex } from 'stream';
-import type Device from '../clients/Device';
-import type DeviceKey from './DeviceKey';
-import type CryptoStream from './CryptoStream';
-import type CryptoManager from './CryptoManager';
+import type { Duplex, Stream } from 'stream';
 
+import type Device from '../clients/Device';
 import ChunkingStream from './ChunkingStream';
+import type CryptoManager from './CryptoManager';
+import type CryptoStream from './CryptoStream';
+import type DeviceKey from './DeviceKey';
 import Logger from './logger';
 const logger = Logger.createModuleLogger(module);
 /*
@@ -398,7 +398,7 @@ class Handshake {
   }
 
   async _onDecipherStreamTimeout() {
-    await new Promise((resolve: (_: void) => void, reject: () => void) => {
+    await new Promise((_resolve: (_: void) => void, reject: () => void) => {
       setTimeout((): void => reject(), DECIPHER_STREAM_TIMEOUT * 1000);
     });
   }

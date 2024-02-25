@@ -3,15 +3,15 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../global.d.ts" />
 
-import path from 'path';
 import { Octokit } from '@octokit/rest';
-import { mkdirp } from 'mkdirp';
 import { FirmwareSetting, HalModuleParser } from 'binary-version-reader';
 import dotenv from 'dotenv';
-import settings from '../settings';
 import fs from 'fs';
+import { mkdirp } from 'mkdirp';
+import path from 'path';
+
 import { filterFalsyValues } from '../filterFalsyValues';
-import { rejects } from 'assert';
+import settings from '../settings';
 
 let fileDirectory = path.resolve(__dirname);
 let filePath = null;

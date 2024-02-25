@@ -1,15 +1,15 @@
-import type { ParsedPacket, Option, NamedOption } from 'coap-packet';
+import type { NamedOption, Option, ParsedPacket } from 'coap-packet';
 import CoapPacket from 'coap-packet';
+
+import { filterFalsyValues } from '../filterFalsyValues';
 import type { CoapMessageTypes } from './CoapMessage';
+import CoapMessage from './CoapMessage';
+import Logger from './logger';
 import type {
   MessageSpecificationType,
   MessageType,
 } from './MessageSpecifications';
-
-import CoapMessage from './CoapMessage';
 import MessageSpecifications from './MessageSpecifications';
-import Logger from './logger';
-import { filterFalsyValues } from '../filterFalsyValues';
 const logger = Logger.createModuleLogger(module);
 
 const getRouteKey = (code: number | string, path: string): string => {
@@ -57,9 +57,7 @@ const decodeNumericValue = (buffer: Buffer): number => {
     return buffer.readUInt16BE(0);
   }
   if (length === 3) {
-    /* eslint-disable no-bitwise */
     return (buffer[1] << 8) | (buffer[2] + ((buffer[0] << 16) >>> 0));
-    /* eslint-enable no-bitwise */
   }
 
   return buffer.readUInt32BE(0);

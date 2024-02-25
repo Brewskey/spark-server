@@ -1,9 +1,10 @@
 import type { ClaimCodeManager } from '@brewskey/spark-protocol';
 import nullthrows from 'nullthrows';
-import type DeviceManager from '../managers/DeviceManager';
-import Controller from './Controller';
+
 import httpVerb from '../decorators/httpVerb';
 import route from '../decorators/route';
+import type DeviceManager from '../managers/DeviceManager';
+import Controller from './Controller';
 import { HttpResult } from './types';
 
 class DeviceClaimsController extends Controller {

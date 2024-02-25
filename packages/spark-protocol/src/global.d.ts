@@ -18,26 +18,25 @@ declare module 'ec-key' {
 }
 declare module 'constitute' {
   class Container {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    bindMethod: <TFunc extends (...p: any[]) => unknown>(
+      key: string,
+      callback: TFunc,
+      inject?: string[],
+    ) => void;
+
     bindValue: (key: string, value: unknown) => void;
 
     // eslint-disable-next-line @typescript-eslint/ban-types
+    bindAlias: (key1: string, clazz: Function) => void;
+
+    // eslint-disable-next-line @typescript-eslint/ban-types
     bindClass: (key: string, clazz: Function, dependencies?: string[]) => void;
+
+    constitute: <TType>(key: string) => TType;
   }
 }
 declare module 'binary-version-reader' {
-  enum PlatformType {
-    Core = 0,
-    Photon = 6,
-    P1 = 8,
-    Electron = 10,
-    Argon = 12,
-    Boron = 13,
-    Xenon = 14,
-    RaspberryPI = 31,
-    Duo = 88,
-    Bluz = 103,
-  }
-
   type ModuleFunction = 2 | 4 | 5;
   type FirmwarePrefixInfo = {
     moduleStartAddy: string;

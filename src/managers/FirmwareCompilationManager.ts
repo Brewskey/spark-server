@@ -1,11 +1,12 @@
+import { spawn } from 'child_process';
 import crypto from 'crypto';
 import fs from 'fs';
-import path from 'path';
 import { mkdirp } from 'mkdirp';
+import path from 'path';
 import rmfr from 'rmfr';
-import { spawn } from 'child_process';
-import settings from '../settings';
+
 import Logger from '../lib/logger';
+import settings from '../settings';
 const logger = Logger.createModuleLogger(module);
 
 const IS_COMPILATION_ENABLED = fs.existsSync(

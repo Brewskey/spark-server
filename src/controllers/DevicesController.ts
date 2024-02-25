@@ -1,16 +1,18 @@
 import nullthrows from 'nullthrows';
-import type DeviceManager from '../managers/DeviceManager';
-import type { DeviceAPIType } from '../lib/deviceToAPI';
-import Controller from './Controller';
-import HttpError from '../lib/HttpError';
-import FirmwareCompilationManager, {
-  CompilationResponse,
-} from '../managers/FirmwareCompilationManager';
+
 import allowUpload from '../decorators/allowUpload';
 import httpVerb from '../decorators/httpVerb';
 import route from '../decorators/route';
+import type { DeviceAPIType } from '../lib/deviceToAPI';
 import deviceToAPI from '../lib/deviceToAPI';
+import HttpError from '../lib/HttpError';
 import Logger from '../lib/logger';
+import type DeviceManager from '../managers/DeviceManager';
+import FirmwareCompilationManager, {
+  CompilationResponse,
+} from '../managers/FirmwareCompilationManager';
+import PermissionManager from '../managers/PermissionManager';
+import Controller from './Controller';
 import { HttpResult } from './types';
 const logger = Logger.createModuleLogger(module);
 
@@ -22,7 +24,10 @@ type CompileConfig = {
 class DevicesController extends Controller {
   _deviceManager: DeviceManager;
 
-  constructor(deviceManager: DeviceManager) {
+  constructor(
+    deviceManager: DeviceManager,
+    private readonly permissionManager: PermissionManager,
+  ) {
     super();
 
     this._deviceManager = deviceManager;
@@ -115,6 +120,11 @@ class DevicesController extends Controller {
   async getDevice(deviceIDorName: string): Promise<HttpResult<DeviceAPIType>> {
     const deviceID = await this._deviceManager.getDeviceID(deviceIDorName);
     const device = await this._deviceManager.getByID(deviceID);
+
+    if (!this.permissionManager.doesUserHaveAccess(device, this.user)) {
+      return this.bad('Unauthorized', 403);
+    }
+
     return this.ok(deviceToAPI(device));
   }
 
@@ -228,7 +238,6 @@ class DevicesController extends Controller {
         postBody,
       );
       const device = await this._deviceManager.getByID(deviceID);
-
       return this.ok(deviceToAPI(device, result));
     } catch (error) {
       const errorMessage =

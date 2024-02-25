@@ -1,31 +1,33 @@
+import type {
+  DeviceAttributeRepository,
+  DeviceAttributes,
+  DeviceKeyAlgorithm,
+  DeviceKeyObjectRepository,
+  EventPublisher,
+} from '@brewskey/spark-protocol';
+import { NAME_GENERATOR, SPARK_SERVER_EVENTS } from '@brewskey/spark-protocol';
 import ECKey from 'ec-key';
 import NodeRSA from 'node-rsa';
-import type {
-  DeviceAttributes,
-  EventPublisher,
-  IDeviceAttributeRepository,
-  IDeviceKeyRepository,
-} from '@brewskey/spark-protocol';
-import { SPARK_SERVER_EVENTS } from '@brewskey/spark-protocol';
-import type PermissionManager from './PermissionManager';
-import type { IDeviceFirmwareRepository } from '../types';
+
 import HttpError from '../lib/HttpError';
+import DeviceFirmwareFileRepository from '../repository/DeviceFirmwareFileRepository';
+import type PermissionManager from './PermissionManager';
 
 class DeviceManager {
-  _deviceAttributeRepository: IDeviceAttributeRepository;
+  _deviceAttributeRepository: DeviceAttributeRepository;
 
-  _deviceFirmwareRepository: IDeviceFirmwareRepository;
+  _deviceFirmwareRepository: DeviceFirmwareFileRepository;
 
-  _deviceKeyRepository: IDeviceKeyRepository;
+  _deviceKeyRepository: DeviceKeyObjectRepository;
 
   _permissionManager: PermissionManager;
 
   _eventPublisher: EventPublisher;
 
   constructor(
-    deviceAttributeRepository: IDeviceAttributeRepository,
-    deviceFirmwareRepository: IDeviceFirmwareRepository,
-    deviceKeyRepository: IDeviceKeyRepository,
+    deviceAttributeRepository: DeviceAttributeRepository,
+    deviceFirmwareRepository: DeviceFirmwareFileRepository,
+    deviceKeyRepository: DeviceKeyObjectRepository,
     permissionManager: PermissionManager,
     eventPublisher: EventPublisher,
   ) {
@@ -38,18 +40,20 @@ class DeviceManager {
 
   async claimDevice(
     deviceID: string,
-    userID: string,
+    userID: number,
   ): Promise<DeviceAttributes> {
     // todo check: we may not need to get attributes from db here.
-    const attributes = await this._deviceAttributeRepository.getByID(deviceID);
+    const attributes =
+      await this._deviceAttributeRepository.findOneByID(deviceID);
 
     if (!attributes) {
       return this._deviceAttributeRepository.updateByID(deviceID, {
         deviceID,
         ownerID: userID,
-        registrar: userID,
+        claimCode: null,
       });
     }
+
     if (attributes.ownerID && attributes.ownerID !== userID) {
       throw new HttpError('The device belongs to someone else.');
     }
@@ -66,6 +70,7 @@ class DeviceManager {
 
     // todo check: we may not need to update attributes in db here.
     return this._deviceAttributeRepository.updateByID(deviceID, {
+      ...attributes,
       ownerID: userID,
     });
   }
@@ -81,6 +86,8 @@ class DeviceManager {
 
     return this._deviceAttributeRepository.updateByID(deviceID, {
       ownerID: null,
+      deviceID,
+      claimCode: null,
     });
   }
 
@@ -113,13 +120,14 @@ class DeviceManager {
 
     return {
       ...attributes,
-      connected: !connectedDeviceAttributes.error,
+      isConnected: !connectedDeviceAttributes.error,
       lastFlashedAppName: null,
     };
   }
 
   async getDeviceID(deviceIDorName: string): Promise<string> {
-    let device = await this._deviceAttributeRepository.getByID(deviceIDorName);
+    let device =
+      await this._deviceAttributeRepository.findOneByID(deviceIDorName);
     if (device == null) {
       device = await this._deviceAttributeRepository.getByName(deviceIDorName);
     }
@@ -156,7 +164,7 @@ class DeviceManager {
             });
           return {
             ...attributes,
-            connected: pingResponse.connected || false,
+            isConnected: pingResponse.connected || false,
             lastFlashedAppName: null,
             lastHeard: pingResponse.lastHeard || attributes.lastHeard,
           };
@@ -332,9 +340,9 @@ class DeviceManager {
 
   async provision(
     deviceID: string,
-    userID: string,
+    userID: number,
     publicKey: string,
-    algorithm: 'ecc' | 'rsa',
+    algorithm: DeviceKeyAlgorithm,
   ): Promise<DeviceAttributes> {
     if (algorithm === 'ecc') {
       try {
@@ -356,16 +364,37 @@ class DeviceManager {
       }
     }
 
-    await this._deviceKeyRepository.updateByID(deviceID, {
+    const existingDeviceKey =
+      await this._deviceKeyRepository.findOneByID(deviceID);
+
+    const creationParams = {
+      ...existingDeviceKey,
       algorithm,
       deviceID,
-      key: publicKey,
-    });
+      key: Buffer.from(publicKey),
+    };
+    if (existingDeviceKey) {
+      await this._deviceKeyRepository.updateByID(deviceID, creationParams);
+    } else {
+      await this._deviceKeyRepository.create(creationParams);
+    }
 
-    await this._deviceAttributeRepository.updateByID(deviceID, {
-      ownerID: userID,
-      registrar: userID,
-    });
+    const deviceAttributes =
+      await this._deviceAttributeRepository.findOneByID(deviceID);
+    if (deviceAttributes) {
+      await this._deviceAttributeRepository.updateByID(deviceID, {
+        ...deviceAttributes,
+        ownerID: userID,
+      });
+    } else {
+      // Create empty DeviceAttributes
+      await this._deviceAttributeRepository.create({
+        deviceID,
+        ownerID: userID,
+        name: NAME_GENERATOR.choose(),
+      });
+    }
+
     return this.getByID(deviceID);
   }
 
@@ -394,7 +423,7 @@ class DeviceManager {
     deviceID: string,
     name: string,
   ): Promise<DeviceAttributes> {
-    await this.getAttributesByID(deviceID);
+    const attributes = await this.getAttributesByID(deviceID);
 
     // update connected device attributes
     await this._eventPublisher.publishAndListenForResponse({
@@ -402,7 +431,10 @@ class DeviceManager {
       name: SPARK_SERVER_EVENTS.UPDATE_DEVICE_ATTRIBUTES,
     });
 
-    return this._deviceAttributeRepository.updateByID(deviceID, { name });
+    return this._deviceAttributeRepository.updateByID(deviceID, {
+      ...attributes,
+      name,
+    });
   }
 }
 

@@ -1,17 +1,18 @@
-import { HalModuleParser } from 'binary-version-reader';
-import type DeviceManager from '../managers/DeviceManager';
-import type { IProductRepository } from '../types';
-import Controller from './Controller';
-import httpVerb from '../decorators/httpVerb';
-import allowUpload from '../decorators/allowUpload';
-import route from '../decorators/route';
-import { HttpResult } from './types';
-import nullthrows from 'nullthrows';
 import {
+  ProductDeviceRepository,
   ProductFirmware,
-  IProductDeviceRepository,
-  IProductFirmwareRepository,
+  ProductFirmwareRepository,
 } from '@brewskey/spark-protocol';
+import { HalModuleParser } from 'binary-version-reader';
+import nullthrows from 'nullthrows';
+
+import allowUpload from '../decorators/allowUpload';
+import httpVerb from '../decorators/httpVerb';
+import route from '../decorators/route';
+import type DeviceManager from '../managers/DeviceManager';
+import { ProductRepository } from '../repository/ProductRepository';
+import Controller from './Controller';
+import { HttpResult } from './types';
 
 type ProductFirmwareUpload = {
   current: boolean;
@@ -21,33 +22,23 @@ type ProductFirmwareUpload = {
   version: number;
 };
 
-type ProductFirmwareAPIResult = Omit<ProductFirmware, 'data'> & {
+type ProductFirmwareAPIResult = Omit<
+  ProductFirmware,
+  'data' | 'deviceCount'
+> & {
   device_count: number;
 };
 
 const MISSING_FIELDS = ['binary', 'description', 'title', 'version'] as const;
 
 class ProductFirmwaresController extends Controller {
-  _deviceManager: DeviceManager;
-
-  _productDeviceRepository: IProductDeviceRepository;
-
-  _productFirmwareRepository: IProductFirmwareRepository;
-
-  _productRepository: IProductRepository;
-
   constructor(
-    deviceManager: DeviceManager,
-    productDeviceRepository: IProductDeviceRepository,
-    productFirmwareRepository: IProductFirmwareRepository,
-    productRepository: IProductRepository,
+    private readonly deviceManager: DeviceManager,
+    private readonly productDeviceRepository: ProductDeviceRepository,
+    private readonly productFirmwareRepository: ProductFirmwareRepository,
+    private readonly productRepository: ProductRepository,
   ) {
     super();
-
-    this._deviceManager = deviceManager;
-    this._productDeviceRepository = productDeviceRepository;
-    this._productFirmwareRepository = productFirmwareRepository;
-    this._productRepository = productRepository;
   }
 
   @httpVerb('get')
@@ -56,24 +47,19 @@ class ProductFirmwaresController extends Controller {
     productIDOrSlug: string,
   ): Promise<HttpResult<ProductFirmwareAPIResult[]>> {
     const product =
-      await this._productRepository.getByIDOrSlug(productIDOrSlug);
-    if (!product) {
-      return this.bad('Product does not exist', 404);
-    }
-
-    const firmwares = await this._productFirmwareRepository.getManyByProductID(
-      product.product_id,
-    );
+      await this.productRepository.findByIDOrSlugOrFail(productIDOrSlug);
+    const firmwares = await this.productFirmwareRepository.find({
+      where: { productID: product.id },
+    });
 
     const mappedFirmware = await Promise.all(
       firmwares.map(async ({ data: _, ...firmware }) => {
-        const deviceCount =
-          await this._productDeviceRepository.countByProductID(
-            product.product_id,
-            {
-              productFirmwareVersion: firmware.version,
-            },
-          );
+        const deviceCount = await this.productDeviceRepository.count({
+          where: {
+            productID: product.id,
+            productFirmwareVersion: firmware.version,
+          },
+        });
         return {
           ...firmware,
           device_count: deviceCount,
@@ -92,14 +78,10 @@ class ProductFirmwaresController extends Controller {
     version: string,
   ): Promise<HttpResult<ProductFirmwareAPIResult>> {
     const product =
-      await this._productRepository.getByIDOrSlug(productIDOrSlug);
-    if (!product) {
-      return this.bad(`${productIDOrSlug} does not exist`);
-    }
-    const firmwareList =
-      await this._productFirmwareRepository.getManyByProductID(
-        product.product_id,
-      );
+      await this.productRepository.findByIDOrSlugOrFail(productIDOrSlug);
+    const firmwareList = await this.productFirmwareRepository.find({
+      where: { productID: product.id },
+    });
 
     const existingFirmware = firmwareList.find(
       (firmware: ProductFirmware): boolean =>
@@ -109,12 +91,12 @@ class ProductFirmwaresController extends Controller {
       return this.bad(`Firmware version ${version} does not exist`);
     }
 
-    const deviceCount = await this._productDeviceRepository.countByProductID(
-      product.product_id,
-      {
+    const deviceCount = await this.productDeviceRepository.count({
+      where: {
+        productID: product.id,
         productFirmwareVersion: existingFirmware.version,
       },
-    );
+    });
 
     const { data: _, ...output } = existingFirmware;
     return this.ok({
@@ -139,10 +121,7 @@ class ProductFirmwaresController extends Controller {
     body.current = this._stringToBoolean(body.current);
 
     const product =
-      await this._productRepository.getByIDOrSlug(productIDOrSlug);
-    if (!product) {
-      return this.bad(`${productIDOrSlug} does not exist`);
-    }
+      await this.productRepository.findByIDOrSlugOrFail(productIDOrSlug);
 
     const parser = new HalModuleParser();
     const moduleInfo = await parser.parseBuffer({
@@ -154,30 +133,29 @@ class ProductFirmwaresController extends Controller {
     }
 
     const firmwarePlatformID = moduleInfo.prefixInfo.platformID;
-    if (firmwarePlatformID !== product.platform_id) {
+    if (firmwarePlatformID !== product.platformID) {
       return this.bad(
-        `Firmware had incorrect platform ID ${firmwarePlatformID}. Expected ${product.platform_id} `,
+        `Firmware had incorrect platform ID ${firmwarePlatformID}. Expected ${product.platformID} `,
       );
     }
 
     const { productId, productVersion } = moduleInfo.suffixInfo;
-    if (productId !== parseInt(product.product_id.toString(), 10)) {
+    if (productId !== product.id) {
       return this.bad(
-        `Firmware had incorrect product ID ${productId}. Expected  ${product.product_id}`,
+        `Firmware had incorrect product ID ${productId}. Expected  ${product.id}`,
       );
     }
 
     const version = parseInt(body.version.toString(), 10);
     if (productVersion !== version) {
       return this.bad(
-        `Firmware had incorrect product version ${productVersion}. Expected ${product.product_id}`,
+        `Firmware had incorrect product version ${productVersion}. Expected ${product.id}`,
       );
     }
 
-    const firmwareList =
-      await this._productFirmwareRepository.getManyByProductID(
-        product.product_id,
-      );
+    const firmwareList = await this.productFirmwareRepository.find({
+      where: { productID: product.id },
+    });
     const maxExistingFirmwareVersion = Math.max(
       ...firmwareList.map((firmware: ProductFirmware): number =>
         parseInt(firmware.version.toString(), 10),
@@ -194,24 +172,26 @@ class ProductFirmwaresController extends Controller {
       await this._findAndUnreleaseCurrentFirmware(firmwareList);
     }
 
-    const firmware = await this._productFirmwareRepository.create({
-      current: body.current,
+    const firmware = await this.productFirmwareRepository.create({
+      isCurrent: body.current,
       data: body.binary.buffer,
       description: body.description,
-      device_count: 0,
+      deviceCount: 0,
       name: body.binary.originalname,
-      product_id: product.product_id,
+      productID: product.id,
       size: body.binary.size,
       title: body.title,
-      version,
     });
 
     if (body.current) {
-      this._deviceManager.flashProductFirmware(product.product_id);
+      this.deviceManager.flashProductFirmware(product.id);
     }
 
-    const { data: _, ...output } = firmware;
-    return this.ok(output);
+    const { data: _, deviceCount, ...output } = firmware;
+    return this.ok({
+      ...output,
+      device_count: deviceCount,
+    });
   }
 
   @httpVerb('put')
@@ -219,7 +199,7 @@ class ProductFirmwaresController extends Controller {
   async updateFirmware(
     productIDOrSlug: string,
     version: string,
-    body: Partial<ProductFirmware>,
+    body: Partial<Omit<ProductFirmware, 'isCurrent'> & { current?: boolean }>,
   ): Promise<HttpResult<ProductFirmwareAPIResult>> {
     const { current, description, title } = body;
     // eslint-disable-next-line no-param-reassign
@@ -229,14 +209,10 @@ class ProductFirmwaresController extends Controller {
       title,
     };
     const product =
-      await this._productRepository.getByIDOrSlug(productIDOrSlug);
-    if (!product) {
-      return this.bad(`${productIDOrSlug} does not exist`);
-    }
-    const firmwareList =
-      await this._productFirmwareRepository.getManyByProductID(
-        product.product_id,
-      );
+      await this.productRepository.findByIDOrSlugOrFail(productIDOrSlug);
+    const firmwareList = await this.productFirmwareRepository.find({
+      where: { productID: product.id },
+    });
 
     const existingFirmware = firmwareList.find(
       (firmware: ProductFirmware): boolean =>
@@ -250,7 +226,7 @@ class ProductFirmwaresController extends Controller {
       await this._findAndUnreleaseCurrentFirmware(firmwareList);
     }
 
-    const firmware = await this._productFirmwareRepository.updateByID(
+    const firmware = await this.productFirmwareRepository.updateByID(
       existingFirmware.id,
       {
         ...existingFirmware,
@@ -258,12 +234,12 @@ class ProductFirmwaresController extends Controller {
       },
     );
 
-    const { data: _, ...output } = firmware;
+    const { data: _, deviceCount, ...output } = firmware;
 
     if (current) {
-      this._deviceManager.flashProductFirmware(product.product_id);
+      this.deviceManager.flashProductFirmware(product.id);
     }
-    return this.ok(output);
+    return this.ok({ ...output, device_count: deviceCount });
   }
 
   @httpVerb('delete')
@@ -273,14 +249,10 @@ class ProductFirmwaresController extends Controller {
     version: string,
   ): Promise<HttpResult<Record<never, never>>> {
     const product =
-      await this._productRepository.getByIDOrSlug(productIDOrSlug);
-    if (!product) {
-      return this.bad(`${productIDOrSlug} does not exist`);
-    }
-    const firmwareList =
-      await this._productFirmwareRepository.getManyByProductID(
-        product.product_id,
-      );
+      await this.productRepository.findByIDOrSlugOrFail(productIDOrSlug);
+    const firmwareList = await this.productFirmwareRepository.find({
+      where: { productID: product.id },
+    });
 
     const existingFirmware = firmwareList.find(
       (firmware: ProductFirmware): boolean =>
@@ -290,7 +262,7 @@ class ProductFirmwaresController extends Controller {
       return this.bad(`Firmware version ${version} does not exist`);
     }
 
-    await this._productFirmwareRepository.deleteByID(existingFirmware.id);
+    await this.productFirmwareRepository.deleteByID(existingFirmware.id);
 
     return this.ok();
   }
@@ -301,13 +273,13 @@ class ProductFirmwaresController extends Controller {
     return Promise.all(
       productFirmwareList
         .filter(
-          (firmware: ProductFirmware): boolean => firmware.current === true,
+          (firmware: ProductFirmware): boolean => firmware.isCurrent === true,
         )
         .map(
           (releasedFirmware: ProductFirmware): Promise<ProductFirmware> =>
-            this._productFirmwareRepository.updateByID(releasedFirmware.id, {
+            this.productFirmwareRepository.updateByID(releasedFirmware.id, {
               ...releasedFirmware,
-              current: false,
+              isCurrent: false,
             }),
         ),
     );

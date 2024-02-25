@@ -1,37 +1,42 @@
+import {
+  defaultBindings,
+  Organization,
+  Product,
+  ProductConfig,
+  User,
+  Webhook,
+} from '@brewskey/spark-protocol';
 import type { Container } from 'constitute';
-import { defaultBindings } from '@brewskey/spark-protocol';
-import OAuthServer from 'express-oauth-server';
-import type { Settings } from './types';
-import OAuthModel from './OAuthModel';
+import ExpressOAuthServer from 'express-oauth-server';
+import { DataSource } from 'typeorm';
+
 import DeviceClaimsController from './controllers/DeviceClaimsController';
 import DevicesController from './controllers/DevicesController';
 import EventsController from './controllers/EventsController';
 import EventsControllerV2 from './controllers/EventsControllerV2';
 import OauthClientsController from './controllers/OauthClientsController';
-import ProductsController from './controllers/ProductsController';
-import ProductsControllerV2 from './controllers/ProductsControllerV2';
 import ProductFirmwaresController from './controllers/ProductFirmwaresController';
 import ProductFirmwaresControllerV2 from './controllers/ProductFirmwaresControllerV2';
+import ProductsController from './controllers/ProductsController';
+import ProductsControllerV2 from './controllers/ProductsControllerV2';
 import ProvisioningController from './controllers/ProvisioningController';
 import UsersController from './controllers/UsersController';
 import WebhooksController from './controllers/WebhooksController';
 import DeviceManager from './managers/DeviceManager';
-import WebhookManager from './managers/WebhookManager';
 import EventManager from './managers/EventManager';
 import PermissionManager from './managers/PermissionManager';
+import WebhookManager from './managers/WebhookManager';
+import OAuthModel from './OAuthModel';
 import DeviceFirmwareFileRepository from './repository/DeviceFirmwareFileRepository';
-import NeDb from './repository/NeDb';
 import MongoDb from './repository/MongoDb';
-import DeviceAttributeDatabaseRepository from './repository/DeviceAttributeDatabaseRepository';
-import DeviceKeyDatabaseRepository from './repository/DeviceKeyDatabaseRepository';
-import OrganizationDatabaseRepository from './repository/OrganizationDatabaseRepository';
-import ProductDatabaseRepository from './repository/ProductDatabaseRepository';
-import ProductConfigDatabaseRepository from './repository/ProductConfigDatabaseRepository';
-import ProductDeviceDatabaseRepository from './repository/ProductDeviceDatabaseRepository';
-import ProductFirmwareDatabaseRepository from './repository/ProductFirmwareDatabaseRepository';
-import UserDatabaseRepository from './repository/UserDatabaseRepository';
-import WebhookDatabaseRepository from './repository/WebhookDatabaseRepository';
+import NeDb from './repository/NeDb';
+import OrganizationRepository from './repository/OrganizationRepository';
+import ProductConfigRepository from './repository/ProductConfigRepository';
+import { ProductRepository } from './repository/ProductRepository';
+import UserRepository from './repository/UserRepository';
+import WebhookRepository from './repository/WebhookRepository';
 import settings from './settings';
+import type { Settings } from './types';
 
 export default <TSettings extends Settings>(
   container: Container,
@@ -54,16 +59,12 @@ export default <TSettings extends Settings>(
     TCP_DEVICE_SERVER_CONFIG,
   } = newSettings;
 
-  const { ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES } =
-    newSettings.TCP_DEVICE_SERVER_CONFIG;
-
   // spark protocol container bindings
   defaultBindings(container, {
     BINARIES_DIRECTORY,
     CONNECTED_DEVICES_LOGGING_INTERVAL:
       CONNECTED_DEVICES_LOGGING_INTERVAL || 15000,
     DEVICE_DIRECTORY,
-    ENABLE_SYSTEM_FIRWMARE_AUTOUPDATES,
     SERVER_KEY_FILENAME,
     SERVER_KEY_PASSWORD: SERVER_KEY_PASSWORD ?? undefined,
     SERVER_KEYS_DIRECTORY,
@@ -97,9 +98,11 @@ export default <TSettings extends Settings>(
     settings.ALLOW_DEVICE_TO_PROVIDE_PEM,
   );
 
-  container.bindClass('OAuthModel', OAuthModel, ['IUserRepository']);
+  container.bindClass('OAuthModel', OAuthModel, ['UserRepository']);
 
-  container.bindClass('OAuthServer', OAuthServer, ['OAUTH_SETTINGS']);
+  container.bindClass('ExpressOAuthServer', ExpressOAuthServer, [
+    'OAUTH_SETTINGS',
+  ]);
 
   if (settings.DB_CONFIG.DB_TYPE === 'mongodb') {
     container.bindValue('DATABASE_URL', settings.DB_CONFIG.URL);
@@ -120,6 +123,7 @@ export default <TSettings extends Settings>(
   ]);
   container.bindClass('DevicesController', DevicesController, [
     'DeviceManager',
+    'PermissionManager',
   ]);
   container.bindClass('EventsController', EventsController, [
     'EventManager',
@@ -130,39 +134,35 @@ export default <TSettings extends Settings>(
     'DeviceManager',
   ]);
   container.bindClass('PermissionManager', PermissionManager, [
-    'IDeviceAttributeRepository',
-    'IOrganizationRepository',
-    'IUserRepository',
-    'IWebhookRepository',
-    'OAuthServer',
+    'DeviceAttributeRepository',
+    'OrganizationRepository',
+    'UserRepository',
+    'WebhookRepository',
+    'ExpressOAuthServer',
   ]);
   container.bindClass('OauthClientsController', OauthClientsController, []);
   container.bindClass('ProductsController', ProductsController, [
     'DeviceManager',
-    'IDeviceAttributeRepository',
-    'IOrganizationRepository',
-    'IProductRepository',
-    'IProductConfigRepository',
-    'IProductDeviceRepository',
-    'IProductFirmwareRepository',
+    'DeviceAttributeRepository',
+    'OrganizationRepository',
+    'ProductRepository',
+    'ProductConfigRepository',
+    'ProductDeviceRepository',
+    'ProductFirmwareRepository',
   ]);
   container.bindClass('ProductsControllerV2', ProductsControllerV2, [
-    'DeviceManager',
-    'IDeviceAttributeRepository',
-    'IOrganizationRepository',
-    'IProductRepository',
-    'IProductConfigRepository',
-    'IProductDeviceRepository',
-    'IProductFirmwareRepository',
+    'DeviceAttributeRepository',
+    'ProductRepository',
+    'ProductDeviceRepository',
   ]);
   container.bindClass(
     'ProductFirmwaresController',
     ProductFirmwaresController,
     [
       'DeviceManager',
-      'IProductDeviceRepository',
-      'IProductFirmwareRepository',
-      'IProductRepository',
+      'ProductDeviceRepository',
+      'ProductFirmwareRepository',
+      'ProductRepository',
     ],
   );
   container.bindClass(
@@ -170,24 +170,24 @@ export default <TSettings extends Settings>(
     ProductFirmwaresControllerV2,
     [
       'DeviceManager',
-      'IProductDeviceRepository',
-      'IProductFirmwareRepository',
-      'IProductRepository',
+      'ProductDeviceRepository',
+      'ProductFirmwareRepository',
+      'ProductRepository',
     ],
   );
   container.bindClass('ProvisioningController', ProvisioningController, [
     'DeviceManager',
   ]);
-  container.bindClass('UsersController', UsersController, ['IUserRepository']);
+  container.bindClass('UsersController', UsersController, ['UserRepository']);
   container.bindClass('WebhooksController', WebhooksController, [
     'WebhookManager',
   ]);
 
   // managers
   container.bindClass('DeviceManager', DeviceManager, [
-    'IDeviceAttributeRepository',
-    'IDeviceFirmwareRepository',
-    'IDeviceKeyRepository',
+    'DeviceAttributeRepository',
+    'DeviceFirmwareFileRepository',
+    'DeviceKeyObjectRepository',
     'PermissionManager',
     'EventPublisher',
   ]);
@@ -195,49 +195,42 @@ export default <TSettings extends Settings>(
   container.bindClass('WebhookManager', WebhookManager, [
     'EventPublisher',
     'PermissionManager',
-    'IWebhookRepository',
+    'WebhookRepository',
   ]);
 
   // Repositories
+  const dataSource = container.constitute<DataSource>('DataSource');
+  [
+    {
+      entity: Organization,
+      repository: OrganizationRepository,
+      extra: ['User.Repository'],
+    },
+    {
+      entity: Product,
+      repository: ProductRepository,
+    },
+    {
+      entity: ProductConfig,
+      repository: ProductConfigRepository,
+    },
+    {
+      entity: User,
+      repository: UserRepository,
+    },
+    {
+      entity: Webhook,
+      repository: WebhookRepository,
+    },
+  ].forEach(({ entity, repository, extra = [] }) => {
+    const repositoryKey = entity.name + '.Repository';
+    container.bindValue(repositoryKey, dataSource.getRepository(entity));
+    container.bindClass(repository.name, repository, [repositoryKey, ...extra]);
+  });
+
   container.bindClass(
-    'IDeviceAttributeRepository',
-    DeviceAttributeDatabaseRepository,
-    ['IDatabase', 'IProductDeviceRepository'],
-  );
-  container.bindClass(
-    'IDeviceFirmwareRepository',
+    'DeviceFirmwareFileRepository',
     DeviceFirmwareFileRepository,
     ['FIRMWARE_DIRECTORY'],
   );
-  container.bindClass('IDeviceKeyRepository', DeviceKeyDatabaseRepository, [
-    'IDatabase',
-  ]);
-  container.bindClass(
-    'IOrganizationRepository',
-    OrganizationDatabaseRepository,
-    ['IDatabase'],
-  );
-  container.bindClass('IProductRepository', ProductDatabaseRepository, [
-    'IDatabase',
-  ]);
-  container.bindClass(
-    'IProductConfigRepository',
-    ProductConfigDatabaseRepository,
-    ['IDatabase'],
-  );
-  container.bindClass(
-    'IProductDeviceRepository',
-    ProductDeviceDatabaseRepository,
-    ['IDatabase'],
-  );
-  container.bindClass(
-    'IProductFirmwareRepository',
-    ProductFirmwareDatabaseRepository,
-    ['IDatabase'],
-  );
-
-  container.bindClass('IUserRepository', UserDatabaseRepository, ['IDatabase']);
-  container.bindClass('IWebhookRepository', WebhookDatabaseRepository, [
-    'IDatabase',
-  ]);
 };

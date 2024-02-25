@@ -1,5 +1,6 @@
 import bunyan from 'bunyan';
 import path from 'path';
+
 import settings from '../settings';
 
 export default class Logger {
