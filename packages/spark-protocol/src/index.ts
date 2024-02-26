@@ -25,10 +25,5 @@ export { default as ServerKeyFileRepository } from './repository/ServerKeyFileRe
 export { default as DeviceServer, NAME_GENERATOR } from './server/DeviceServer';
 export { default as SETTINGS, Settings } from './settings';
 export const TYPEORM_ENTITIES = path.join(__dirname, 'entity/*entity{.ts,.js}');
-export const TYPEORM_MIGRATIONS = path.join(__dirname, 'migration/*{.ts,.js}');
-export const TYPEORM_SUBSCRIBERS = path.join(
-  __dirname,
-  'subscriber/*{.ts,.js}',
-);
 export { objectAssign } from './objectAssign';
 export * from './types';
