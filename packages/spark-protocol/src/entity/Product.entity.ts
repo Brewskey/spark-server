@@ -32,18 +32,14 @@ export class Product extends EntityBase {
   @OneToOne(() => ProductConfig)
   productConfig!: ProductConfig | null;
 
-  @Column()
+  @Column({ default: '' })
   description!: string;
 
-  @Column()
-  latestFirmwareVersion!: number;
+  @Column({ default: '' })
+  hardwareVersion!: string;
 
   @Column()
   name!: string;
-
-  @Column()
-  @Index()
-  ownerID!: number;
 
   @Column({ nullable: true })
   @Index()
@@ -55,7 +51,7 @@ export class Product extends EntityBase {
   })
   organization!: Organization | null;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'int' })
   platformID!: Platform;
 
   @Column()

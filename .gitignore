@@ -40,3 +40,4 @@ settings.json
 temp
 path
 dist
+src/migration

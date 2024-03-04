@@ -114,7 +114,7 @@ class ProductsController extends Controller {
       productConfig: objectAssign(new ProductConfig(), {
         organizationID: model.product.org ?? null,
       }),
-      ownerID: this.user.id,
+      hardwareVersion: model.product.hardware_version,
       organizationID: model.product.org ?? null,
       platformID: model.product.platform_id,
     });

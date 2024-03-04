@@ -10,13 +10,13 @@ class ServerKeyFileRepository {
     this._serverKeyFileName = serverKeyFileName;
   }
 
-  async createKeys(
+  createKeys(
     privateKeyPem: Buffer,
     publicKeyPem: Buffer,
-  ): Promise<{
+  ): {
     privateKeyPem: Buffer;
     publicKeyPem: Buffer;
-  }> {
+  } {
     const extIdx = this._serverKeyFileName.lastIndexOf('.');
     const pubPemFilename = `${this._serverKeyFileName.substring(
       0,
@@ -29,7 +29,7 @@ class ServerKeyFileRepository {
     return { privateKeyPem, publicKeyPem };
   }
 
-  async getPrivateKey(): Promise<string | null | undefined> {
+  getPrivateKey(): string | null | undefined {
     return this._fileManager.getFile(this._serverKeyFileName);
   }
 }

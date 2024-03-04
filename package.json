@@ -39,7 +39,7 @@
     "lint-staged": "lint-staged",
     "lint:deps": "npx lerna run lint",
     "migrate-files-to-mongo": "ts-node ./src/scripts/migrateFilesToDatabase mongo",
-    "migrate-files-to-nedb": "ts-node ./src/scripts/migrateFilesToDatabase nedb",
+    "migrate-to-typeorm": "ts-node ./src/scripts/migrateToTypeorm",
     "prettify": "prettier --write src/*/**.ts",
     "prettify:deps": "npx lerna run prettify",
     "start": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.test.ts\" --exec \"ts-node src/main.ts | bunyan\"",
@@ -52,7 +52,9 @@
     "test:watch": "jest --watch",
     "watch": "tsc --watch",
     "update-firmware": "node ./node_modules/@brewskey/spark-protocol/dist/scripts/update-firmware-binaries",
-    "bump": "npm update spark-protocol"
+    "bump": "npm update spark-protocol",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "npm run typeorm -- migration:generate -d ./src/SparkServerDataSource.ts"
   },
   "workspaces": [
     "packages/*"

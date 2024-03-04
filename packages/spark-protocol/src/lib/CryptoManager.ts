@@ -3,16 +3,16 @@ import NodeRSA from 'node-rsa';
 
 import { DeviceKeyAlgorithm } from '../entity/DeviceKeyObject.entity';
 import { DeviceKeyObjectRepository } from '../repository/DeviceKeyObjectRepository';
-import type { ServerKeyRepository } from '../types';
 import CryptoStream from './CryptoStream';
 import DeviceKey from './DeviceKey';
+import ServerKeyFileRepository from '../repository/ServerKeyFileRepository';
 
 const HASH_TYPE = 'sha1';
 
 class CryptoManager {
   _deviceKeyRepository: DeviceKeyObjectRepository;
 
-  _serverKeyRepository: ServerKeyRepository;
+  _serverKeyRepository: ServerKeyFileRepository;
 
   _serverPrivateKey!: NodeRSA;
 
@@ -20,16 +20,14 @@ class CryptoManager {
 
   constructor(
     deviceKeyRepository: DeviceKeyObjectRepository,
-    serverKeyRepository: ServerKeyRepository,
+    serverKeyRepository: ServerKeyFileRepository,
     serverKeyPassword?: string | null,
   ) {
     this._deviceKeyRepository = deviceKeyRepository;
     this._serverKeyRepository = serverKeyRepository;
     this._serverKeyPassword = serverKeyPassword;
 
-    (async () => {
-      this._serverPrivateKey = await this._getServerPrivateKey();
-    })();
+    this._serverPrivateKey = this._getServerPrivateKey();
   }
 
   _createCryptoStream(
@@ -55,10 +53,10 @@ class CryptoManager {
     });
   }
 
-  async _createServerKeys(): Promise<NodeRSA> {
+  _createServerKeys(): NodeRSA {
     const privateKey = new NodeRSA({ b: 2048 });
 
-    await this._serverKeyRepository.createKeys(
+    this._serverKeyRepository.createKeys(
       Buffer.from(privateKey.exportKey('pkcs1-private-pem')),
       Buffer.from(privateKey.exportKey('pkcs8-public-pem')),
     );
@@ -66,8 +64,8 @@ class CryptoManager {
     return privateKey;
   }
 
-  async _getServerPrivateKey(): Promise<NodeRSA> {
-    const privateKeyString = await this._serverKeyRepository.getPrivateKey();
+  _getServerPrivateKey(): NodeRSA {
+    const privateKeyString = this._serverKeyRepository.getPrivateKey();
 
     if (!privateKeyString) {
       return this._createServerKeys();

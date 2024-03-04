@@ -2,13 +2,13 @@
 
 These instructions have been modified for the Brewskey clone of the local cloud :)
 
-An API compatible open source server for interacting with devices speaking the [spark-protocol](https://github.com/Brewskey/spark-protocol)
+An API compatible open source server for interacting with devices speaking the [@brewskey/spark-protocol](https://github.com/Brewskey/spark-protocol)
 
 We support
 
 - OTA Updates - user application as well as system updates
 - Product API - fleet management by grouping devices.
-- Firmware compilation
+- Firmware compilation (haven't tested this in a very long time. Probably better to just use the Particle cloud to build your firmware)
 
 <pre>
    __  __            __                 __        __                ____
@@ -18,7 +18,7 @@ We support
 \__/_/ /_/\___/  /_/\____/\___/\__,_/_/   \___/_/\____/\__,_/\__,_(_)   
 </pre>
 
-# Quick Install
+# Setup
 
 ```
 git clone https://github.com/Brewskey/spark-server.git
@@ -33,6 +33,7 @@ You'll need to create an OAuth token under your github settings with the `public
 The .env file needs the following:
 
 ```
+GITHUB_AUTH_TYPE=oauth
 GITHUB_AUTH_TOKEN=<github-token>
 ```
 
@@ -58,15 +59,15 @@ to take effect.
 # How do I get started?
 
 1. Run the server with:
-   Run with babel (useful for local development)
 
 ```
 npm start
 ```
 
-For production - uses transpiled files from babel.
+For production - uses transpiled files from typescript.
 
 ```
+npm run build:all
 npm run start:prod
 ```
 
@@ -120,28 +121,21 @@ to get your core id. You'll need this id later
 9. Change server keys to local cloud key + IP Address
 
 ```
-particle keys server ..\spark-server\data\default_key.pub.pem --host IP_ADDRESS --protocol tcp
+particle keys server ..\spark-server\data\default_key.pub.pem --host IP_ADDRESS
 ```
 
 **Note You can go back to using the particle cloud by [downloading the public key here](https://s3.amazonaws.com/spark-website/cloud_public.der).**
-You'll need to run `particle config particle`, `particle keys server cloud_public.der`, and `particle keys doctor your_core_id` while your device is in DFU mode.
+You'll need to run `particle config particle`, `particle keys server cloud_public.der`, and `particle keys doctor` while your device is in DFU mode.
 
 10. Create and provision access on your local cloud with the keys doctor:
 
 ```
-   particle keys doctor your_core_id
+   particle keys doctor
 ```
 
 **Note For Electrons and probably all newer hardware you need to run these commands**
-There is either a bug in the CLI or Particle always expects these newer devices to use UDP.
-
-Put your device in DFU mode and then:
-
-```
-particle keys new test_key --protocol tcp
-particle keys load test_key.der
-particle keys send XXXXXXXXXXXXXXXXXXXXXXXX test_key.pub.pem
-```
+This project does not currently support UDP!
+Feel free to make a pull request if you'd like to implement this.
 
 ---
 
@@ -149,19 +143,68 @@ At this point you should be able to run normal cloud commands and flash binaries
 
 # Configuring Spark Server
 
-In most cases you'll want to connect to a MongoDB instance as it's going to be a lot more performant than using the built-in NeDB implementation.
-You may also want to change the default admin password or have your server use SSL certificates.
+Spark Server uses environment variables or a `.env` file for managing its settings.
 
-**This can all be accomplished by creating a `settings.json` file in the root of the project.**
+The following can be configured
+| Variable | Info | Default Values | Allowed Values |
+| TODO | | | |
+| DATABASE\_\_\*\* | Typeorm configuration. See `The Database` section for more details | | |
 
-1. `cd /my-root-where-i-have-the-repo`
-2. `cp settings.example.json settings.json`
-3. [Edit the json with any of the keys that are set in settings.js](https://github.com/Brewskey/spark-server/blob/dev/src/settings.js#L33-L71)
-4. Run `npm install` if you changed some directories of the binaries (I'd do it just to be safe anyways)
-5. `npm run start:prod`
-6. You should see the JSON changes you made log in the console and the server should run with your changes.
+## The Database
+
+Spark Server uses SQLite out of the box and stores the database at `~/data/particle.db`. If you'd like to use an alternative database (recommended), we use [typeorm which supports these](https://typeorm.io/data-source-options#common-data-source-options).
+
+Make sure you install the appropriate package to support your database of choice!
+
+---
+
+_Typeorm supports `synchronize` to keep your database in sync with this repository but there is always a risk that a schema change in this project could drop some of your data_
+We recommend that you run `npm run migration:generate -- ./src/migration/Initialize` after you've configured your database!
+If we make any changes to the schema, you can use the same command like `npm run migration:generate -- ./src/migration/Update` in order to apply new schema changes.
+
+You can configure your database following this convention:
+
+```
+DATABASE__SOME_KEY__SOME_NESTED_KEY=foo
+DATABASE__SOME_KEY_2=bar
+```
+
+This would give you a configuration of:
+
+```
+{
+  someKey: {
+    someNestedKey: 'foo',
+  },
+  someKey2: 'bar',
+}
+```
+
+Basically a double underscore splits the config and a single underscore is used when converting to camel case.
+
+Here's an example to configure Postgres:
+
+```
+DATABASE_TYPE=postgres
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=typeormtest
+DATABASE_PASSWORD=password
+DATABASE_DATABASE=typeormtest
+DATABASE_SYNCHRONIZE=TRUE
+DATABASE_LOGGING=FALSE
+```
+
+**Historically we supported NeDB or a file-based repository but we've moved away from that and instead use typeorm to support different database types**
+
+In most cases you'll want to connect to a SQL instance as it can scale better than a sqlite implementation.
+
+If you've used MongoDB in the past, you can use this command to migrate the data over to your new Typeorm implementation.
+`npm run migrate-to-typeorm`
 
 # Electron Support
+
+**CLI may no longer support this so good luck**
 
 Yes, this supports Electron but only over TCP. TCP will drastically increase
 the amount of data used so watch out.
@@ -185,12 +228,8 @@ On first run the server creates the following directories for storing data about
 - The cloud keys `default_key.pem` and `default_key.pub.pem` go directly in here. Previously these keys lived in the main directory.
 - `data/deviceKeys/`
 - Device keys (.pub.pem) and information (.json) for each device live in here. Previously these were found in `core_keys/`
-- `data/users/`
-- User account data (.json) for each user live in here. Previously stored in `users/`
 - `data/knownApps/`
-- ???
 - `data/webhooks/`
-- ???
 
 # What kind of project is this?
 

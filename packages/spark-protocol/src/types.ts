@@ -51,17 +51,6 @@ export type ResultEventContext = {
   result: string | number | boolean | Buffer | null | undefined;
 };
 
-export type ServerKeyRepository = {
-  createKeys: (
-    privateKeyPem: Buffer,
-    publicKeyPem: Buffer,
-  ) => Promise<{
-    privateKeyPem: Buffer;
-    publicKeyPem: Buffer;
-  }>;
-  getPrivateKey: () => Promise<string | null | undefined>;
-};
-
 export type PublishOptions = {
   isInternal?: boolean;
   isPublic?: boolean;

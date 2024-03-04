@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+
 import { TYPEORM_ENTITIES } from '../..';
 
 export const TestDataSource = new DataSource({

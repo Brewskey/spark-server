@@ -37,9 +37,7 @@
     "start": "tsc --watch",
     "update-firmware": "ts-node ./src/scripts/update-firmware-binaries.ts",
     "test": "jest",
-    "test:watch": "jest --watch",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "npm run typeorm -- migration:generate ./src/migration/Initialize -d ./src/__tests__/setup/TestDataSource.ts"
+    "test:watch": "jest --watch"
   },
   "bin": {
     "update-firmware": "dist/scripts/update-firmware-binaries.js"

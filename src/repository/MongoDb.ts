@@ -24,6 +24,8 @@ class MongoDb<
     created_at: number;
   },
 > extends BaseMongoDb {
+  _client!: MongoClient;
+
   _database!: Db;
 
   _statusEventEmitter: EventEmitter = new EventEmitter();
@@ -168,19 +170,19 @@ class MongoDb<
   };
 
   _init = async (url: string, options: MongoClientOptions | undefined) => {
-    const database = await MongoClient.connect(url, options);
+    this._client = await MongoClient.connect(url, options);
 
-    database.on('error', (error: Error): void =>
+    this._client.on('error', (error: Error): void =>
       logger.error({ err: error, options, url }, 'DB connection Error: '),
     );
 
-    database.on('open', (): void => logger.info('DB connected'));
+    this._client.on('open', (): void => logger.info('DB connected'));
 
-    database.on('close', (str: string): void =>
+    this._client.on('close', (str: string): void =>
       logger.info({ info: str }, 'DB disconnected: '),
     );
 
-    this._database = database.db();
+    this._database = this._client.db();
     this._statusEventEmitter.emit(DB_READY_EVENT);
   };
 

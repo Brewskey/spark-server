@@ -94,9 +94,9 @@ class ProductsControllerV2 extends Controller {
       productConfig: objectAssign(new ProductConfig(), {
         organizationID: productModel.org ?? null,
       }),
-      ownerID: this.user.id,
       organizationID: productModel.org ?? null,
       platformID: productModel.platform_id,
+      hardwareVersion: productModel.hardware_version,
     });
 
     return this.ok(product);
