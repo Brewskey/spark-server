@@ -2,14 +2,12 @@ import {
   Column,
   Entity,
   Index,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { EntityBase } from './EntityBase';
 import { Product } from './Product.entity';
-import { ProductFirmware } from './ProductFirmware.entity';
 
 @Entity()
 export class ProductDevice extends EntityBase {

@@ -1,14 +1,7 @@
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { EntityBase } from './EntityBase';
 import { Product } from './Product.entity';
-import { ProductDevice } from './ProductDevice.entity';
 
 @Entity()
 export class ProductFirmware extends EntityBase {

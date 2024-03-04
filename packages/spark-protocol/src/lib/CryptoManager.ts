@@ -3,9 +3,9 @@ import NodeRSA from 'node-rsa';
 
 import { DeviceKeyAlgorithm } from '../entity/DeviceKeyObject.entity';
 import { DeviceKeyObjectRepository } from '../repository/DeviceKeyObjectRepository';
+import ServerKeyFileRepository from '../repository/ServerKeyFileRepository';
 import CryptoStream from './CryptoStream';
 import DeviceKey from './DeviceKey';
-import ServerKeyFileRepository from '../repository/ServerKeyFileRepository';
 
 const HASH_TYPE = 'sha1';
 
