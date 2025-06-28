@@ -7,6 +7,7 @@
     "start": "ts-node ./src/index.ts",
     "build": "tsc --noEmit"
   },
+  "private": "true",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Brewskey/particle-collider.git"

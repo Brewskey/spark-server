@@ -348,6 +348,8 @@ class DeviceManager {
     } else {
       try {
         const createdKey = new NodeRSA(publicKey);
+        createdKey.setOptions({ environment: 'browser' }); //By default it will use the node crypto library with the CVE
+
         if (!createdKey.isPublic()) {
           throw new HttpError('Not a public key');
         }

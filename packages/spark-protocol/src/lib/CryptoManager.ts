@@ -55,6 +55,7 @@ class CryptoManager {
 
   async _createServerKeys(): Promise<NodeRSA> {
     const privateKey = new NodeRSA({ b: 2048 });
+    privateKey.setOptions({ environment: 'browser' }); //By default it will use the node crypto library with the CVE
 
     await this._serverKeyRepository.createKeys(
       Buffer.from(privateKey.exportKey('pkcs1-private-pem')),
@@ -74,6 +75,7 @@ class CryptoManager {
     return new NodeRSA(privateKeyString, undefined, {
       encryptionScheme: 'pkcs1',
       signingScheme: 'pkcs1',
+      environment: 'browser',
     });
   }
 
@@ -114,6 +116,7 @@ class CryptoManager {
     try {
       return this._serverPrivateKey.decrypt(data);
     } catch (error) {
+      console.error(error);
       return null;
     }
   }

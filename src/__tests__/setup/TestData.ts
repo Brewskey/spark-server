@@ -65,6 +65,7 @@ class TestData {
 
   static getPublicKey: () => string = (): string => {
     const key = new NodeRSA({ b: 1024 });
+    key.setOptions({ environment: 'browser' }); //By default it will use the node crypto library with the CVE
 
     return key.exportKey('pkcs8-public-pem');
   };

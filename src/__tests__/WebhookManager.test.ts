@@ -14,7 +14,8 @@ import { CoreOptions, UrlOptions } from 'request';
 const WEBHOOK_BASE: Webhook = {
   event: 'test-event',
   requestType: 'POST',
-  url: 'https://webhook.site/7d7dff97-b980-4d36-a4ed-ac7e94cc0c0f',
+  // TODO - use supertest or something for a mock server. This API will break whenever they decide to clean up old webhooks
+  url: 'https://webhook.site/fb2d5641-92c6-4b1d-9df9-4fbccfd22aa6',
   created_at: new Date(),
   id: 'test-id',
   ownerID: 'test-owner-id',

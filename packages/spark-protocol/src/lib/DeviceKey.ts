@@ -11,6 +11,7 @@ class DeviceKey {
       this._nodeRsa = new NodeRSA(pemString, 'pkcs8-public-pem', {
         encryptionScheme: 'pkcs1',
         signingScheme: 'pkcs1',
+        environment: 'browser',
       });
     } catch (_) {
       this._ecKey = new ECKey(pemString, 'pem');

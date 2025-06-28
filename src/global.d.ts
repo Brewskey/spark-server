@@ -65,15 +65,6 @@ declare module 'ec-key' {
   }
   export = ECKey;
 }
-declare module 'node-rsa' {
-  class NodeRSA {
-    constructor(publicKey: string | { b: number });
-    isPublic: () => boolean;
-
-    exportKey: (format: string) => string;
-  }
-  export = NodeRSA;
-}
 declare module 'basic-auth-parser' {
   function AuthParser(param: string | undefined): {
     username: string;
