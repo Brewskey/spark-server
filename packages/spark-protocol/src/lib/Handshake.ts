@@ -251,7 +251,6 @@ class Handshake {
 
     const deviceProvidedPem = this._convertDERtoPEM(deviceKeyBuffer);
     const deviceID = deviceIDBuffer.toString('hex');
-    console.log('decrypted', { deviceID, deviceProvidedPem });
 
     return { deviceID, deviceProvidedPem };
   }

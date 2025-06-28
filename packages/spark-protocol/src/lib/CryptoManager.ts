@@ -4,8 +4,10 @@ import type { IDeviceKeyRepository, ServerKeyRepository } from '../types';
 
 import CryptoStream from './CryptoStream';
 import DeviceKey from './DeviceKey';
+import Logger from './logger';
 
 const HASH_TYPE = 'sha1';
+const logger = Logger.createModuleLogger(module);
 
 class CryptoManager {
   _deviceKeyRepository: IDeviceKeyRepository;
@@ -116,7 +118,7 @@ class CryptoManager {
     try {
       return this._serverPrivateKey.decrypt(data);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return null;
     }
   }
