@@ -1,8 +1,16 @@
 import ECKey from 'ec-key';
 import NodeRSA from 'node-rsa';
 
+/** ec-key lacks consistent typings when Jest/tsconfig does not load `src/global.d.ts` (e.g. repo-root test run). */
+type EcKeyCompat = {
+  createSign: (hash: string) => {
+    update: (data: Buffer) => { sign: () => Buffer };
+  };
+  toString: (format: string) => string;
+};
+
 class DeviceKey {
-  _ecKey: ECKey | null | undefined;
+  _ecKey: EcKeyCompat | null | undefined;
 
   _nodeRsa: NodeRSA | null | undefined;
 
@@ -14,7 +22,7 @@ class DeviceKey {
         environment: 'browser',
       });
     } catch (_) {
-      this._ecKey = new ECKey(pemString, 'pem');
+      this._ecKey = new ECKey(pemString, 'pem') as unknown as EcKeyCompat;
     }
   }
 

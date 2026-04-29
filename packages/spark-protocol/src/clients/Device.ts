@@ -330,7 +330,15 @@ class Device extends EventEmitter {
       this._cipherStream = cipherStream;
       this._decipherStream = decipherStream;
 
-      const getHelloInfo = this._getHello(handshakeBuffer);
+      const handshakePdus = CoapMessages.unwrapPdus(handshakeBuffer);
+      if (!handshakePdus.length) {
+        throw new Error('Handshake plaintext did not contain a parseable CoAP PDU');
+      }
+      const getHelloInfo = this._getHello(handshakePdus[0]);
+      // Same decrypted frame may include additional PDUs; Hello must run first (receive counter).
+      for (let i = 1; i < handshakePdus.length; i += 1) {
+        this.routeParsedPacket(handshakePdus[i]);
+      }
 
       this.updateAttributes({
         ...(getHelloInfo || {}),
@@ -428,16 +436,16 @@ class Device extends EventEmitter {
     );
   }
 
-  _getHello(chunk: Buffer): GetHelloInfo | null | undefined {
-    const message = CoapMessages.unwrap(chunk);
-    if (!message || !message.messageId) {
+  /** Apply Hello from a single parsed CoAP PDU (handshake buffer is unwrapped by the caller). */
+  _getHello(packet: CoapPacket): GetHelloInfo | null | undefined {
+    if (!packet.messageId) {
       throw new Error('failed to parse hello');
     }
 
-    this._receiveCounter = message.messageId;
+    this._receiveCounter = packet.messageId;
 
     try {
-      const { payload } = message;
+      const { payload } = packet;
       if (!payload || payload.length <= 0) {
         return null;
       }
@@ -490,9 +498,9 @@ class Device extends EventEmitter {
    * @param data
    */
   routeMessage(data: Buffer) {
-    const packet = CoapMessages.unwrap(data);
+    const packets = CoapMessages.unwrapPdus(data);
 
-    if (!packet) {
+    if (packets.length === 0) {
       this._logger.error(
         {
           deviceID: this.getDeviceID(),
@@ -502,7 +510,13 @@ class Device extends EventEmitter {
       return;
     }
 
-    // make sure the packet always has a number for code...
+    for (const packet of packets) {
+      this.routeParsedPacket(packet);
+    }
+  }
+
+  /** Routes one decrypted CoAP packet (possibly one of several parsed from a TCP chunk). */
+  routeParsedPacket(packet: CoapPacket) {
     const messageCode = parseFloat(packet.code);
     packet.code = messageCode.toString();
 

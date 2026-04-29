@@ -65,6 +65,109 @@ const decodeNumericValue = (buffer: Buffer): number => {
   return buffer.readUInt32BE(0);
 };
 
+/** RFC 7252: version bits (top two) === 01 for protocol version 1. */
+const isCoapVersion1HeaderByte = (b: number): boolean =>
+  ((b >>> 6) & 3) === 1;
+
+const wireFromParsed = (packet: ParsedPacket): Buffer =>
+  CoapPacket.generate({
+    ack: !!packet.ack,
+    confirmable: !!packet.confirmable,
+    reset: !!packet.reset,
+    code: String(packet.code),
+    messageId: packet.messageId ?? 0,
+    token: packet.token ?? Buffer.alloc(0),
+    options: (packet.options ?? []) as Option[],
+    payload: packet.payload ?? Buffer.alloc(0),
+  });
+
+/** True iff `buf` equals `generate(parsed)` for coap-packet (strict left-segment / whole-buffer checks). */
+const bufferMatchesParsedWire = (buf: Buffer, parsed: ParsedPacket): boolean => {
+  const encoded = wireFromParsed(parsed);
+  return encoded.length === buf.length && encoded.compare(buf) === 0;
+};
+
+/**
+ * Consume the first CoAP PDU starting at `start`.
+ * - Prefer a minimal parse that cannot extend by one byte (true single PDU prefix).
+ * - Otherwise, if the rest is one canonical wire PDU, take the whole slice.
+ * - Else try a split at a CoAP v1-looking byte (glued `[p‖q]` blobs from coap-packet mis-parse).
+ */
+const peelFirstCoapPdu = (
+  data: Buffer,
+  start: number,
+): { packet: ParsedPacket; consumed: number } | null => {
+  const upper = data.length;
+  const lower = start + 4;
+
+  if (lower > upper) {
+    return null;
+  }
+
+  /* 1) Shortest prefix parse that fails if extended by one byte (true PDU end). */
+  for (let end = lower; end < upper; end += 1) {
+    let packet: ParsedPacket;
+    try {
+      packet = CoapPacket.parse(data.subarray(start, end));
+    } catch {
+      continue;
+    }
+
+    try {
+      CoapPacket.parse(data.subarray(start, end + 1));
+    } catch {
+      return { packet, consumed: end - start };
+    }
+  }
+
+  const restAll = data.subarray(start);
+
+  let wholePkt: ParsedPacket | null = null;
+  let canonOk = false;
+
+  try {
+    wholePkt = CoapPacket.parse(restAll);
+    canonOk = bufferMatchesParsedWire(restAll, wholePkt);
+  } catch {
+    wholePkt = null;
+  }
+
+  if (!canonOk) {
+    for (let split = upper - 4; split >= lower; split -= 1) {
+      if (!isCoapVersion1HeaderByte(data[split])) {
+        continue;
+      }
+
+      const leftBuf = data.subarray(start, split);
+
+      try {
+        const packet = CoapPacket.parse(leftBuf);
+        if (!bufferMatchesParsedWire(leftBuf, packet)) {
+          continue;
+        }
+
+        CoapPacket.parse(data.subarray(split));
+        return { packet, consumed: split - start };
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  if (canonOk && wholePkt) {
+    return { packet: wholePkt, consumed: restAll.length };
+  }
+
+  try {
+    return {
+      packet: CoapPacket.parse(restAll),
+      consumed: restAll.length,
+    };
+  } catch {
+    return null;
+  }
+};
+
 class CoapMessages {
   static _specifications: Map<MessageType, MessageSpecificationType> = new Map(
     MessageSpecifications,
@@ -225,18 +328,35 @@ class CoapMessages {
     return null;
   }
 
+  /** One or more CoAP PDUs from plaintext (fixes concatenated PDU blobs / coap-packet eating the whole buffer). */
+  static unwrapPdus(data: Buffer | null): ParsedPacket[] {
+    if (!data || !data.length) {
+      return [];
+    }
+
+    const out: ParsedPacket[] = [];
+    let offset = 0;
+
+    while (offset < data.length) {
+      const peeled = peelFirstCoapPdu(data, offset);
+      if (!peeled) {
+        if (offset === 0) {
+          logger.error({ dataLen: data.length }, 'Coap Error');
+        }
+
+        break;
+      }
+
+      out.push(peeled.packet);
+      offset += peeled.consumed;
+    }
+
+    return out;
+  }
+
+  /** First CoAP PDU only (backward compatible). Prefer {@link unwrapPdus} for inbound device traffic. */
   static unwrap(data: Buffer): ParsedPacket | null | undefined {
-    if (!data) {
-      return null;
-    }
-
-    try {
-      return CoapPacket.parse(data);
-    } catch (error) {
-      logger.error({ data, err: error }, 'Coap Error');
-    }
-
-    return null;
+    return CoapMessages.unwrapPdus(data)[0];
   }
 
   // http://en.wikipedia.org/wiki/X.690
