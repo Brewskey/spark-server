@@ -1,6 +1,6 @@
 {
   "name": "@brewskey/spark-protocol",
-  "version": "1.0.12",
+  "version": "1.0.14",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {

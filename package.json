@@ -1,10 +1,10 @@
 {
   "name": "@brewskey/spark-server",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brewskey/spark-server"
+    "url": "git+https://github.com/brewskey/spark-server.git"
   },
   "homepage": "https://github.com/brewskey/spark-server",
   "bugs": "https://github.com/brewskey/spark-server/issues",
@@ -96,7 +96,7 @@
     "mongodb": "^6.3.0",
     "morgan": "^1.10.0",
     "multer": "^1.2.1",
-    "nedb-core": "https://github.com/bnielsen1965/nedb-core",
+    "nedb-core": "git+https://github.com/bnielsen1965/nedb-core.git",
     "node-rsa": "^1.1.1",
     "nullthrows": "^1.1.1",
     "request": "^2.83.0",
