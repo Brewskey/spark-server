@@ -5,15 +5,18 @@ const logger = Logger.createModuleLogger(module);
 /**
  Our job here is to accept messages in whole chunks, and put their length in front
  as we send them out, and parse them back into those size chunks as we read them in.
+
+ If TCP splits the 2-byte length prefix across reads, `_pendingLead` holds bytes
+ until the next chunk so we never read `[len_hi, undefined]` as a length.
+
  * */
 /* eslint-disable no-bitwise */
 
 const MSG_LENGTH_BYTES = 2;
+
 const messageLengthBytes = (
   message: Buffer | string,
 ): Buffer | null | undefined => {
-  // assuming a maximum encrypted message length of 65K, lets write an
-  // unsigned short int before every message, so we know how much to read out.
   const { length } = message;
   const lengthBuffer = Buffer.alloc(MSG_LENGTH_BYTES);
 
@@ -28,7 +31,10 @@ type ChunkingStreamOptions = {
 };
 
 class ChunkingStream extends Transform {
-  _combinedBuffer: Buffer | null | undefined = null;
+  /** When starting a frame, leftover bytes (< 2) until we can read BE length. */
+  _pendingLead: Buffer | null = null;
+
+  _combinedBuffer: Buffer | null = null;
 
   _currentOffset: number = 0;
 
@@ -50,7 +56,7 @@ class ChunkingStream extends Transform {
 
   _processOutput(
     buffer: Buffer | string,
-    encoding: string,
+    _encoding: string,
     callback: () => void,
   ) {
     const tempBuffer =
@@ -58,41 +64,58 @@ class ChunkingStream extends Transform {
 
     const lengthChunk = messageLengthBytes(tempBuffer);
     this.push(
-      Buffer.concat(lengthChunk ? [lengthChunk, tempBuffer] : [tempBuffer]),
+      Buffer.concat(
+        (lengthChunk
+          ? [lengthChunk, tempBuffer]
+          : [tempBuffer]) as readonly Uint8Array[],
+      ),
     );
     process.nextTick(callback);
   }
 
   _processInput(
     buffer: Buffer | string,
-    encoding: string,
+    _encoding: string,
     callback: () => void,
   ) {
     try {
-      let copyStart = 0;
-      const tempBuffer: Buffer =
+      let tempBuffer =
         typeof buffer === 'string' ? Buffer.from(buffer) : buffer;
 
+      if (this._pendingLead?.length) {
+        tempBuffer = Buffer.concat([
+          this._pendingLead,
+          tempBuffer,
+        ] as readonly Uint8Array[]);
+        this._pendingLead = null;
+      }
+
+      if (
+        this._combinedBuffer === null &&
+        tempBuffer.length < MSG_LENGTH_BYTES
+      ) {
+        this._pendingLead = tempBuffer;
+        process.nextTick(callback);
+        return;
+      }
+
+      let copyStart = 0;
       if (this._combinedBuffer === null) {
-        const expectedLength: number =
-          (tempBuffer[0] << 8) + parseInt(buffer[1].toString(), 10);
+        const expectedLength = (tempBuffer[0] << 8) | tempBuffer[1];
         this._combinedBuffer = Buffer.alloc(expectedLength);
         this._currentOffset = 0;
         copyStart = 2;
       }
 
-      const combinedBuffer = this._combinedBuffer;
-      if (combinedBuffer == null) {
-        return;
-      }
+      const combinedBuffer = this._combinedBuffer!;
 
       const copyEnd = Math.min(
-        buffer.length,
+        tempBuffer.length,
         combinedBuffer.length - this._currentOffset + copyStart,
       );
 
       this._currentOffset += tempBuffer.copy(
-        combinedBuffer,
+        combinedBuffer as Uint8Array,
         this._currentOffset,
         copyStart,
         copyEnd,
@@ -111,9 +134,9 @@ class ChunkingStream extends Transform {
         return;
       }
 
-      const remainder = buffer.slice(copyEnd);
+      const remainder = tempBuffer.subarray(copyEnd);
       process.nextTick((): void =>
-        this._processInput(remainder, encoding, callback),
+        this._processInput(remainder, _encoding, callback),
       );
     } catch (error) {
       logger.error({ err: error }, 'ChunkingStream error!');

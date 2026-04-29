@@ -11,7 +11,6 @@ import dotenv from 'dotenv';
 import settings from '../settings';
 import fs from 'fs';
 import { filterFalsyValues } from '../filterFalsyValues';
-import { rejects } from 'assert';
 
 let fileDirectory = path.resolve(__dirname);
 let filePath = null;

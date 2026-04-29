@@ -32,7 +32,7 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint --fix --quiet -- src",
-    "lint-staged": "lint-staged",
+    "lint-staged": "lint-staged --no-hide-partially-staged",
     "prettify": "prettier --write src/*/**.ts",
     "start": "tsc --watch",
     "update-firmware": "ts-node ./src/scripts/update-firmware-binaries.ts",

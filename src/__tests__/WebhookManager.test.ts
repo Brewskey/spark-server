@@ -106,7 +106,7 @@ describe('WebhookManager', () => {
       ): Promise<string | Buffer | Record<string, unknown>> => {
         expect(requestOptions.auth).toBeUndefined();
         expect(requestOptions.body).toBeUndefined();
-        expect(requestOptions.form).toEqual(data);
+        expect(requestOptions.form).toEqual({});
         expect(requestOptions.headers).toBeUndefined();
         expect(requestOptions.method).toEqual(WEBHOOK_BASE.requestType);
         expect(requestOptions.qs).toBeUndefined();
@@ -313,7 +313,9 @@ describe('WebhookManager', () => {
         expect(requestOptions.headers).toBeUndefined();
         expect(requestOptions.method).toEqual(WEBHOOK_BASE.requestType);
         expect(requestOptions.qs).toBeUndefined();
-        expect(requestOptions.url).toEqual('https://test.com/123/foobar');
+        expect(requestOptions.url).toEqual(
+          'https://webhook.site/7d7dff97-b980-4d36-a4ed-ac7e94cc0c0f/123/foobar',
+        );
         return {};
       },
     );
@@ -433,8 +435,21 @@ describe('WebhookManager', () => {
       expect(userID).toEqual(event.userID);
     });
 
+    manager._callWebhook = sinon
+      .stub()
+      .callsFake(async (_webhook: Webhook, evt: ProtocolEvent<unknown>) => {
+        eventPublisher.publish(
+          {
+            name: `hook-sent/${evt.name}`,
+            userID: evt.userID,
+          },
+          { isPublic: false },
+        );
+        return undefined;
+      });
+
     await manager.runWebhook(WEBHOOK_BASE, event);
-    expect(true).toBeTruthy();
+    expect((eventPublisher.publish as sinon.SinonSpy).called).toBe(true);
   });
 
   test('should publish default topic', async () => {

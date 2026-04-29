@@ -175,8 +175,6 @@ class FirmwareManager {
       return [];
     }
 
-    const iter = 0;
-
     const addRealDependencies = (
       dependency: FirmwareModule,
     ): FirmwareModule | null => {

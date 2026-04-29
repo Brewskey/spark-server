@@ -36,7 +36,7 @@
     "build:clean": "rimraf ./build",
     "build:watch": "tsc --watch src --watch ./packages/spark-protocol/dist --ignore data",
     "lint": "eslint --fix --max-warnings 0 ./src",
-    "lint-staged": "lint-staged",
+    "lint-staged": "lint-staged --no-hide-partially-staged",
     "lint:deps": "npx lerna run lint",
     "migrate-files-to-mongo": "ts-node ./src/scripts/migrateFilesToDatabase mongo",
     "migrate-files-to-nedb": "ts-node ./src/scripts/migrateFilesToDatabase nedb",

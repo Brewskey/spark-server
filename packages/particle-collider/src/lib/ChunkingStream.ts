@@ -3,15 +3,18 @@ import { Transform } from 'stream';
 /**
  Our job here is to accept messages in whole chunks, and put their length in front
  as we send them out, and parse them back into those size chunks as we read them in.
+
+ If TCP splits the 2-byte length prefix across reads, `_pendingLead` holds bytes
+ until the next chunk so we never read `[len_hi, undefined]` as a length.
+
  **/
 /* eslint-disable no-bitwise */
 
 const MSG_LENGTH_BYTES = 2;
+
 const messageLengthBytes = (
   message: Buffer | string,
 ): Buffer | null | undefined => {
-  // assuming a maximum encrypted message length of 65K, lets write an
-  // unsigned short int before every message, so we know how much to read out.
   if (!message) {
     return null;
   }
@@ -30,9 +33,13 @@ type ChunkingStreamOptions = {
 };
 
 class ChunkingStream extends Transform {
-  _expectedLength!: number;
-  _incomingBuffer: Buffer | null | undefined = null;
-  _incomingIndex: number = -1;
+  /** When starting a frame, leftover bytes (< 2) until we can read BE length. */
+  _pendingLead: Buffer | null = null;
+
+  _combinedBuffer: Buffer | null = null;
+
+  _currentOffset: number = 0;
+
   _outgoing: boolean;
 
   constructor(options: ChunkingStreamOptions) {
@@ -41,81 +48,98 @@ class ChunkingStream extends Transform {
     this._outgoing = !!options.outgoing;
   }
 
-  process = (chunk: Buffer | null | undefined, callback: any) => {
-    if (!chunk) {
-      return;
-    }
+  _processOutput(
+    chunk: Buffer,
+    _encoding: BufferEncoding,
+    callback: (err?: Error | null) => void,
+  ): void {
+    const lengthChunk = messageLengthBytes(chunk);
+    this.push(
+      Buffer.concat(lengthChunk ? [lengthChunk, chunk] : [chunk]),
+    );
+    process.nextTick(callback);
+  }
 
-    const isNewMessage = this._incomingIndex === -1;
-    let startIndex = 0;
-    if (isNewMessage) {
-      this._expectedLength = (chunk[0] << 8) + chunk[1];
+  _processInput(
+    buffer: Buffer | string,
+    encoding: BufferEncoding,
+    callback: (err?: Error | null) => void,
+  ): void {
+    try {
+      let tempBuffer =
+        typeof buffer === 'string' ? Buffer.from(buffer) : buffer;
 
-      // if we don't have a buffer, make one as big as we will need.
-      this._incomingBuffer = Buffer.alloc(this._expectedLength);
-      this._incomingIndex = 0;
-      startIndex = 2; // skip the first two.
-    }
-
-    const bytesLeft = this._expectedLength - this._incomingIndex;
-    let endIndex = startIndex + bytesLeft;
-    if (endIndex > chunk.length) {
-      endIndex = chunk.length;
-    }
-
-    if (startIndex < endIndex && this._incomingBuffer) {
-      if (this._incomingIndex >= this._incomingBuffer.length) {
-        throw new Error("hmm, shouldn't end up here.");
+      if (this._pendingLead?.length) {
+        tempBuffer = Buffer.concat([this._pendingLead, tempBuffer]);
+        this._pendingLead = null;
       }
 
-      chunk.copy(
-        this._incomingBuffer,
-        this._incomingIndex,
-        startIndex,
-        endIndex,
-      );
-    }
-
-    this._incomingIndex += endIndex - startIndex;
-
-    let remainder: Buffer | null = null;
-    if (endIndex < chunk.length) {
-      remainder = Buffer.alloc(chunk.length - endIndex);
-      chunk.copy(remainder, 0, endIndex, chunk.length);
-    }
-
-    if (this._incomingIndex === this._expectedLength && this._incomingBuffer) {
-      this.push(this._incomingBuffer);
-      this._incomingBuffer = null;
-      this._incomingIndex = -1;
-      this._expectedLength = -1;
-      if (!remainder && callback) {
+      if (this._combinedBuffer === null && tempBuffer.length < MSG_LENGTH_BYTES) {
+        this._pendingLead = tempBuffer;
         process.nextTick(callback);
-      } else {
-        process.nextTick((): void => this.process(remainder, callback));
+        return;
       }
-    } else {
-      process.nextTick(callback);
+
+      let copyStart = 0;
+      if (this._combinedBuffer === null) {
+        const expectedLength =
+          (tempBuffer[0] << 8) | tempBuffer[1];
+        this._combinedBuffer = Buffer.alloc(expectedLength);
+        this._currentOffset = 0;
+        copyStart = 2;
+      }
+
+      const combinedBuffer = this._combinedBuffer;
+      if (combinedBuffer == null) {
+        process.nextTick(callback);
+        return;
+      }
+
+      const copyEnd = Math.min(
+        tempBuffer.length,
+        combinedBuffer.length - this._currentOffset + copyStart,
+      );
+
+      this._currentOffset += tempBuffer.copy(
+        combinedBuffer,
+        this._currentOffset,
+        copyStart,
+        copyEnd,
+      );
+
+      if (this._currentOffset !== combinedBuffer.length) {
+        process.nextTick(callback);
+        return;
+      }
+
+      this.push(combinedBuffer);
+      this._combinedBuffer = null;
+
+      if (tempBuffer.length <= copyEnd) {
+        process.nextTick(callback);
+        return;
+      }
+
+      const remainder = tempBuffer.subarray(copyEnd);
+      process.nextTick((): void =>
+        this._processInput(remainder, encoding, callback),
+      );
+    } catch (error: unknown) {
+      throw new Error(`ChunkingStream error!: ${error}`);
     }
-  };
+  }
 
-  _transform = (chunk: Buffer | string, _encoding: string, callback: any) => {
-    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-
+  _transform = (
+    chunk: Buffer | string,
+    encoding: BufferEncoding,
+    callback: (err?: Error | null) => void,
+  ) => {
     if (this._outgoing) {
-      // we should be passed whole messages here.
-      // write our length first, then message, then bail.
-      const lengthChunk = messageLengthBytes(chunk);
-      this.push(Buffer.concat(lengthChunk ? [lengthChunk, buffer] : [buffer]));
-      process.nextTick(callback);
+      const buffer =
+        typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+      this._processOutput(buffer, encoding, callback);
     } else {
-      // Collect chunks until we hit an expected size, and then trigger a
-      // readable
-      try {
-        process.nextTick((): void => this.process(buffer, callback));
-      } catch (error: any) {
-        throw new Error(`ChunkingStream error!: ${error}`);
-      }
+      this._processInput(chunk, encoding, callback);
     }
   };
 }

@@ -1,19 +1,17 @@
-/* eslint-disable no-unused-vars */
-
 import type { IProductFirmwareRepository, ProductFirmware } from '../types';
 
 // getByID, deleteByID and update uses model.deviceID as ID for querying
 class MockProductFirmwareRepository implements IProductFirmwareRepository {
   countByProductID(
-    productID: number,
-    query?: Record<string, unknown> | undefined,
+    _productID: number,
+    _query?: Record<string, unknown> | undefined,
   ): Promise<number> {
     throw new Error('Method not implemented.');
   }
 
   getManyByProductID(
-    productID: number,
-    query?: Record<string, unknown> | undefined,
+    _productID: number,
+    _query?: Record<string, unknown> | undefined,
   ): Promise<ProductFirmware[]> {
     throw new Error('Method not implemented.');
   }
@@ -34,7 +32,6 @@ class MockProductFirmwareRepository implements IProductFirmwareRepository {
     throw new Error('The method is not implemented');
   }
 
-  // eslint-disable-next-line
   getAll(): Promise<Array<ProductFirmware>> {
     throw new Error('The method is not implemented');
   }

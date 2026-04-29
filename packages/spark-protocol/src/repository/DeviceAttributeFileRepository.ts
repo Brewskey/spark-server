@@ -10,8 +10,7 @@ class DeviceAttributeFileRepository {
     this._fileManager = new JSONFileManager(path);
   }
 
-  // eslint-disable-next-line no-unused-vars
-  async create(model: DeviceAttributes): Promise<DeviceAttributes> {
+  async create(_model: DeviceAttributes): Promise<DeviceAttributes> {
     throw new Error('Create device attributes not implemented');
   }
 

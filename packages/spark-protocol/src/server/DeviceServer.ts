@@ -1137,6 +1137,7 @@ class DeviceServer {
     }
 
     const { data, ...loggingInfo } = productFirmware;
+    void data;
     logger.info('Flashing Product Firmware', {
       deviceId: device.getDeviceID(),
       ...loggingInfo,
