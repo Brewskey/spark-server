@@ -79,8 +79,7 @@ class ChunkingStream extends Transform {
     callback: () => void,
   ) {
     try {
-      let merged =
-        typeof buffer === 'string' ? Buffer.from(buffer) : buffer;
+      let merged = typeof buffer === 'string' ? Buffer.from(buffer) : buffer;
 
       if (this._pendingLead?.length) {
         merged = Buffer.concat([
@@ -127,7 +126,12 @@ class ChunkingStream extends Transform {
         }
 
         const take = Math.min(need, avail);
-        merged.copy(buf as Uint8Array, this._currentOffset, offset, offset + take);
+        merged.copy(
+          buf as Uint8Array,
+          this._currentOffset,
+          offset,
+          offset + take,
+        );
         this._currentOffset += take;
         offset += take;
 

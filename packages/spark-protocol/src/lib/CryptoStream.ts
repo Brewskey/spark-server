@@ -71,7 +71,9 @@ class CryptoStream extends Transform {
     } catch (error) {
       logger.error(
         {
-          chunkLength: Buffer.isBuffer(chunk) ? chunk.length : String(chunk).length,
+          chunkLength: Buffer.isBuffer(chunk)
+            ? chunk.length
+            : String(chunk).length,
           streamType: this._streamType,
           encoding,
           deviceId: this._getDeviceId(),
