@@ -560,23 +560,6 @@ class Device extends EventEmitter {
     }
 
     if (!packet || packet.messageId !== this._receiveCounter) {
-      const rawMid = packet?.messageId;
-      const midNum =
-        typeof rawMid === 'number'
-          ? rawMid
-          : typeof rawMid === 'string'
-            ? parseInt(rawMid, 10)
-            : NaN;
-      let gap = !Number.isNaN(midNum) ? midNum - this._receiveCounter : 0;
-      if (gap < 0) {
-        gap += COUNTER_MAX;
-      }
-      if (requestType === 'DescribeReturn' && gap >= 1 && gap <= 48) {
-        this._receiveCounter = midNum;
-        this.emit(requestType || '', packet);
-        return;
-      }
-
       this._logger.warn(
         {
           deviceID: this.getDeviceID(),
