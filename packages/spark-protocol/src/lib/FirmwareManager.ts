@@ -52,8 +52,15 @@ const findSettingForFirmwareModule = (
 class FirmwareManager {
   private static binariesDirectory: string;
 
-  static initialize(binariesDirectory: string): void {
+  static initialize(
+    binariesDirectory: string,
+    settingsOverride?: FirmwareSetting[],
+  ): void {
     FirmwareManager.binariesDirectory = binariesDirectory;
+    if (settingsOverride) {
+      FirmwareSettings = settingsOverride;
+      return;
+    }
     // eslint-disable-next-line import/no-dynamic-require, @typescript-eslint/no-var-requires
     FirmwareSettings = require(
       path.join(binariesDirectory, '../third-party/settings.json'),

@@ -1,10 +1,27 @@
-import SETTINGS from '../settings';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { FirmwareSetting, SystemInformation } from 'binary-version-reader';
 import FirmwareManager from '../lib/FirmwareManager';
-import { SystemInformation } from 'binary-version-reader';
+// Narrow subset of third-party/settings.json required for these tests only.
+import mockFirmwareSettings from './fixtures/minimal-settings.json';
 
 describe('FirmwareManager', () => {
+  let testRoot: string;
+
   beforeAll(() => {
-    FirmwareManager.initialize(SETTINGS.BINARIES_DIRECTORY);
+    const settings = mockFirmwareSettings as FirmwareSetting[];
+    testRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spark-fw-test-'));
+    const binariesDir = path.join(testRoot, 'binaries');
+    fs.mkdirSync(binariesDir, { recursive: true });
+    for (const { filename } of settings) {
+      fs.writeFileSync(path.join(binariesDir, filename), Buffer.alloc(0));
+    }
+    FirmwareManager.initialize(binariesDir, settings);
+  });
+
+  afterAll(() => {
+    fs.rmSync(testRoot, { recursive: true, force: true });
   });
 
   test('should subscribe to event', async () => {
