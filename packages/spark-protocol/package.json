@@ -1,18 +1,19 @@
 {
   "name": "@brewskey/spark-protocol",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/brewskey/spark-protocol"
+    "url": "https://github.com/brewskey/spark-server.git",
+    "directory": "packages/spark-protocol"
   },
   "files": [
     "dist",
     "fixtures"
   ],
-  "homepage": "https://github.com/brewskey/spark-protocol",
-  "bugs": "https://github.com/brewskey/spark-protocol/issues",
+  "homepage": "https://github.com/brewskey/spark-server/tree/dev/packages/spark-protocol",
+  "bugs": "https://github.com/brewskey/spark-server/issues",
   "contributors": [
     {
       "name": "Kenneth Lim",
