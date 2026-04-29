@@ -1,6 +1,6 @@
 {
   "name": "@brewskey/spark-server",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
@@ -36,8 +36,10 @@
     "build:clean": "rimraf ./build",
     "build:watch": "tsc --watch src --watch ./packages/spark-protocol/dist --ignore data",
     "lint": "eslint --fix --max-warnings 0 ./src",
+    "lint:check": "eslint --max-warnings 0 ./src",
     "lint-staged": "lint-staged --no-hide-partially-staged",
     "lint:deps": "npx lerna run lint",
+    "lint:check:deps": "npx lerna run lint:check",
     "migrate-files-to-mongo": "ts-node ./src/scripts/migrateFilesToDatabase mongo",
     "migrate-files-to-nedb": "ts-node ./src/scripts/migrateFilesToDatabase nedb",
     "prettify": "prettier --write src/*/**.ts",

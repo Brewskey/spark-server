@@ -1,19 +1,18 @@
-name: Publish
+name: CI
 
 on:
-  push:
-    branches:
-      - dev
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: publish-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
-  publish:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,16 +36,3 @@ jobs:
 
       - name: Test
         run: npm run test:all
-
-      - name: Publish @brewskey/spark-protocol
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_PUBLISH }}
-          access: public
-          package: ./packages/spark-protocol
-
-      - name: Publish @brewskey/spark-server
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_PUBLISH }}
-          access: public
