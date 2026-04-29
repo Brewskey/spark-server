@@ -4,7 +4,7 @@ import path from 'path';
 import { FirmwareSetting, SystemInformation } from 'binary-version-reader';
 import FirmwareManager from '../lib/FirmwareManager';
 // Narrow subset of third-party/settings.json required for these tests only.
-import mockFirmwareSettings from './fixtures/minimal-settings.json';
+import mockFirmwareSettings from '../../fixtures/minimal-firmware-settings.json';
 
 describe('FirmwareManager', () => {
   let testRoot: string;

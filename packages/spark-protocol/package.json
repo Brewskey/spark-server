@@ -7,7 +7,8 @@
     "url": "https://github.com/brewskey/spark-protocol"
   },
   "files": [
-    "dist"
+    "dist",
+    "fixtures"
   ],
   "homepage": "https://github.com/brewskey/spark-protocol",
   "bugs": "https://github.com/brewskey/spark-protocol/issues",

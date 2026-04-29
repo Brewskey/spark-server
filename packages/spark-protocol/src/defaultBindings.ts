@@ -1,4 +1,7 @@
 import type { Container } from 'constitute';
+import fs from 'fs';
+import path from 'path';
+import type { FirmwareSetting } from 'binary-version-reader';
 
 import DeviceAttributeFileRepository from './repository/DeviceAttributeFileRepository';
 import DeviceKeyFileRepository from './repository/DeviceKeyFileRepository';
@@ -32,7 +35,28 @@ const defaultBindings = (
   serverSettings: ServerSettings,
 ) => {
   const mergedSettings = { ...protocolSettings, ...serverSettings } as const;
-  FirmwareManager.initialize(mergedSettings.BINARIES_DIRECTORY);
+  const { BINARIES_DIRECTORY } = mergedSettings;
+  const settingsPath = path.join(
+    BINARIES_DIRECTORY,
+    '..',
+    'third-party',
+    'settings.json',
+  );
+
+  if (fs.existsSync(settingsPath)) {
+    FirmwareManager.initialize(BINARIES_DIRECTORY);
+  } else {
+    const fallbackPath = path.join(
+      __dirname,
+      '..',
+      'fixtures',
+      'minimal-firmware-settings.json',
+    );
+    const fallbackSettings = JSON.parse(
+      fs.readFileSync(fallbackPath, 'utf8'),
+    ) as FirmwareSetting[];
+    FirmwareManager.initialize(BINARIES_DIRECTORY, fallbackSettings);
+  }
 
   // Settings
   container.bindValue('DEVICE_DIRECTORY', mergedSettings.DEVICE_DIRECTORY);
