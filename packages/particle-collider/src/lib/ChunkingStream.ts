@@ -66,64 +66,61 @@ class ChunkingStream extends Transform {
     callback: (err?: Error | null) => void,
   ): void {
     try {
-      let tempBuffer =
+      let merged =
         typeof buffer === 'string' ? Buffer.from(buffer) : buffer;
 
       if (this._pendingLead?.length) {
-        tempBuffer = Buffer.concat([this._pendingLead, tempBuffer]);
+        merged = Buffer.concat([this._pendingLead, merged]);
         this._pendingLead = null;
       }
 
-      if (this._combinedBuffer === null && tempBuffer.length < MSG_LENGTH_BYTES) {
-        this._pendingLead = tempBuffer;
-        process.nextTick(callback);
-        return;
+      let offset = 0;
+
+      while (true) {
+        if (this._combinedBuffer === null) {
+          if (offset >= merged.length) {
+            break;
+          }
+          const left = merged.length - offset;
+          if (left < MSG_LENGTH_BYTES) {
+            this._pendingLead = merged.subarray(offset);
+            break;
+          }
+
+          const expectedLength = merged.readUInt16BE(offset);
+          offset += MSG_LENGTH_BYTES;
+
+          this._combinedBuffer = Buffer.alloc(expectedLength);
+          this._currentOffset = 0;
+        }
+
+        const buf = this._combinedBuffer!;
+
+        if (this._currentOffset === buf.length) {
+          this.push(buf);
+          this._combinedBuffer = null;
+          continue;
+        }
+
+        const need = buf.length - this._currentOffset;
+        const avail = merged.length - offset;
+
+        if (avail === 0) {
+          break;
+        }
+
+        const take = Math.min(need, avail);
+        merged.copy(buf, this._currentOffset, offset, offset + take);
+        this._currentOffset += take;
+        offset += take;
+
+        if (this._currentOffset === buf.length) {
+          this.push(buf);
+          this._combinedBuffer = null;
+        }
       }
 
-      let copyStart = 0;
-      if (this._combinedBuffer === null) {
-        const expectedLength =
-          (tempBuffer[0] << 8) | tempBuffer[1];
-        this._combinedBuffer = Buffer.alloc(expectedLength);
-        this._currentOffset = 0;
-        copyStart = 2;
-      }
-
-      const combinedBuffer = this._combinedBuffer;
-      if (combinedBuffer == null) {
-        process.nextTick(callback);
-        return;
-      }
-
-      const copyEnd = Math.min(
-        tempBuffer.length,
-        combinedBuffer.length - this._currentOffset + copyStart,
-      );
-
-      this._currentOffset += tempBuffer.copy(
-        combinedBuffer,
-        this._currentOffset,
-        copyStart,
-        copyEnd,
-      );
-
-      if (this._currentOffset !== combinedBuffer.length) {
-        process.nextTick(callback);
-        return;
-      }
-
-      this.push(combinedBuffer);
-      this._combinedBuffer = null;
-
-      if (tempBuffer.length <= copyEnd) {
-        process.nextTick(callback);
-        return;
-      }
-
-      const remainder = tempBuffer.subarray(copyEnd);
-      process.nextTick((): void =>
-        this._processInput(remainder, encoding, callback),
-      );
+      process.nextTick(callback);
     } catch (error: unknown) {
       throw new Error(`ChunkingStream error!: ${error}`);
     }

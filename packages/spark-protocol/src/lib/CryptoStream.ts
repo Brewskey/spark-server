@@ -44,8 +44,8 @@ class CryptoStream extends Transform {
       return;
     }
 
+    const data = chunk as Buffer;
     try {
-      const data = chunk as Buffer;
       const cipherParams: [string, crypto.CipherKey, crypto.BinaryLike] = [
         settings.CRYPTO_ALGORITHM,
         this._key,
@@ -71,9 +71,7 @@ class CryptoStream extends Transform {
     } catch (error) {
       logger.error(
         {
-          chunk,
-          key: this._key,
-          iv: this._iv,
+          chunkLength: Buffer.isBuffer(chunk) ? chunk.length : String(chunk).length,
           streamType: this._streamType,
           encoding,
           deviceId: this._getDeviceId(),
