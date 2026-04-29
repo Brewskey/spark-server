@@ -17,10 +17,11 @@
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "sourceMap": true
+    "sourceMap": true,
+    "rootDir": "./src"
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"],
+  "exclude": ["node_modules", "dist", "src/__tests__/**/*"],
   "ts-node": {
     "compilerOptions": {
       "module": "NodeNext"

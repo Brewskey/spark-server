@@ -30,9 +30,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:deps && tsc",
     "build:deps": "npx lerna run build",
-    "build:all": "npm run build:deps && npm run build",
+    "build:all": "npm run build",
     "build:clean": "rimraf ./build",
     "build:watch": "tsc --watch src --watch ./packages/spark-protocol/dist --ignore data",
     "lint": "eslint --fix --max-warnings 0 ./src",
