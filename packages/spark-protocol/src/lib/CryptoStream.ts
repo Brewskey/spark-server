@@ -1,4 +1,4 @@
-import { Transform } from 'stream';
+import { Transform, TransformCallback } from 'stream';
 import crypto from 'crypto';
 import settings from '../settings';
 import Logger from './logger';
@@ -32,7 +32,11 @@ class CryptoStream extends Transform {
     this._getDeviceId = options.getDeviceId;
   }
 
-  _transform(chunk: Buffer | string, encoding: string, callback: () => void) {
+  _transform(
+    chunk: Buffer | string,
+    encoding: BufferEncoding,
+    callback: TransformCallback,
+  ) {
     if (!chunk.length) {
       logger.error({
         encoding,
@@ -51,23 +55,46 @@ class CryptoStream extends Transform {
         this._key,
         this._iv,
       ];
-      const cipher =
-        this._streamType === 'encrypt'
-          ? crypto.createCipheriv(...cipherParams)
-          : crypto.createDecipheriv(...cipherParams);
 
-      const transformedData = cipher.update(data);
-      const extraData = cipher.final();
-      const output = Buffer.concat(
-        [transformedData, extraData],
-        transformedData.length + extraData.length,
-      );
+      let output: Buffer;
+
+      if (this._streamType === 'encrypt') {
+        const cipher = crypto.createCipheriv(...cipherParams);
+        const transformedData = cipher.update(data);
+        const extraData = cipher.final();
+        output = Buffer.concat(
+          [transformedData, extraData],
+          transformedData.length + extraData.length,
+        );
+      } else {
+        const decodeCbcChunk = (autoPad: boolean): Buffer => {
+          const d = crypto.createDecipheriv(...cipherParams);
+          d.setAutoPadding(autoPad);
+          return Buffer.concat([d.update(data), d.final()]);
+        };
+
+        try {
+          output = decodeCbcChunk(true);
+        } catch (e) {
+          if (
+            e &&
+            typeof e === 'object' &&
+            'code' in e &&
+            (e as NodeJS.ErrnoException).code === 'ERR_OSSL_BAD_DECRYPT'
+          ) {
+            output = decodeCbcChunk(false);
+          } else {
+            throw e;
+          }
+        }
+      }
 
       const ivContainer = this._streamType === 'encrypt' ? output : data;
       this._iv = Buffer.alloc(16);
       ivContainer.copy(this._iv, 0, 0, 16);
 
       this.push(output);
+      callback();
     } catch (error) {
       logger.error(
         {
@@ -81,8 +108,8 @@ class CryptoStream extends Transform {
         },
         'CryptoStream transform error',
       );
+      callback(error as Error);
     }
-    callback();
   }
 }
 

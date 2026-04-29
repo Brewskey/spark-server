@@ -332,7 +332,9 @@ class Device extends EventEmitter {
 
       const handshakePdus = CoapMessages.unwrapPdus(handshakeBuffer);
       if (!handshakePdus.length) {
-        throw new Error('Handshake plaintext did not contain a parseable CoAP PDU');
+        throw new Error(
+          'Handshake plaintext did not contain a parseable CoAP PDU',
+        );
       }
       const getHelloInfo = this._getHello(handshakePdus[0]);
       // Same decrypted frame may include additional PDUs; Hello must run first (receive counter).
@@ -535,6 +537,10 @@ class Device extends EventEmitter {
       requestType = this._getResponseType(packet.token || Buffer.from([]));
     }
 
+    // Every inbound PDU consumes the next CoAP message-id on the device;
+    // ACK-only PDUs still advance that counter on modern Device OS.
+    this._incrementReceiveCounter();
+
     // This is just a dumb ack packet. We don't really need to do anything
     // with it.
     if (packet.ack) {
@@ -547,7 +553,6 @@ class Device extends EventEmitter {
       return;
     }
 
-    this._incrementReceiveCounter();
     if (packet.code === '0' && packet.confirmable) {
       this.updateAttributes({ lastHeard: new Date() });
       this.sendReply('PingAck', packet.messageId);
@@ -555,6 +560,23 @@ class Device extends EventEmitter {
     }
 
     if (!packet || packet.messageId !== this._receiveCounter) {
+      const rawMid = packet?.messageId;
+      const midNum =
+        typeof rawMid === 'number'
+          ? rawMid
+          : typeof rawMid === 'string'
+            ? parseInt(rawMid, 10)
+            : NaN;
+      let gap = !Number.isNaN(midNum) ? midNum - this._receiveCounter : 0;
+      if (gap < 0) {
+        gap += COUNTER_MAX;
+      }
+      if (requestType === 'DescribeReturn' && gap >= 1 && gap <= 48) {
+        this._receiveCounter = midNum;
+        this.emit(requestType || '', packet);
+        return;
+      }
+
       this._logger.warn(
         {
           deviceID: this.getDeviceID(),

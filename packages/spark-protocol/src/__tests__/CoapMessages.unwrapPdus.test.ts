@@ -9,7 +9,9 @@ describe('CoapMessages.unwrapPdus', () => {
   });
 
   it('returns empty array when plaintext cannot peel as CoAP', () => {
-    expect(CoapMessages.unwrapPdus(Buffer.from([0xff, 0xff, 0xff]))).toEqual([]);
+    expect(CoapMessages.unwrapPdus(Buffer.from([0xff, 0xff, 0xff]))).toEqual(
+      [],
+    );
   });
 
   it('parses two concatenated CoAP PDUs (coap-packet.parse alone would mis-parse options)', () => {

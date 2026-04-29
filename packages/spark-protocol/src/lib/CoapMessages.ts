@@ -66,8 +66,7 @@ const decodeNumericValue = (buffer: Buffer): number => {
 };
 
 /** RFC 7252: version bits (top two) === 01 for protocol version 1. */
-const isCoapVersion1HeaderByte = (b: number): boolean =>
-  ((b >>> 6) & 3) === 1;
+const isCoapVersion1HeaderByte = (b: number): boolean => ((b >>> 6) & 3) === 1;
 
 const wireFromParsed = (packet: ParsedPacket): Buffer =>
   CoapPacket.generate({
@@ -82,7 +81,10 @@ const wireFromParsed = (packet: ParsedPacket): Buffer =>
   });
 
 /** True iff `buf` equals `generate(parsed)` for coap-packet (strict left-segment / whole-buffer checks). */
-const bufferMatchesParsedWire = (buf: Buffer, parsed: ParsedPacket): boolean => {
+const bufferMatchesParsedWire = (
+  buf: Buffer,
+  parsed: ParsedPacket,
+): boolean => {
   const encoded = wireFromParsed(parsed);
   return encoded.length === buf.length && encoded.compare(buf) === 0;
 };

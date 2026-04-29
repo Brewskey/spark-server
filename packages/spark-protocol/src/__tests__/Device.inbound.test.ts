@@ -85,9 +85,9 @@ describe('Device inbound CoAP', () => {
         }
       )._getHello(parsed);
 
-    expect((device as unknown as { _receiveCounter: number })._receiveCounter).toBe(
-      12345,
-    );
+    expect(
+      (device as unknown as { _receiveCounter: number })._receiveCounter,
+    ).toBe(12345);
     expect(helloInfo.particleProductId).toBe(0xbeef);
   });
 
@@ -113,28 +113,35 @@ describe('Device inbound CoAP', () => {
     expect(CoapMessages.unwrapPdus(handshakeBuffer)).toHaveLength(2);
 
     const device = minimalDevice();
-    jest.spyOn(device, 'disconnect').mockImplementation((): undefined => undefined);
+    jest
+      .spyOn(device, 'disconnect')
+      .mockImplementation((): undefined => undefined);
     const routeSpy = jest
       .spyOn(device, 'routeParsedPacket')
       .mockImplementation((): undefined => undefined);
 
-    (device as unknown as { _handshake: { start: () => Promise<HandshakeStartResult> } })._handshake =
-      {
-        start: (): Promise<HandshakeStartResult> =>
-          Promise.resolve({
-            cipherStream: {},
-            decipherStream: {},
-            deviceID: 'unit-device',
-            handshakeBuffer,
-          }),
-      };
+    (
+      device as unknown as {
+        _handshake: { start: () => Promise<HandshakeStartResult> };
+      }
+    )._handshake = {
+      start: (): Promise<HandshakeStartResult> =>
+        Promise.resolve({
+          cipherStream: {},
+          decipherStream: {},
+          deviceID: 'unit-device',
+          handshakeBuffer,
+        }),
+    };
 
     const deviceId = await device.startHandshake();
 
     expect(deviceId).toBe('unit-device');
     expect(routeSpy).toHaveBeenCalledTimes(1);
     expect(routeSpy.mock.calls[0][0].messageId).toBe(200);
-    expect((device as unknown as { _receiveCounter: number })._receiveCounter).toBe(100);
+    expect(
+      (device as unknown as { _receiveCounter: number })._receiveCounter,
+    ).toBe(100);
 
     routeSpy.mockRestore();
   });
@@ -142,18 +149,23 @@ describe('Device inbound CoAP', () => {
   it('startHandshake throws when handshake plaintext has no peelable CoAP PDU', async () => {
     const device = minimalDevice();
 
-    jest.spyOn(device, 'disconnect').mockImplementation((): undefined => undefined);
+    jest
+      .spyOn(device, 'disconnect')
+      .mockImplementation((): undefined => undefined);
 
-    (device as unknown as { _handshake: { start: () => Promise<HandshakeStartResult> } })._handshake =
-      {
-        start: (): Promise<HandshakeStartResult> =>
-          Promise.resolve({
-            cipherStream: {},
-            decipherStream: {},
-            deviceID: 'unit-device',
-            handshakeBuffer: Buffer.alloc(0),
-          }),
-      };
+    (
+      device as unknown as {
+        _handshake: { start: () => Promise<HandshakeStartResult> };
+      }
+    )._handshake = {
+      start: (): Promise<HandshakeStartResult> =>
+        Promise.resolve({
+          cipherStream: {},
+          decipherStream: {},
+          deviceID: 'unit-device',
+          handshakeBuffer: Buffer.alloc(0),
+        }),
+    };
 
     await expect(device.startHandshake()).rejects.toThrow(
       'Handshake plaintext did not contain a parseable CoAP PDU',
