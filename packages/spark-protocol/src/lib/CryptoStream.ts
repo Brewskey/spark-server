@@ -24,7 +24,17 @@ class CryptoStream extends Transform {
   _getDeviceId: () => string;
 
   constructor(options: CryptoStreamOptions) {
-    super();
+    // For decrypt streams: keep each transformed chunk as a discrete object
+    // on the readable side. Each AES-CBC frame from the upstream chunker is
+    // exactly one CoAP PDU, so preserving frame boundaries on read() prevents
+    // the readable buffer from coalescing multiple PDUs into a single read
+    // (the CoAP-over-UDP wire format cannot un-coalesce — payload length
+    // isn't encoded in the PDU).
+    super(
+      options.streamType === 'decrypt'
+        ? { readableObjectMode: true }
+        : undefined,
+    );
 
     this._key = options.key;
     this._iv = options.iv;

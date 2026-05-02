@@ -537,12 +537,11 @@ class Device extends EventEmitter {
       requestType = this._getResponseType(packet.token || Buffer.from([]));
     }
 
-    // Every inbound PDU consumes the next CoAP message-id on the device;
-    // ACK-only PDUs still advance that counter on modern Device OS.
-    this._incrementReceiveCounter();
-
-    // This is just a dumb ack packet. We don't really need to do anything
-    // with it.
+    // ACK PDUs reuse the request's message-id and do NOT consume the device's
+    // next outgoing message-id, so we must not advance _receiveCounter for them.
+    // Confirmed empirically against fw17 and fw18 Photon devices: incrementing
+    // here produces `expect=N got=N-1` mismatches every time the device ACKs
+    // a server-initiated confirmable (Hello, Describe).
     if (packet.ack) {
       if (!requestType) {
         // no type, can't route it.
@@ -552,6 +551,9 @@ class Device extends EventEmitter {
       this.emit(requestType, packet);
       return;
     }
+
+    // Every non-ACK inbound PDU consumes the next CoAP message-id on the device.
+    this._incrementReceiveCounter();
 
     if (packet.code === '0' && packet.confirmable) {
       this.updateAttributes({ lastHeard: new Date() });

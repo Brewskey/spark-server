@@ -91,9 +91,22 @@ const bufferMatchesParsedWire = (
 
 /**
  * Consume the first CoAP PDU starting at `start`.
- * - Prefer a minimal parse that cannot extend by one byte (true single PDU prefix).
- * - Otherwise, if the rest is one canonical wire PDU, take the whole slice.
- * - Else try a split at a CoAP v1-looking byte (glued `[p‖q]` blobs from coap-packet mis-parse).
+ *
+ * Strategy:
+ *  - Try the canonical whole-buffer parse first; if `generate(parse(buf)) === buf`,
+ *    that is a complete single PDU (the common case).
+ *  - Otherwise scan FORWARDS for the smallest split S where `data[start..S]` is a
+ *    canonical PDU AND `data[S]` looks like a fresh CoAP v1 header byte AND
+ *    `data[S..]` parses.
+ *  - Fall back to a non-canonical whole-buffer parse so the caller still gets the
+ *    PDU's mid (vs returning null and dropping it).
+ *
+ * NEVER returns a sub-prefix that just happens to fail on the next byte — that
+ * heuristic mis-truncates valid PDUs whose next byte is the *start* of a multi-byte
+ * option header (e.g. 0x0d = length-extended marker). For a 95-byte claim/code
+ * event with `Uri-Path=E, Uri-Path=spark/device/claim/code`, that heuristic
+ * returned a 6-byte sub-prefix and discarded the second option, the payload, AND
+ * any subsequent concatenated PDUs.
  */
 const peelFirstCoapPdu = (
   data: Buffer,
@@ -104,22 +117,6 @@ const peelFirstCoapPdu = (
 
   if (lower > upper) {
     return null;
-  }
-
-  /* 1) Shortest prefix parse that fails if extended by one byte (true PDU end). */
-  for (let end = lower; end < upper; end += 1) {
-    let packet: ParsedPacket;
-    try {
-      packet = CoapPacket.parse(data.subarray(start, end));
-    } catch {
-      continue;
-    }
-
-    try {
-      CoapPacket.parse(data.subarray(start, end + 1));
-    } catch {
-      return { packet, consumed: end - start };
-    }
   }
 
   const restAll = data.subarray(start);
@@ -134,40 +131,44 @@ const peelFirstCoapPdu = (
     wholePkt = null;
   }
 
-  if (!canonOk) {
-    for (let split = upper - 4; split >= lower; split -= 1) {
-      if (!isCoapVersion1HeaderByte(data[split])) {
-        continue;
-      }
-
-      const leftBuf = data.subarray(start, split);
-
-      try {
-        const packet = CoapPacket.parse(leftBuf);
-        if (!bufferMatchesParsedWire(leftBuf, packet)) {
-          continue;
-        }
-
-        CoapPacket.parse(data.subarray(split));
-        return { packet, consumed: split - start };
-      } catch {
-        continue;
-      }
-    }
-  }
-
   if (canonOk && wholePkt) {
     return { packet: wholePkt, consumed: restAll.length };
   }
 
-  try {
-    return {
-      packet: CoapPacket.parse(restAll),
-      consumed: restAll.length,
-    };
-  } catch {
-    return null;
+  /* Whole-buffer parse is non-canonical or failed; this is multi-PDU plaintext.
+     Find smallest split S in [lower, upper) such that the left side is a
+     canonical single PDU and the right side starts with a fresh CoAP v1 header. */
+  for (let split = lower; split < upper; split += 1) {
+    if (!isCoapVersion1HeaderByte(data[split])) {
+      continue;
+    }
+
+    const leftBuf = data.subarray(start, split);
+    let leftPkt: ParsedPacket;
+    try {
+      leftPkt = CoapPacket.parse(leftBuf);
+    } catch {
+      continue;
+    }
+
+    if (!bufferMatchesParsedWire(leftBuf, leftPkt)) {
+      continue;
+    }
+
+    try {
+      CoapPacket.parse(data.subarray(split));
+    } catch {
+      continue;
+    }
+
+    return { packet: leftPkt, consumed: split - start };
   }
+
+  if (wholePkt) {
+    return { packet: wholePkt, consumed: restAll.length };
+  }
+
+  return null;
 };
 
 class CoapMessages {
