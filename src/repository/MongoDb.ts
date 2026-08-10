@@ -29,6 +29,8 @@ class MongoDb<
 {
   _database!: Db;
 
+  _client!: MongoClient;
+
   _statusEventEmitter: EventEmitter = new EventEmitter();
 
   constructor(url: string, options?: MongoClientOptions | undefined) {
@@ -114,10 +116,14 @@ class MongoDb<
     this.__runForCollection(
       collectionName,
       async (collection: Collection): Promise<TEntity> => {
+        // returnDocument: 'after' matches NeDb's returnUpdatedDocs — without
+        // it findOneAndUpdate returns the PRE-image, which is null when the
+        // upsert inserts (so creating e.g. a never-connected device's
+        // attributes threw "Got unexpected null") and stale on updates.
         const modifyResult = await collection.findOneAndUpdate(
           this.__translateQuery(query),
           this.__translateQuery(updateQuery),
-          { upsert: true },
+          { upsert: true, returnDocument: 'after' },
         );
         return nullthrows(
           this.__translateResultItem(modifyResult as unknown as TEntity),
@@ -184,8 +190,13 @@ class MongoDb<
       logger.info({ info: str }, 'DB disconnected: '),
     );
 
+    this._client = database;
     this._database = database.db();
     this._statusEventEmitter.emit(DB_READY_EVENT);
+  };
+
+  disconnect = async (): Promise<void> => {
+    await this._client?.close();
   };
 
   _isDbReady: () => Promise<void> = async (): Promise<void> => {
