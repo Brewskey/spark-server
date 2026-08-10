@@ -22,11 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No registry-url here: it writes an .npmrc _authToken placeholder,
+      # which suppresses npm's OIDC token exchange (trusted publishing).
+      # Both packages pin the registry via publishConfig instead.
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci --include=optional
