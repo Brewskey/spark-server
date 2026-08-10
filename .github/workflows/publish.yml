@@ -55,8 +55,6 @@ jobs:
       # provided — the action itself can't do tokenless OIDC publishing).
       - name: Publish packages
         run: |
-          npm --version
-          echo "OIDC env present: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
           for dir in packages/spark-protocol .; do
             name=$(node -p "require('./${dir}/package.json').name")
             version=$(node -p "require('./${dir}/package.json').version")
@@ -65,5 +63,5 @@ jobs:
               continue
             fi
             echo "Publishing ${name}@${version}..."
-            (cd "${dir}" && npm publish --loglevel http)
+            (cd "${dir}" && npm publish)
           done
