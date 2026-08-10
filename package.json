@@ -4,10 +4,10 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brewskey/spark-server.git"
+    "url": "git+https://github.com/Brewskey/spark-server.git"
   },
-  "homepage": "https://github.com/brewskey/spark-server",
-  "bugs": "https://github.com/brewskey/spark-server/issues",
+  "homepage": "https://github.com/Brewskey/spark-server",
+  "bugs": "https://github.com/Brewskey/spark-server/issues",
   "contributors": [
     {
       "name": "Kenneth Lim",
