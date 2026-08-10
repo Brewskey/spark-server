@@ -5,8 +5,12 @@ on:
     branches:
       - dev
 
+# id-token: write enables npm Trusted Publishing (OIDC) — no NPM_PUBLISH
+# secret. Each package's Trusted Publisher is configured on npmjs.com:
+# GitHub Actions -> Brewskey/spark-server -> publish.yml.
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -22,6 +26,7 @@ jobs:
         with:
           node-version: '20'
           cache: npm
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci --include=optional
@@ -38,15 +43,22 @@ jobs:
       - name: Test
         run: npm run test:all
 
-      - name: Publish @brewskey/spark-protocol
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_PUBLISH }}
-          access: public
-          package: ./packages/spark-protocol
+      # Trusted publishing needs npm >= 11.5.1 (node 20 ships npm 10).
+      - name: Update npm for trusted publishing
+        run: npm install -g npm@latest
 
-      - name: Publish @brewskey/spark-server
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_PUBLISH }}
-          access: public
+      # Publishes each package unless that name@version is already on the
+      # registry (the skip behavior the old JS-DevTools/npm-publish action
+      # provided — the action itself can't do tokenless OIDC publishing).
+      - name: Publish packages
+        run: |
+          for dir in packages/spark-protocol .; do
+            name=$(node -p "require('./${dir}/package.json').name")
+            version=$(node -p "require('./${dir}/package.json').version")
+            if [ "$(npm view "${name}@${version}" version 2>/dev/null || true)" = "${version}" ]; then
+              echo "${name}@${version} is already published — skipping."
+              continue
+            fi
+            echo "Publishing ${name}@${version}..."
+            (cd "${dir}" && npm publish)
+          done
