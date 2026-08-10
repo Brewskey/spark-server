@@ -44,8 +44,9 @@ jobs:
         run: npm run test:all
 
       # Trusted publishing needs npm >= 11.5.1 (node 20 ships npm 10).
+      # Pinned to 11: npm 12 requires node >= 22.
       - name: Update npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       # Publishes each package unless that name@version is already on the
       # registry (the skip behavior the old JS-DevTools/npm-publish action
